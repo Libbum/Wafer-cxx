@@ -1,0 +1,113 @@
+// standard deviation of initial wavefunc noise 
+SIG		1.0
+
+// number of spatial grid points; should be divisible by the number of computational nodes
+NUM 		861
+
+// spatial grid spacing
+A		0.01
+
+// temporal grid spacing - should be <= A*A/3
+EPS		0.00003
+
+// convergence tolerance for ground state energy
+TOLERANCE	1.e-6
+
+// maximum # of steps to take
+STEPS   	100000
+
+// how many steps before recording measurables
+UPDATE		1000
+
+// how many steps before dumping all variables to file; "taking a snapshot"
+SNAPUPDATE	300
+
+// set to one to dump the full 3d wavefncs to disk at the end of the run
+SAVEWAVEFNCS	1
+
+//
+// potential to simulate
+//
+//    0  No potential (V=0); solutions to infinite-depth 3d well due to BCs
+//    1  3d square well in center of cube
+//    2  3d quad well in center of cube with short side along z-axis
+//    3  3d double well
+//    4  Radial Coulomb potential
+//    5  Elliptical Coulomb potential
+//    6  Cornell potential
+//    7  Isotropically Screened Cornell potential
+//    8  Isotropically Screened Cornell potential + Spin correction
+//    9  Anisotropically Short Distance + Isotropically Screened Cornell potential + Spin correction
+//    10 Anisotropically Screened Cornell potential (isotropic V_infty) + Spin correction
+//    11 Fully Anisotropic Screened Cornell potential + Spin correction
+//    12 Fully Anisotropic small-xi Screened Cornell potential + Spin correction
+//    13 Fully Anisotropic Screened Cornell potential + Spin correction + Modification
+//    14 Fully Anisotropic Screened Cornell potential + Spin correction + Entropy Contribution
+//    15 3d harmonic oscillator potential
+//    16 Mickey Mouse's Head
+//    17 Dodecahedron
+//    18 Complex Harmonic Oscillator
+//    19 Imaginary Couloumb
+//    20 Complex Dodecahedron
+//    21 Anisotropically Screened Quarkonium Potential with Imaginary Part
+//    22 Streitz-Mintmire
+//
+POTENTIAL	22
+
+//
+// initial condition to use
+//
+//    0         read initial condition from wavefunction_0_#.dat files in the data directory
+//    1 	random gaussian with std dev sig
+//    2		coulomb-like
+//    3		constant of 0.1 in interior 
+//    4		boolean test grid; mod(i%2)mod(j%2)mod(k%2)
+//
+INITCONDTYPE	1
+
+//
+// initial symmetry constraint
+//
+//	0	None
+//	1	Symmetric about z-axis
+//	2	Antisymmetric about z-axis
+//	3	Symmetric about y-axis
+//	4	Antisymmetric about y-axis
+//
+INITSYMMETRY	0
+
+//
+// Physical parameters used in potentials
+//
+
+// Reduced mass; charmonium reduced mass is 1.3/2; bottomonium reduced mass is 4.7/2
+// I think this is meant to be in GeV?
+//MASS    1.0
+//MASS    30.6915
+//MASS  33512.9
+MASS  33.5129
+
+// temperature over Tc
+T		1.01
+
+// the critical temperature in GeV
+TC		0.192
+
+// string tension
+SIGMA		0.223
+
+// number of contributing quark flavors
+NF		2
+
+// plasma anisotropy parameter
+XI		0
+
+//Aluminium cluster data
+ALX   2.8 
+
+ALY   3
+
+ALZ   2.5788
+
+//Grid range of potential (for matlab scaling)
+GR   4.3
