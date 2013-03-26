@@ -10,6 +10,8 @@ Trifid
 ======
 
 module load blas/1.0.248
+
 module load openmpi-gcc/1.6.4
+
 module load lapack/3.4.2
 

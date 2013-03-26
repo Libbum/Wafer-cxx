@@ -33,9 +33,6 @@
 using namespace std;
 
 typedef complex<double> dcomp;
-/*typedef mpc_get_dc dcomp; */
-/*typedef _Complex double dcomp;*/
-/*typedef __complex__ double dcomp;*/
 
 extern "C"
 {
@@ -45,7 +42,7 @@ extern "C"
 }
 
 extern int NUMX,NUM,UPDATE,SNAPUPDATE,POTENTIAL,INITCONDTYPE,INITSYMMETRY,NF,SAVEWAVEFNCS;
-extern double A,STEPS,EPS,SIG,MASS,T,TC,SIGMA,XI,TOLERANCE,ALX,ALY,ALZ,GR;
+extern double A,STEPS,EPS,SIG,MASS,T,TC,SIGMA,XI,TOLERANCE,ALX,ALY,ALZ,GR,DX;
 
 extern int nodeID, numNodes, debug;
 

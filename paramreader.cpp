@@ -47,6 +47,7 @@ void setParameter(char *key, const char *value) {
   if (strcmp(key,"ALY")==0) ALY=atof(value);
   if (strcmp(key,"ALZ")==0) ALZ=atof(value);
   if (strcmp(key,"GR")==0) GR=atof(value);
+  if (strcmp(key,"DX")==0) DX=atof(value);
   return;
 }
 
