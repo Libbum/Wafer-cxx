@@ -12,6 +12,16 @@
 typedef complex<double> dcomp;
 extern double ALX,ALY,ALZ;
 
+#if defined(VAYU)
+
+extern "C"
+{
+    void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
+                         double*,int*,double*,double*,int*);
+}
+
+#elif defined(TRIFID)
+
 extern "C" 
 {
  void dgesv_(int *n, int *nrhs, double *a, int *lda, int *ipiv, 
@@ -26,6 +36,14 @@ extern "C"
  void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
                  double*,int*,double*,double*,int*);  
 }
+
+#else
+
+#error "One of VAYU or TRIFID must be defined"
+
+#endif
+
+
 
 void matRightDivide(double *A, double *B, ptrdiff_t M, ptrdiff_t N);
 void matMultiply(double *A, double *B, double *C, ptrdiff_t M, ptrdiff_t N);

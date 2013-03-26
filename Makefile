@@ -3,16 +3,28 @@ OBJ = intde2.o random.o paramreader.o grid.o outputroutines.o initialconditions.
 
 PROFILE = #-pg
 DEBUG = -Wno-deprecated #-W -Wall -g
-INCLUDES = -I include #-I/usr/local/openmpi/1.6.3-intel/include 
 OPTIMIZATION = -funroll-loops -finline-functions -O2
-LAPACK = /usr/local/lapack/3.4.2/lib/liblapack.so /usr/local/blas/1.0.248/lib/libblas.so -lm  
-LIBS = -L/usr/local/lapack/3.4.2/lib
+INCLUDES = -I include 
 CXXFLAGS = $(DEBUG) $(PROFILE) $(OPTIMIZATION) $(FLOWTRACE) $(INCLUDES) $(LIBS) 
 MPIFLAGS = $(CXXFLAGS)
-CC = mpicxx
+
+HOST_NAME := $(shell hostname)
+ifeq ($(HOST_NAME),trifid)
+LAPACK = /usr/local/lapack/3.4.2/lib/liblapack.so /usr/local/blas/1.0.248/lib/libblas.so -lm  
+LIBS = -L/usr/local/lapack/3.4.2/lib
 CXX = g++ #icpc
+CPPFLAGS += -DTRIFID=1
+else
+INCLUDES += -I$(MKL)/include
+LAPACK = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -ltvh 
+LIBS = -L$(MKL)/lib/intel64 -L$(TVLIB)
+CPPFLAGS += -DVAYU=1
+endif
+
+CC = mpicxx
 
 all: $(TARGET) 
+	@echo 'Built target for '$(HOST_NAME)
 
 mpisolve:	$(OBJ) 
 	$(CC) $(OBJ) -o $(TARGET) $(LAPACK) 

@@ -10,7 +10,15 @@
 #include <string>
 #include <iostream>
 #include <complex>
-//#include <mkl.h>
+
+#if defined(VAYU)
+#include <mkl.h>
+#define LP_INT MKL_INT
+#elif defined(TRIFID)
+#define LP_INT int
+#else
+#error "One of VAYU or TRIFID must be defined"
+#endif
 //#include <Accelerate/Accelerate.h> //For Lapack & Blas
 
 using namespace std;
@@ -24,12 +32,12 @@ using namespace std;
 
 
 /* Calculate matrix "\" division using LAPACK */
-void matRightDivide(double *A, double *B, int M, int N)
+void matRightDivide(double *A, double *B, LP_INT M, LP_INT N)
 {
     /* Create inputs for DGESV */
-    int *iPivot;
-    int info;
-    iPivot = (int *)malloc((M+1)*sizeof(int));
+    LP_INT *iPivot;
+    LP_INT info;
+    iPivot = (LP_INT *)malloc((M+1)*sizeof(LP_INT));
     
     /* Call LAPACK */
     dgesv_(&M,&N,A,&M,iPivot,B,&M,&info);
@@ -50,17 +58,17 @@ void matMultiply(double *A, double *B, double *C, int M, int N)
 }
 
 /* Calculate matrix inverse using LAPACK */
-void matInverse(double *A, int N)
+void matInverse(double *A, LP_INT N)
 {
     double *WORK;  /* in/out arguments to dgetrf */
-    int *iPivot;   /* inputs to dgetrf */
-    int info;
-    int prod;
+    LP_INT *iPivot;   /* inputs to dgetrf */
+    LP_INT info;
+    LP_INT prod;
     
     /* Create inputs for dgetrf */
     prod = N*N;
     WORK = (double *)malloc(prod*sizeof(double));
-    iPivot = (int *)malloc((N+1)*sizeof(int));
+    iPivot = (LP_INT *)malloc((N+1)*sizeof(LP_INT));
     
     /* dgetrf(M,N,A,LDA,IPIV,INFO)
      * LU decomoposition of a general matrix, which means invert LDA columns of an M by N matrix
@@ -132,7 +140,7 @@ double electroneg(double *system)
     double Z[] = {0.746759, 0}; /*a.u.*/
     double kc = 14.4; /*eV \AA e^-2*/
     double chij[CLUSTER] = {0};
-    int clust = CLUSTER, one = 1; /* For sending to LAPACK routines */
+    LP_INT clust = CLUSTER, one = 1; /* For sending to LAPACK routines */
     
     /* Variables */
     double X[CLUSTER] = {0}, q[CLUSTER] = {0};
