@@ -9,9 +9,7 @@ Pulled from [sourceforge](http://sourceforge.net/projects/quantumfdtd/) original
 Trifid
 ======
 
-module load blas/1.0.248
-
-module load openmpi-gcc/1.6.4
-
+module load blas/1.0.248\\
+module load openmpi-gcc/1.7.0\\
 module load lapack/3.4.2
 
