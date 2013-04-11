@@ -43,11 +43,10 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"TC")==0) TC=atof(value);
 	if (strcmp(key,"XI")==0) XI=atof(value);
 	if (strcmp(key,"TOLERANCE")==0) TOLERANCE=atof(value);
-  if (strcmp(key,"ALX")==0) ALX=atof(value);
-  if (strcmp(key,"ALY")==0) ALY=atof(value);
-  if (strcmp(key,"ALZ")==0) ALZ=atof(value);
-  if (strcmp(key,"GR")==0) GR=atof(value);
-  if (strcmp(key,"DX")==0) DX=atof(value);
+        if (strcmp(key,"ALX")==0) ALX=atof(value);
+        if (strcmp(key,"ALY")==0) ALY=atof(value);
+        if (strcmp(key,"ALZ")==0) ALZ=atof(value);
+        if (strcmp(key,"GR")==0) GR=atof(value);
   return;
 }
 

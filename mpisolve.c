@@ -46,7 +46,7 @@ typedef std::numeric_limits< double > dbl;
 int    NUMX=20,NUM=20,UPDATE=100,SNAPUPDATE=1000;
 int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0;
 double  A=0.05,EPS=0.001,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
-double  ALX=4.7,ALY=4,ALZ=2.5788,GR=4.9,DX=0.1; //Aluminium Clusters & Grid Range
+double  ALX=4.7,ALY=4,ALZ=2.5788,GR=4.9; //Aluminium Clusters & Grid Range
 
 // mpi vars
 int nodeID,numNodes;
@@ -260,7 +260,7 @@ void solveInitialize() {
       	cout << "Spatial Step Size (A): " << A << endl;
       	cout << "Temporal Step Size (EPS): " << EPS << endl;
       	cout << "Standard Deviation of initial wavefunction noise (SIG): " << SIG << endl;
-      	cout << "Box Size [Solver] (A*" << NUM << "): " << A*NUM << ", Box Size [Solution] (DX*" << NUM << "): " << DX*NUM << endl;
+      	cout << "Box Size (A*" << NUM << "): " << A*NUM << endl;
       	print_line();
       	cout.width(dwidth); cout << "Time";
       	cout.width(dwidth); cout << "Energy";

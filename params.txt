@@ -96,5 +96,3 @@ ALZ   2.5788
 //Grid range of potential (for matlab scaling)
 GR   6.15
 
-//dx for matlab scaling
-DX   0.05
