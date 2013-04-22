@@ -389,7 +389,7 @@ dcomp makepot(double *points)
     }
     else
     {
-      return (dcomp)(UBuckTot + URydTot + UEAMTot + UElecNegTot)*1e6; //return result in \mueV
+      return (dcomp)(UBuckTot + URydTot + UEAMTot + UElecNegTot); // eV *1e6; //return result in \mueV
     }
 
 }

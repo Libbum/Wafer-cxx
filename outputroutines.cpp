@@ -37,8 +37,10 @@ void outputMeasurements(const double time) {
 	cout.precision(12);
 	cout.width(dwidth); cout << time;
 	cout.width(dwidth); cout << setprecision (7) << ener;
-	cout.width(dwidth); cout << setprecision (7) << binding;
-	cout.width(dwidth); cout << setprecision (7) << sqrt(real(rRMS2));   // #ad.
+	cout.width(dwidth); cout << setprecision (7) << energyCollect;
+	cout.width(dwidth); cout << setprecision (7) << normalizationCollect;
+	//cout.width(dwidth); cout << setprecision (7) << binding;
+	//cout.width(dwidth); cout << setprecision (7) << sqrt(real(rRMS2));   // #ad.
 	cout << endl;
 
 	// output to files

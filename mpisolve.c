@@ -264,8 +264,10 @@ void solveInitialize() {
       	print_line();
       	cout.width(dwidth); cout << "Time";
       	cout.width(dwidth); cout << "Energy";
-      	cout.width(dwidth); cout << "Binding Energy";
-      	cout.width(dwidth); cout << "r_RMS";   // #ad
+      	cout.width(dwidth); cout << "Collect";
+        cout.width(dwidth); cout << "Normal";
+        //cout.width(dwidth); cout << "Binding Energy";
+      	//cout.width(dwidth); cout << "r_RMS";   // #ad
       	cout << endl;
       	print_line();
 	}
