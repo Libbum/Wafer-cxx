@@ -382,14 +382,14 @@ dcomp makepot(double *points)
     UElecNegTot = electroneg(points);
 
     //Curently potential is all in eV. Check to see if total is > 0 in \mueV, 
-    //truncate if so. Return total in GeV for scaling reasons.
+    //truncate if so.
     if (((UBuckTot + URydTot + UEAMTot + UElecNegTot)*1e6) > 0.0)
     {
       return (dcomp)0.0;
     }
     else
     {
-      return (dcomp)(UBuckTot + URydTot + UEAMTot + UElecNegTot)*1e6; //return result in \mueV
+      return (dcomp)(UBuckTot + URydTot + UEAMTot + UElecNegTot)*239.2311; //return result in eV*Scale Offset
     }
 
 }

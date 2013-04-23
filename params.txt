@@ -81,17 +81,16 @@ INITSYMMETRY	0
 //
 
 // Reduced mass; charmonium reduced mass is 1.3/2; bottomonium reduced mass is 4.7/2
-// I think this is meant to be in GeV?
 //MASS    1.0
-MASS  33.5129
-//MASS = 1.492e4
+//MASS  33.5129
+MASS   15.9994
 
 //Aluminium cluster data
-ALX   3.6735
+ALX   5.5
 
-ALY   3.6735
+ALY   5.5
 
-ALZ   2.5788
+ALZ   5.5
 
 //Grid range of potential (for matlab scaling)
 GR   6.15
