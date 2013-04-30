@@ -12,4 +12,5 @@
 *.la
 *.a
 
+.*.swp
 mpisolve
