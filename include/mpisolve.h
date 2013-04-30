@@ -67,6 +67,7 @@ extern dcomp rRMS2Collect;    // #ad.
 // the main solve routines
 void solveInitialize();
 void solve();
+void solveRestart();
 void solveFinalize();
 void evolve(int);
 void findExcitedStates();

@@ -56,6 +56,7 @@ fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
 int debug = DEBUG_FULL;
+bool nanError = false;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
@@ -271,6 +272,43 @@ void solveInitialize() {
 	}
 }
 
+void solveRestart() {
+        double EPSold = EPS;
+        EPS = EPSold / 10;
+
+        if (nodeID==1) { 
+            print_line();
+            cout << "Temporal Step Size (EPS = " << EPSold << ") too large; rescaling to EPS = " << EPS << " and restarting..." << endl;
+            cout << "Current step: " << step << ", energyCollect/normalizationCollect: " << energyCollect/normalizationCollect << endl;
+        }
+
+	loadPotentialArrays(); //to update a and b with new eps
+        //Reinitialise w and W to ICs (usually rand gaussian)
+        setInitialConditions(nodeID+1);
+
+        if (nodeID==1) { 
+            print_line();
+      	    cout.width(dwidth); cout << "Time";
+      	    cout.width(dwidth); cout << "Energy";
+      	    cout.width(dwidth); cout << "Binding Energy";
+      	    cout.width(dwidth); cout << "r_RMS";   // #ad
+      	    cout << endl;
+      	    print_line();
+        }
+        
+        //reset variables
+        step = 0;
+        //energy=0;         // the local node energy
+        //energyCollect=0;          // the total energy
+        //normalization=0;          // the local node normalization squared
+        //normalizationCollect=0;  // the total normalization squared
+        //vInfinity=0;              // the local node expectation value of v_infty
+        //vInfinityCollect=0;      // the total expectation value of v_infty
+        //rRMS2=0;                 // the local node <r^2>  #ad.
+        //rRMS2Collect=0;
+        nanError = false;
+}
+
 // reduce observables across nodes to first worker node
 void computeObservables(dcomp*** wfnc) {
 	
@@ -314,7 +352,12 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&rRMS2_re,&rRMS2_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&rRMS2_im,&rRMS2_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	rRMS2Collect = dcomp(rRMS2_re_collect,rRMS2_im_collect);
-	
+        
+        if (energy_re_collect/normalization_re_collect != energy_re_collect/normalization_re_collect) {
+                nanError = true;
+        } else {
+                nanError = false;
+        }
 }
 
 // main computational solve routine
@@ -340,6 +383,21 @@ void solve() {
 		
 		// reduce observables across nodes
 		computeObservables(w);
+                
+                //Additions for Mexican Hat autosolve, comment out if using another potential
+                if (nanError) {
+                //if (nodeID==1) cout << "YOU'RE GONNA HAVE A BAD TIME" << endl;
+                      //Energy has nan'ed out, we need to decrease the step size.
+                //      if (nodeID==1) cout << nanError << endl;
+                      energytot,lastenergy = 1.0e50;
+                      solveRestart();
+		      syncBoundaries(w);
+		      computeObservables(w);
+	              if (EPS < 1e-8) {
+                           //we can't let the time step decrease ad infinitum
+                           break;
+                      }
+                }
 		
 		// output 2d snapshots of the wavefunction for inspection
 		// and check convergence of ground state energy
@@ -349,29 +407,27 @@ void solve() {
 			MPI_Bcast(&energyCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			// force symmetry
 			symmetrizeWavefunction();
-            // normalize wavefunction
-            normalizeWavefunction(w);
+                        // normalize wavefunction
+                        normalizeWavefunction(w);
 			// record and output snapshot
 	//		sprintf(label,"%d_%d",nodeID,step); 
 	//		outputSnapshot(w,label);
-            // check convergence and break if tolerance is achieved
+                        // check convergence and break if tolerance is achieved
 			// otherwise, record snapshot for use in excited state 
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
-			if (abs(energytot-lastenergy)<TOLERANCE) {
-				if (nodeID==1) outputMeasurements(step*EPS);
-				break;
-			} else {
-				lastenergy = energytot;
-				if (step!=STEPS) recordSnapshot(w);
-			}
-		}
-		
-		if (nodeID==1) outputMeasurements(step*EPS);
-		
-		if (step<STEPS) evolve(UPDATE);
-		step += UPDATE;
-		
+		        if (abs(energytot-lastenergy)<TOLERANCE) {
+			        if (nodeID==1) outputMeasurements(step*EPS);
+			        break;
+		        } else {
+			        lastenergy = energytot;
+			        if (step!=STEPS) recordSnapshot(w);
+		        }
+                }
+                if (nodeID==1) outputMeasurements(step*EPS);
+                if (step<STEPS) evolve(UPDATE);
+                step += UPDATE;
+                
 	} while (step<=STEPS);
 	
 	// #ad.
@@ -379,7 +435,14 @@ void solve() {
 	EGrnd = energytot;
 	timef = step*EPS;
 	
-	if (nodeID==1) outputSummaryData();
+	if (nodeID==1) {
+                if (EPS >= 1e-8) {
+                        outputSummaryData();
+                } else {
+                        print_line();
+                        cout << "ERROR: Aborted early due to time step (EPS) complications. Check input parameters." << endl;
+                }
+        }
 	
 	if (debug) {
 		debug_out << "==> Unnormalized Energy : " << energy << endl;
@@ -397,7 +460,7 @@ void solve() {
 void solveFinalize() {
 	
 	// this routine currently computes the first excited state energy and wavefunction
-	findExcitedStates();
+	if (EPS >= 1e-8) findExcitedStates();
 	
 }
 
