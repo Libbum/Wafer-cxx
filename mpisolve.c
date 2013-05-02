@@ -93,7 +93,7 @@ int step = 0;
 
 int main( int argc, char *argv[] ) 
 { 
-    int done=0,checksum=0,nanAbort=0;
+    int done=0,checksum=0;
     char message[64]; 
     char fname[32];
     int exclude[1];
@@ -214,7 +214,18 @@ int main( int argc, char *argv[] )
 
 		// the master said hello so now let's get to work
 		solve();
-		
+	        
+                //If there's a nanError, extend EPS and resolve
+                while (nanErrorCollect == 1) {
+                        solveRestart();
+
+                        nanErrorCollect = 0;
+                        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
+                        if (EPS >= 1e-7) { //Don't loop forever
+                                solve();
+                        }
+                }
+                
 		// done with main computation, now do any analysis required
 		solveFinalize();
 		
@@ -282,7 +293,6 @@ void solveRestart() {
         if (nodeID==1) { 
             print_line();
             cout << "Temporal Step Size (EPS = " << EPSold << ") too large; rescaling to EPS = " << EPS << " and restarting..." << endl;
-            cout << "Current step: " << step << ", energyCollect/normalizationCollect: " << energyCollect/normalizationCollect << endl;
         }
 
 	loadPotentialArrays(); //to update a and b with new eps
@@ -294,22 +304,13 @@ void solveRestart() {
       	    cout.width(dwidth); cout << "Time";
       	    cout.width(dwidth); cout << "Energy";
       	    cout.width(dwidth); cout << "Binding Energy";
-      	    cout.width(dwidth); cout << "r_RMS";   // #ad
+      	    cout.width(dwidth); cout << "r_RMS";   
       	    cout << endl;
       	    print_line();
         }
         
-        //reset variables
+        //reset step
         step = 0;
-        //energy=0;         // the local node energy
-        //energyCollect=0;          // the total energy
-        //normalization=0;          // the local node normalization squared
-        //normalizationCollect=0;  // the total normalization squared
-        //vInfinity=0;              // the local node expectation value of v_infty
-        //vInfinityCollect=0;      // the total expectation value of v_infty
-        //rRMS2=0;                 // the local node <r^2>  #ad.
-        //rRMS2Collect=0;
-        //nanError = false;
 }
 
 // reduce observables across nodes to first worker node
@@ -361,7 +362,7 @@ void computeObservables(dcomp*** wfnc) {
 void solve() {
 	
 	dcomp energytot,lastenergy = 1.0e50;
-	int done=1;//,nanError=0; //step=0,
+	int done=1; //step=0,
 	char label[64]; 
 	
 	leftSendBuffer = (double *)malloc( 2 * (NUM+2) * (NUM+2) * sizeof(double) );
@@ -419,26 +420,22 @@ void solve() {
                 
 	} while ((step<=STEPS) && nanErrorCollect == 0);
 	
-	// #ad.
 	// save grd-state energy and tau_f in global variables
-	EGrnd = energytot;
-	timef = step*EPS;
-	
-	if (nodeID==1) {
-                if (nanErrorCollect == 0) {
-                        outputSummaryData();
-                } else {
-                        print_line();
-                        cout << "ERROR: Aborted early due to time step (EPS) complications." << endl;
-                }
+        if (nanErrorCollect == 0) {
+	        EGrnd = energytot;
+	        timef = step*EPS;
+        
+	        if (debug) {
+		        debug_out << "==> Unnormalized Energy : " << energy << endl;
+		        debug_out << "==> Normalization2 : " << normalization << endl;
+	        }
         }
-	
-	if (debug) {
-		debug_out << "==> Unnormalized Energy : " << energy << endl;
-		debug_out << "==> Normalization2 : " << normalization << endl;
-	}
-	
-	free(rightSendBuffer);
+
+	if ((nodeID==1) && (nanErrorCollect == 0)) {
+                outputSummaryData();
+        }	
+
+        free(rightSendBuffer);
 	free(leftSendBuffer);
 	free(rightReceiveBuffer);
 	free(leftReceiveBuffer);
@@ -449,7 +446,11 @@ void solve() {
 void solveFinalize() {
 	
 	// this routine currently computes the first excited state energy and wavefunction
-	if (nanErrorCollect == 0) findExcitedStates();
+	if (EPS >= 1e-7) {
+                findExcitedStates();
+        } else {
+                if (nodeID==1) cout << "ERROR: EPS smaller than 1e-7 will likely cause memory issues. Aborting, check input parameters" << endl;
+        }
 	//findExcitedStates();
 }
 

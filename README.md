@@ -15,3 +15,8 @@ module load openmpi-gcc/1.7.0
 
 module load lapack/3.4.2
 
+
+TODO
+====
+
+- [ ] Pull EPS check into parameters so it's not hard coded
