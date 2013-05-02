@@ -63,6 +63,7 @@ extern dcomp rRMS2Collect;    // #ad.
 #define SYNC_LEFT_MESSAGE	4
 #define SYNC_RIGHT		5
 #define SYNC_RIGHT_MESSAGE	6
+#define NANERROR		7
 
 // the main solve routines
 void solveInitialize();

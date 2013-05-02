@@ -51,6 +51,7 @@ dcomp computeEnergy();
 
 // other methods
 void allocateMemory();
+void deallocateMemory();
 void updateBoundaries(double eps);
 void updateInterior(double eps);
 void copyDown();

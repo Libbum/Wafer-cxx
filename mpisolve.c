@@ -55,8 +55,7 @@ int nodeID,numNodes;
 fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
-int debug = DEBUG_FULL;
-bool nanError = false;
+int debug = DEBUG_ON;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
@@ -86,15 +85,15 @@ dcomp vInfinity=0;		// the local node expectation value of v_infty
 dcomp vInfinityCollect=0;      // the total expectation value of v_infty
 dcomp rRMS2=0;                 // the local node <r^2>  #ad.
 dcomp rRMS2Collect=0;		// the total <r^2>  #ad.
+int nanErrorCollect=0;
 
 // #ad.: grnd-state energy and final time saved in global var after convergence
 dcomp	EGrnd, EOne, timef;
 int step = 0;
 
-
 int main( int argc, char *argv[] ) 
 { 
-    int done=0,checksum=0;
+    int done=0,checksum=0,nanAbort=0;
     char message[64]; 
     char fname[32];
     int exclude[1];
@@ -183,12 +182,16 @@ int main( int argc, char *argv[] )
 		// master loops and waits for children to report that they are done
 		checksum=0;
 		do {
+//			MPI_Recv(&nanError, 1, MPI_INT, MPI_ANY_SOURCE, NANERROR, MPI_COMM_WORLD, &status); 
+//			if (nanError == 1) {
+ //                               if (debug) debug_out << "Recieved: Nan Error notification; setting abort flag." << endl;
+  //                      }
 			MPI_Recv(&done, 1, MPI_INT, MPI_ANY_SOURCE, DONE, MPI_COMM_WORLD, &status); 
 			checksum += done;
-			if (debug) debug_out << "Received: checkout from computational node" << endl;
+                        if (debug) debug_out << "Received: checkout from computational node" << endl;
 			sleep(0.1); // sleep 0.1 seconds between checks in order to reduce CPU usage of master
 		} while( checksum < numNodes-1 ); 
-		
+	        
 		times(&endtime); // load end time into endtime structure
 		cout << "==> User time: " << (endtime.tms_utime - starttime.tms_utime)/((double)sysconf(_SC_CLK_TCK)) << " seconds"<< endl;
 		cout << "==> System time: " << (endtime.tms_stime - starttime.tms_stime)/((double)sysconf(_SC_CLK_TCK)) << " seconds" << endl;
@@ -306,7 +309,7 @@ void solveRestart() {
         //vInfinityCollect=0;      // the total expectation value of v_infty
         //rRMS2=0;                 // the local node <r^2>  #ad.
         //rRMS2Collect=0;
-        nanError = false;
+        //nanError = false;
 }
 
 // reduce observables across nodes to first worker node
@@ -352,17 +355,13 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&rRMS2_re,&rRMS2_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&rRMS2_im,&rRMS2_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	rRMS2Collect = dcomp(rRMS2_re_collect,rRMS2_im_collect);
-        
-      //  if (energy_re_collect/normalization_re_collect != energy_re_collect/normalization_re_collect) {
-      //          nanError = true;
-      //  } 
 }
 
 // main computational solve routine
 void solve() {
 	
 	dcomp energytot,lastenergy = 1.0e50;
-	int done=1; //step=0,
+	int done=1;//,nanError=0; //step=0,
 	char label[64]; 
 	
 	leftSendBuffer = (double *)malloc( 2 * (NUM+2) * (NUM+2) * sizeof(double) );
@@ -382,22 +381,6 @@ void solve() {
 		// reduce observables across nodes
 		computeObservables(w);
                 
-                //Additions for Mexican Hat autosolve, comment out if using another potential
-//                if (nanError == true) {
-                //if (nodeID==1) cout << "YOU'RE GONNA HAVE A BAD TIME" << endl;
-                      //Energy has nan'ed out, we need to decrease the step size.
-                //      if (nodeID==1) cout << nanError << endl;
-                     // energytot = 1.0e50;
-                      //lastenergy = 1.0e50;
-                      //solveRestart();
-		      //syncBoundaries(w);
-		      //computeObservables(w);
-	              //if (EPS < 1e-8) {
-                           //we can't let the time step decrease ad infinitum
-  //                         break;
-                      //}
-  //              }
-		
 		// output 2d snapshots of the wavefunction for inspection
 		// and check convergence of ground state energy
 		if (step%SNAPUPDATE==0) {
@@ -415,8 +398,11 @@ void solve() {
 			// otherwise, record snapshot for use in excited state 
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
-		        if (real(energytot) != real(energytot)) {
-                                nanError = true;
+		        //break run if we have a nanError
+                        if (real(energytot) != real(energytot)) {
+                                nanErrorCollect = 1;
+		                if (debug) debug_out << "Nan Error Detected" << endl; 
+			        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
                                 break;
                         }
                         if (abs(energytot-lastenergy)<TOLERANCE) {
@@ -431,7 +417,7 @@ void solve() {
                 if (step<STEPS) evolve(UPDATE);
                 step += UPDATE;
                 
-	} while (step<=STEPS);
+	} while ((step<=STEPS) && nanErrorCollect == 0);
 	
 	// #ad.
 	// save grd-state energy and tau_f in global variables
@@ -439,11 +425,11 @@ void solve() {
 	timef = step*EPS;
 	
 	if (nodeID==1) {
-                if (nanError == false) {
+                if (nanErrorCollect == 0) {
                         outputSummaryData();
                 } else {
                         print_line();
-                        cout << "ERROR: Aborted early due to time step (EPS) complications. Check input parameters." << endl;
+                        cout << "ERROR: Aborted early due to time step (EPS) complications." << endl;
                 }
         }
 	
@@ -463,8 +449,8 @@ void solve() {
 void solveFinalize() {
 	
 	// this routine currently computes the first excited state energy and wavefunction
-	if (nanError == false) findExcitedStates();
-	
+	if (nanErrorCollect == 0) findExcitedStates();
+	//findExcitedStates();
 }
 
 // evolves solution nsteps

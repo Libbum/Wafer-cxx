@@ -87,6 +87,45 @@ void allocateMemory() {
 	return;
 }
 
+// deallocate memory arrays
+void deallocateMemory() {
+
+
+        // indices x,y,z
+        
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] w[sx][sy];
+	for (int sx=0;sx<NUMX+2;sx++) delete [] w[sx];
+	delete [] w; 
+	
+        for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] W[sx][sy];
+	for (int sx=0;sx<NUMX+2;sx++) delete [] W[sx];
+	delete [] W; 
+
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] W2[sx][sy];
+	for (int sx=0;sx<NUMX+2;sx++) delete [] W2[sx];
+	delete [] W2; 
+
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] v[sx][sy];
+	for (int sx=0;sx<NUMX+2;sx++) delete [] v[sx];
+	delete [] v; 
+	
+        for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] a[sx][sy];
+	for (int sx=0;sx<NUMX+2;sx++) delete [] a[sx];
+	delete [] a; 
+
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] b[sx][sy];
+	for (int sx=0;sx<NUMX+2;sx++) delete [] b[sx];
+	delete [] b; 
+
+	int snaps = 2;
+	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUM+2;sy++) delete [] wstore[n][sx][sy];
+	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUMX+2;sx++) delete [] wstore[n][sx];
+	for (int n=0;n<snaps;n++) delete [] wstore[n];
+	delete [] wstore; 
+		
+	return;
+}
+
 // "copies" updated arrays using pointer swap
 void copyDown() {
 	tmp = w;
