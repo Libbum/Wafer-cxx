@@ -353,11 +353,9 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&rRMS2_im,&rRMS2_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	rRMS2Collect = dcomp(rRMS2_re_collect,rRMS2_im_collect);
         
-        if (energy_re_collect/normalization_re_collect != energy_re_collect/normalization_re_collect) {
-                nanError = true;
-        } else {
-                nanError = false;
-        }
+      //  if (energy_re_collect/normalization_re_collect != energy_re_collect/normalization_re_collect) {
+      //          nanError = true;
+      //  } 
 }
 
 // main computational solve routine
@@ -385,19 +383,20 @@ void solve() {
 		computeObservables(w);
                 
                 //Additions for Mexican Hat autosolve, comment out if using another potential
-                if (nanError) {
+//                if (nanError == true) {
                 //if (nodeID==1) cout << "YOU'RE GONNA HAVE A BAD TIME" << endl;
                       //Energy has nan'ed out, we need to decrease the step size.
                 //      if (nodeID==1) cout << nanError << endl;
-                      energytot,lastenergy = 1.0e50;
-                      solveRestart();
-		      syncBoundaries(w);
-		      computeObservables(w);
-	              if (EPS < 1e-8) {
+                     // energytot = 1.0e50;
+                      //lastenergy = 1.0e50;
+                      //solveRestart();
+		      //syncBoundaries(w);
+		      //computeObservables(w);
+	              //if (EPS < 1e-8) {
                            //we can't let the time step decrease ad infinitum
-                           break;
-                      }
-                }
+  //                         break;
+                      //}
+  //              }
 		
 		// output 2d snapshots of the wavefunction for inspection
 		// and check convergence of ground state energy
@@ -416,7 +415,11 @@ void solve() {
 			// otherwise, record snapshot for use in excited state 
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
-		        if (abs(energytot-lastenergy)<TOLERANCE) {
+		        if (real(energytot) != real(energytot)) {
+                                nanError = true;
+                                break;
+                        }
+                        if (abs(energytot-lastenergy)<TOLERANCE) {
 			        if (nodeID==1) outputMeasurements(step*EPS);
 			        break;
 		        } else {
@@ -436,7 +439,7 @@ void solve() {
 	timef = step*EPS;
 	
 	if (nodeID==1) {
-                if (EPS >= 1e-8) {
+                if (nanError == false) {
                         outputSummaryData();
                 } else {
                         print_line();
@@ -460,7 +463,7 @@ void solve() {
 void solveFinalize() {
 	
 	// this routine currently computes the first excited state energy and wavefunction
-	if (EPS >= 1e-8) findExcitedStates();
+	if (nanError == false) findExcitedStates();
 	
 }
 
