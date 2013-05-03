@@ -182,13 +182,9 @@ int main( int argc, char *argv[] )
 		// master loops and waits for children to report that they are done
 		checksum=0;
 		do {
-//			MPI_Recv(&nanError, 1, MPI_INT, MPI_ANY_SOURCE, NANERROR, MPI_COMM_WORLD, &status); 
-//			if (nanError == 1) {
- //                               if (debug) debug_out << "Recieved: Nan Error notification; setting abort flag." << endl;
-  //                      }
 			MPI_Recv(&done, 1, MPI_INT, MPI_ANY_SOURCE, DONE, MPI_COMM_WORLD, &status); 
 			checksum += done;
-                        if (debug) debug_out << "Received: checkout from computational node" << endl;
+            if (debug) debug_out << "Received: checkout from computational node" << endl;
 			sleep(0.1); // sleep 0.1 seconds between checks in order to reduce CPU usage of master
 		} while( checksum < numNodes-1 ); 
 	        
@@ -280,7 +276,7 @@ void solveInitialize() {
       	cout.width(dwidth); cout << "Time";
       	cout.width(dwidth); cout << "Energy";
       	cout.width(dwidth); cout << "Binding Energy";
-      	cout.width(dwidth); cout << "r_RMS";   // #ad
+      	cout.width(dwidth); cout << "r_RMS";   
       	cout << endl;
       	print_line();
 	}
@@ -295,7 +291,7 @@ void solveRestart() {
             cout << "Temporal Step Size (EPS = " << EPSold << ") too large; rescaling to EPS = " << EPS << " and restarting..." << endl;
         }
 
-	loadPotentialArrays(); //to update a and b with new eps
+	    loadPotentialArrays(); //to update a and b with new eps
         //Reinitialise w and W to ICs (usually rand gaussian)
         setInitialConditions(nodeID+1);
 
@@ -395,47 +391,47 @@ void solve() {
 			// record and output snapshot
 	//		sprintf(label,"%d_%d",nodeID,step); 
 	//		outputSnapshot(w,label);
-                        // check convergence and break if tolerance is achieved
+            // check convergence and break if tolerance is achieved
 			// otherwise, record snapshot for use in excited state 
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
-		        //break run if we have a nanError
-                        if (real(energytot) != real(energytot)) {
-                                nanErrorCollect = 1;
-		                if (debug) debug_out << "Nan Error Detected" << endl; 
-			        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
-                                break;
-                        }
-                        if (abs(energytot-lastenergy)<TOLERANCE) {
-			        if (nodeID==1) outputMeasurements(step*EPS);
-			        break;
-		        } else {
-			        lastenergy = energytot;
-			        if (step!=STEPS) recordSnapshot(w);
-		        }
-                }
-                if (nodeID==1) outputMeasurements(step*EPS);
-                if (step<STEPS) evolve(UPDATE);
-                step += UPDATE;
+            //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
+            if (real(rRMS2Collect)/real(normalizationCollect) != real(rRMS2Collect)/real(normalizationCollect)) {
+                nanErrorCollect = 1;
+	            if (debug) debug_out << "Nan Error Detected" << endl; 
+	   	        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
+                break;
+            }
+            if (abs(energytot-lastenergy)<TOLERANCE) {
+		        if (nodeID==1) outputMeasurements(step*EPS);
+		        break;
+	        } else {
+		        lastenergy = energytot;
+		        if (step!=STEPS) recordSnapshot(w);
+	        }
+        }
+        if (nodeID==1) outputMeasurements(step*EPS);
+        if (step<STEPS) evolve(UPDATE);
+        step += UPDATE;
                 
 	} while ((step<=STEPS) && nanErrorCollect == 0);
 	
 	// save grd-state energy and tau_f in global variables
-        if (nanErrorCollect == 0) {
-	        EGrnd = energytot;
-	        timef = step*EPS;
-        
-	        if (debug) {
-		        debug_out << "==> Unnormalized Energy : " << energy << endl;
-		        debug_out << "==> Normalization2 : " << normalization << endl;
-	        }
+   if (nanErrorCollect == 0) {
+        EGrnd = energytot;
+        timef = step*EPS;
+       
+        if (debug) {
+	        debug_out << "==> Unnormalized Energy : " << energy << endl;
+	        debug_out << "==> Normalization2 : " << normalization << endl;
         }
+    }
 
 	if ((nodeID==1) && (nanErrorCollect == 0)) {
-                outputSummaryData();
-        }	
+        outputSummaryData();
+    }	
 
-        free(rightSendBuffer);
+    free(rightSendBuffer);
 	free(leftSendBuffer);
 	free(rightReceiveBuffer);
 	free(leftReceiveBuffer);
@@ -447,11 +443,10 @@ void solveFinalize() {
 	
 	// this routine currently computes the first excited state energy and wavefunction
 	if (EPS >= 1e-7) {
-                findExcitedStates();
-        } else {
-                if (nodeID==1) cout << "ERROR: EPS smaller than 1e-7 will likely cause memory issues. Aborting, check input parameters" << endl;
-        }
-	//findExcitedStates();
+       findExcitedStates();
+    } else {
+       if (nodeID==1) cout << "ERROR: EPS smaller than 1e-7 will likely cause memory issues. Aborting, check input parameters" << endl;
+    }
 }
 
 // evolves solution nsteps
