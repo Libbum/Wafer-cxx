@@ -5,30 +5,12 @@
  mpisolve.c
  
  Copyright (c) Michael Strickland
- 
+ Forked at v2.0; Additions by Tim DuBois
+
  GNU General Public License (GPLv3)
  See detailed text in license directory
  
  */
-
-/*#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <limits>
-#include <climits>
-#include <cstring>
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
-#include <ctime>
-#include <cerrno>
-#include <complex>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <sys/types.h>
-#include <unistd.h> */
-
 
 #include "mpi.h" 
 #include "mpisolve.h"

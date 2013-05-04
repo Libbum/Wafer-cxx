@@ -8,7 +8,7 @@ NUM 		124
 A		0.1
 
 // temporal grid spacing - should be <= A*A/3
-EPS		0.000003
+EPS		0.003
 
 // convergence tolerance for ground state energy
 TOLERANCE	1.e-6

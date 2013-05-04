@@ -16,6 +16,16 @@ module load openmpi-gcc/1.7.0
 module load lapack/3.4.2
 
 
+Vayu
+====
+
+module load intel-mkl/13.2.146 
+
+module load intel-fc/13.2.146
+
+module openmpi/1.6.3
+
+
 TODO
 ====
 
