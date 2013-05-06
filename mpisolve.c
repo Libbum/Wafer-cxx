@@ -27,7 +27,7 @@ typedef std::numeric_limits< double > dbl;
 // defaults set here are overridden by that file
 int    NUMX=20,NUM=20,UPDATE=100,SNAPUPDATE=1000;
 int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0;
-double  A=0.05,EPS=0.001,MINEPS=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
+double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788,GR=4.9; //Aluminium Clusters & Grid Range
 
 // mpi vars
@@ -199,7 +199,7 @@ int main( int argc, char *argv[] )
 
                 nanErrorCollect = 0;
                 MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
-                if (EPS >= MINEPS) { //Don't loop forever
+                if (EPS >= MINTSTEP) { //Don't loop forever
                         solve();
                 }
         }
@@ -425,10 +425,10 @@ void solve() {
 void solveFinalize() {
 	
 	// this routine currently computes the first excited state energy and wavefunction
-	if (EPS >= MINEPS) {
+	if (EPS >= MINTSTEP) {
        findExcitedStates();
     } else {
-       if (nodeID==1) cout << "ERROR: MINEPS value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
+       if (nodeID==1) cout << "ERROR: MINTSTEP value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
     }
 }
 

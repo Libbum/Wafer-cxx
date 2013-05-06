@@ -35,7 +35,7 @@ void setParameter(char *key, const char *value) {
 	// double/float params
 	if (strcmp(key,"A")==0) A=atof(value);
 	if (strcmp(key,"EPS")==0) EPS=atof(value);
-	if (strcmp(key,"MINEPS")==0) EPS=atof(value);
+	if (strcmp(key,"MINTSTEP")==0) MINTSTEP=atof(value);
 	if (strcmp(key,"SIG")==0) SIG=atof(value);
 	if (strcmp(key,"SIGMA")==0) SIGMA=atof(value);
 	if (strcmp(key,"STEPS")==0) STEPS=atof(value);
