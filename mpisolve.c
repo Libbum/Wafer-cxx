@@ -368,8 +368,8 @@ void solve() {
 			MPI_Bcast(&energyCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			// force symmetry
 			symmetrizeWavefunction();
-                        // normalize wavefunction
-                        normalizeWavefunction(w);
+            // normalize wavefunction
+            normalizeWavefunction(w);
 			// record and output snapshot
 	//		sprintf(label,"%d_%d",nodeID,step); 
 	//		outputSnapshot(w,label);
@@ -378,7 +378,7 @@ void solve() {
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
-            if (real(rRMS2Collect)/real(normalizationCollect) != real(rRMS2Collect)/real(normalizationCollect)) {
+            if ((real(energytot) != real(energytot)) || (imag(energytot) != imag(energytot))) {
                 nanErrorCollect = 1;
 	            if (debug) debug_out << "Nan Error Detected" << endl; 
 	   	        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
