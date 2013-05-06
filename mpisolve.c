@@ -378,7 +378,8 @@ void solve() {
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
-            if ((real(energytot) != real(energytot)) || (imag(energytot) != imag(energytot))) {
+            //if ((real(energytot) != real(energytot)) || (imag(energytot) != imag(energytot))) {
+            if (!isfinite(real(energytot))) {
                 nanErrorCollect = 1;
 	            if (debug) debug_out << "Nan Error Detected" << endl; 
 	   	        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
