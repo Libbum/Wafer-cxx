@@ -29,4 +29,4 @@ module openmpi/1.6.3
 TODO
 ====
 
-- [ ] Pull EPS check into parameters so it's not hard coded
+- [X] Pull EPS check into parameters so it's not hard coded

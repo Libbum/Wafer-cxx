@@ -35,6 +35,7 @@ void setParameter(char *key, const char *value) {
 	// double/float params
 	if (strcmp(key,"A")==0) A=atof(value);
 	if (strcmp(key,"EPS")==0) EPS=atof(value);
+	if (strcmp(key,"MINEPS")==0) EPS=atof(value);
 	if (strcmp(key,"SIG")==0) SIG=atof(value);
 	if (strcmp(key,"SIGMA")==0) SIGMA=atof(value);
 	if (strcmp(key,"STEPS")==0) STEPS=atof(value);
@@ -43,10 +44,10 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"TC")==0) TC=atof(value);
 	if (strcmp(key,"XI")==0) XI=atof(value);
 	if (strcmp(key,"TOLERANCE")==0) TOLERANCE=atof(value);
-        if (strcmp(key,"ALX")==0) ALX=atof(value);
-        if (strcmp(key,"ALY")==0) ALY=atof(value);
-        if (strcmp(key,"ALZ")==0) ALZ=atof(value);
-        if (strcmp(key,"GR")==0) GR=atof(value);
+    if (strcmp(key,"ALX")==0) ALX=atof(value);
+    if (strcmp(key,"ALY")==0) ALY=atof(value);
+    if (strcmp(key,"ALZ")==0) ALZ=atof(value);
+    if (strcmp(key,"GR")==0) GR=atof(value);
   return;
 }
 
