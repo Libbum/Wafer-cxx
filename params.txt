@@ -23,7 +23,7 @@ UPDATE		1000
 SNAPUPDATE	300
 
 // set to one to dump the full 3d wavefncs to disk at the end of the run
-SAVEWAVEFNCS	1
+SAVEWAVEFNCS	0
 
 //
 // potential to simulate
@@ -80,13 +80,11 @@ INITSYMMETRY	0
 // Physical parameters used in potentials
 //
 
-// Reduced mass; charmonium reduced mass is 1.3/2; bottomonium reduced mass is 4.7/2
-//MASS    1.0
-//MASS  33.5129
-MASS   15.9994
+// Currently Mass of Oxygen in amu 
+MASS  15.9994
 
 //Aluminium cluster data
-//ALX   5.5
+//ALX   4
 
 //ALY   5.5
 
@@ -94,4 +92,3 @@ ALZ   4
 
 //Grid range of potential (for matlab scaling)
 GR   6.15
-

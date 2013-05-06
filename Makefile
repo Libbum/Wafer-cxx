@@ -23,10 +23,10 @@ endif
 
 CC = mpicxx
 
-all: $(TARGET) 
+all: $(TARGET)
 	@echo 'Built target for '$(HOST_NAME)
 
-mpisolve:	$(OBJ) 
+mpisolve:	$(OBJ)
 	$(CC) $(OBJ) -o $(TARGET) $(LAPACK) 
 
 run:	
@@ -43,7 +43,6 @@ run8:
 
 clean:
 	rm -f *\.o *~
-	./cleandatafiles.sh
 
 mrproper: clean
 	rm -f $(TARGET)
@@ -56,7 +55,7 @@ help:
 	@echo '  all          - Builds mpisolve standalone'
 	@echo '  solve        - Builds mpisolve standalone'
 	@echo 'Cleanup targets:'
-	@echo '  clean        - Remove generated files + Emacs leftovers'
+	@echo '  clean        - Remove generated and temp files'
 	@echo '  mrproper     - Removes generated targets + all aboves'
 	@echo 'Exec targets:'
 	@echo '  run          - Run mpisolve (with first cleaning up data)'
