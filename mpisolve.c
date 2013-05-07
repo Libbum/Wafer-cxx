@@ -195,13 +195,13 @@ int main( int argc, char *argv[] )
 	        
         //If there's a nanError, extend EPS and resolve
         while (nanErrorCollect == 1) {
-                solveRestart();
+            solveRestart();
 
-                nanErrorCollect = 0;
-                MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
-                if (EPS >= MINTSTEP) { //Don't loop forever
-                        solve();
-                }
+            nanErrorCollect = 0;
+            MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
+            if (EPS >= MINTSTEP) { //Don't loop forever
+                solve();
+            }
         }
                 
 		// done with main computation, now do any analysis required
@@ -378,16 +378,15 @@ void solve() {
 			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
-            //if ((real(energytot) != real(energytot)) || (imag(energytot) != imag(energytot))) {
             if (!isfinite(real(energytot))) {
                 nanErrorCollect = 1;
-	            if (debug) debug_out << "Nan Error Detected" << endl; 
-	   	        MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
+                if (debug) debug_out << "Nan Error Detected" << endl; 
+                MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
                 break;
             }
             if (abs(energytot-lastenergy)<TOLERANCE) {
-		        if (nodeID==1) outputMeasurements(step*EPS);
-		        break;
+	            if (nodeID==1) outputMeasurements(step*EPS);
+                break;
 	        } else {
 		        lastenergy = energytot;
 		        if (step!=STEPS) recordSnapshot(w);
@@ -415,9 +414,9 @@ void solve() {
     }	
 
     free(rightSendBuffer);
-	free(leftSendBuffer);
-	free(rightReceiveBuffer);
-	free(leftReceiveBuffer);
+    free(leftSendBuffer);
+    free(rightReceiveBuffer);
+    free(leftReceiveBuffer);
 	
 }
 

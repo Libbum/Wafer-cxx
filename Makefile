@@ -29,18 +29,6 @@ all: $(TARGET)
 mpisolve:	$(OBJ)
 	$(CC) $(OBJ) -o $(TARGET) $(LAPACK) 
 
-run:	
-	mpirun -np 3 mpisolve
-
-run1:   
-	mpirun -np 2 mpisolve
-
-run4:   
-	mpirun -np 5 mpisolve
-
-run8:   
-	mpirun -np 9 mpisolve
-
 clean:
 	rm -f *\.o *~
 
@@ -57,5 +45,3 @@ help:
 	@echo 'Cleanup targets:'
 	@echo '  clean        - Remove generated and temp files'
 	@echo '  mrproper     - Removes generated targets + all aboves'
-	@echo 'Exec targets:'
-	@echo '  run          - Run mpisolve (with first cleaning up data)'
