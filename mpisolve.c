@@ -25,7 +25,7 @@ typedef std::numeric_limits< double > dbl;
 
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
-int    NUMX=20,NUM=20,UPDATE=100,SNAPUPDATE=1000;
+int    NUMZ=20,NUM=20,UPDATE=100,SNAPUPDATE=1000;
 int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788,GR=4.9; //Aluminium Clusters & Grid Range
@@ -133,7 +133,7 @@ int main( int argc, char *argv[] )
         MPI_Finalize(); 
 		exit(0);
     } else {
-		NUMX = NUM/(numNodes-1);	
+		NUMZ = NUM/(numNodes-1);	
     }
 	
     if (nodeID == 0) {
@@ -158,7 +158,7 @@ int main( int argc, char *argv[] )
 		// cluster is ready
 		if (debug) debug_out << "==> Cluster ready" << endl;
 	
-    // Currently the master process does nothing.  
+        // Currently the master process does nothing.  
 		// It simply starts and waits for the others
 		
 		// master loops and waits for children to report that they are done
@@ -248,7 +248,7 @@ void solveInitialize() {
 	if (nodeID==1) { 
 		print_line();
       	cout << "==> Number of computational nodes : " << numNodes-1 << endl; 
-      	cout << "==> NUMX : " << NUMX << endl; 
+      	cout << "==> NUMZ : " << NUMZ << endl; 
       	print_line();
       	cout << "Spatial Step Size (A): " << A << endl;
       	cout << "Temporal Step Size (EPS): " << EPS << endl;
@@ -517,18 +517,18 @@ void findExcitedStates() {
 	int snap = 0;  //most recently saved snapshot;
 	
 	// compute overlap
-	for (int sx=1;sx<=NUMX;sx++) 
+	for (int sx=1;sx<=NUM;sx++) 
 		for (int sy=1;sy<=NUM;sy++)
-       	    for (int sz=1; sz<=NUM;sz++) 
+       	    for (int sz=1; sz<=NUMZ;sz++) 
 				overlap += w[sx][sy][sz]*wstore[snap][sx][sy][sz];
 	
 	MPI_Reduce(&overlap,&overlapCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
 	// subtract overlap
-	for (int sx=0;sx<NUMX+2;sx++) 
+	for (int sx=0;sx<NUM+2;sx++) 
 		for (int sy=0;sy<NUM+2;sy++)
-       	    for (int sz=0; sz<NUM+2;sz++) 
+       	    for (int sz=0; sz<NUMZ+2;sz++) 
 				W[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect*w[sx][sy][sz];
 	
 	// compute observables
@@ -584,9 +584,9 @@ void findExcitedStates() {
 	snap = 1; //second most recently saved snapshot
 	
 	// compute overlap
-	for (int sx=1;sx<=NUMX;sx++) 
+	for (int sx=1;sx<=NUM;sx++) 
 		for (int sy=1;sy<=NUM;sy++)
-       	    for (int sz=1; sz<=NUM;sz++) {
+       	    for (int sz=1; sz<=NUMZ;sz++) {
 				overlap += w[sx][sy][sz]*wstore[snap][sx][sy][sz];
         overlap2 += W[sx][sy][sz]*wstore[snap][sx][sy][sz];
             }
@@ -597,9 +597,9 @@ void findExcitedStates() {
   MPI_Bcast(&overlapCollect2, 1, MPI_DOUBLE, 0, workers_comm);
 
 	// subtract overlap
-	for (int sx=0;sx<NUMX+2;sx++) 
+	for (int sx=0;sx<NUM+2;sx++) 
 		for (int sy=0;sy<NUM+2;sy++)
-       for (int sz=0; sz<NUM+2;sz++) {
+       for (int sz=0; sz<NUMZ+2;sz++) {
         W2[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect2*W[sx][sy][sz] - overlapCollect*w[sx][sy][sz];
       }
 	
@@ -684,10 +684,10 @@ void sendRightBoundary(dcomp*** wfnc) {
 		debug_out << "==> Sending : " << message << endl;
 		MPI_Isend(message, strlen(message), MPI_CHAR, nodeID+1, SYNC_RIGHT_MESSAGE, MPI_COMM_WORLD, &rightMessageSend); 
 	}
-	for (int sy=0;sy<NUM+2;sy++)
-		for (int sz=0;sz<NUM+2;sz++) {
-			rightSendBuffer[sy*(NUM+2)+sz%(NUM+2)] = real(wfnc[NUMX][sy][sz]);
-			rightSendBuffer[sy*(NUM+2)+sz%(NUM+2) + (NUM+2)*(NUM+2)] = imag(wfnc[NUMX][sy][sz]);
+	for (int sx=0;sx<NUM+2;sx++)
+		for (int sy=0;sy<NUM+2;sy++) {
+			rightSendBuffer[sx*(NUM+2)+sy%(NUM+2)] = real(wfnc[sx][sy][NUMZ]);
+			rightSendBuffer[sx*(NUM+2)+sy%(NUM+2) + (NUM+2)*(NUM+2)] = imag(wfnc[sx][sy][NUMZ]);
 		}
 	MPI_Isend(rightSendBuffer, 2*(NUM+2)*(NUM+2), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
 }
@@ -699,10 +699,10 @@ void sendLeftBoundary(dcomp*** wfnc) {
 		debug_out << "==> Sending : " << message << endl;
 		MPI_Isend(message, strlen(message), MPI_CHAR, nodeID-1, SYNC_LEFT_MESSAGE, MPI_COMM_WORLD, &leftMessageSend); 
 	}
-	for (int sy=0;sy<NUM+2;sy++)
-		for (int sz=0;sz<NUM+2;sz++) { 
-			leftSendBuffer[sy*(NUM+2)+sz%(NUM+2)] = real(wfnc[1][sy][sz]);
-			leftSendBuffer[sy*(NUM+2)+sz%(NUM+2) + (NUM+2)*(NUM+2)] = imag(wfnc[1][sy][sz]);
+	for (int sx=0;sx<NUM+2;sx++)
+		for (int sy=0;sy<NUM+2;sy++) { 
+			leftSendBuffer[sx*(NUM+2)+sy%(NUM+2)] = real(wfnc[sx][sy][1]);
+			leftSendBuffer[sx*(NUM+2)+sy%(NUM+2) + (NUM+2)*(NUM+2)] = imag(wfnc[sx][sy][1]);
 		}
 	MPI_Isend(leftSendBuffer, 2*(NUM+2)*(NUM+2), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
 }
@@ -718,9 +718,9 @@ void receiveRightBoundary() {
 
 inline void loadRightBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array right boundary
-	for (int sy=0;sy<NUM+2;sy++)
-		for (int sz=0;sz<NUM+2;sz++)
-			wfnc[NUMX+1][sy][sz] = dcomp(rightReceiveBuffer[sy*(NUM+2)+sz%(NUM+2)],rightReceiveBuffer[sy*(NUM+2)+sz%(NUM+2)+(NUM+2)*(NUM+2)]);
+	for (int sx=0;sx<NUM+2;sx++)
+		for (int sy=0;sy<NUM+2;sy++)
+			wfnc[sx][sy][NUMZ+1] = dcomp(rightReceiveBuffer[sx*(NUM+2)+sy%(NUM+2)],rightReceiveBuffer[sx*(NUM+2)+sy%(NUM+2)+(NUM+2)*(NUM+2)]);
 }
 
 void receiveLeftBoundary() {
@@ -734,7 +734,7 @@ void receiveLeftBoundary() {
 
 inline void loadLeftBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array left boundary
-	for (int sy=0;sy<NUM+2;sy++)
-		for (int sz=0;sz<NUM+2;sz++)
-			wfnc[0][sy][sz] = dcomp(leftReceiveBuffer[sy*(NUM+2)+sz%(NUM+2)],leftReceiveBuffer[sy*(NUM+2)+sz%(NUM+2)+(NUM+2)*(NUM+2)]);
+	for (int sx=0;sx<NUM+2;sx++)
+		for (int sy=0;sy<NUM+2;sy++)
+			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUM+2)+sy%(NUM+2)],leftReceiveBuffer[sx*(NUM+2)+sy%(NUM+2)+(NUM+2)*(NUM+2)]);
 }

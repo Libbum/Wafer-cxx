@@ -44,7 +44,7 @@ void setInitialConditions(int seedMult)
 	char fname[32];
 	string line;
 	vector<string> lines;
-	int inputLatticeSize,inputLatticeSizeX,stridein=1,strideout=1,linenumber;
+	int inputLatticeSize,inputLatticeSizeZ,stridein=1,strideout=1,linenumber;
 	
 	
 	//cout << "==> Initializing variables\n";
@@ -60,19 +60,19 @@ void setInitialConditions(int seedMult)
 		if (nodeID==1) cout << "==> Initial wavefunction : From file" << endl;
 		if (!input) {
 			cout << "==> Error : Unable to open wavefunction file " << fname << ". Using random Gaussian instead." << endl;
-			for (sx=0;sx<NUMX+2;sx++)
+			for (sx=0;sx<NUM+2;sx++)
 				for (sy=0;sy<NUM+2;sy++)
-					for (sz=0; sz<NUM+2;sz++)
+					for (sz=0; sz<NUMZ+2;sz++)
 						w[sx][sy][sz] = randGauss(sig);
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
 		inputLatticeSize = round(pow((numNodes-1)*lines.size(),1/3.));
-		inputLatticeSizeX = inputLatticeSize/(numNodes-1);
-		if (NUMX > inputLatticeSizeX) strideout = NUMX/inputLatticeSizeX;
-		if (NUMX < inputLatticeSizeX) stridein = inputLatticeSizeX/NUMX;
-		for (sx=1;sx<=NUMX;sx++)
+		inputLatticeSizeZ = inputLatticeSize/(numNodes-1);
+		if (NUMZ > inputLatticeSizeZ) strideout = NUMZ/inputLatticeSizeZ;
+		if (NUMZ < inputLatticeSizeZ) stridein = inputLatticeSizeZ/NUMZ;
+		for (sx=1;sx<=NUM;sx++)
 			for (sy=1;sy<=NUM;sy++)
-				for (sz=1; sz<=NUM;sz++) {
+				for (sz=1; sz<=NUMZ;sz++) {
 					if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
 						linenumber  = (sx-1)*inputLatticeSize*inputLatticeSize + (sy-1)*inputLatticeSize + (sz-1);
@@ -113,9 +113,9 @@ void setInitialConditions(int seedMult)
 	  case 1:
 		// random
 		if (nodeID==1) cout << "==> Initial wavefunction : Random" << endl;
-        	for (sx=0;sx<NUMX+2;sx++)
+        	for (sx=0;sx<NUM+2;sx++)
           	  for (sy=0;sy<NUM+2;sy++)
-            	    for (sz=0; sz<NUM+2;sz++)
+            	    for (sz=0; sz<NUMZ+2;sz++)
                       w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		break;
 	  case 2:
@@ -125,9 +125,9 @@ void setInitialConditions(int seedMult)
           	  for (sy=0;sy<=NUM+1;sy++)
             	    for (sz=0; sz<=NUM+1;sz++) {
 		      // coordinate system is centered in simulation volume
-		      dx = sx - ((double)NUMX+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMX;
+		      dx = sx - ((double)NUM+1.)/2.;
 		      dy = sy - ((double)NUM+1.)/2.;
-		      dz = sz - ((double)NUM+1.)/2.;
+		      dz = sz - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
 		      r = A*sqrt(dx*dx+dy*dy+dz*dz);
 		      costheta = A*dz/r;
 		      cosphi = A*dx/r;
@@ -140,17 +140,17 @@ void setInitialConditions(int seedMult)
 	  case 3:
 		// constant
 		if (nodeID==1) cout << "==> Initial wavefunction : Constant" << endl;
-        	for (sx=0;sx<=NUMX+1;sx++)
+        	for (sx=0;sx<=NUM+1;sx++)
           	  for (sy=0;sy<=NUM+1;sy++)
-            	    for (sz=0; sz<=NUM+1;sz++)
+            	    for (sz=0; sz<=NUMZ+1;sz++)
                       w[sx][sy][sz] = 0.1;
 		break;
 	  case 4:
 		// test grid
 		if (nodeID==1) cout << "==> Initial wavefunction : Boolean Test" << endl;
-        	for (sx=0;sx<=NUMX+1;sx++)
+        	for (sx=0;sx<=NUM+1;sx++)
           	  for (sy=0;sy<=NUM+1;sy++)
-            	    for (sz=0; sz<=NUM+1;sz++)
+            	    for (sz=0; sz<=NUMZ+1;sz++)
                       w[sx][sy][sz] = (sx%2)*(sy%2)*(sz%2);
 		break;
 	  default:
@@ -160,28 +160,28 @@ void setInitialConditions(int seedMult)
 	}
 
 	// enforce BCs
-        for (sx=0;sx<=NUMX+1;sx++)
+        for (sx=0;sx<=NUM+1;sx++)
           for (sy=0;sy<=NUM+1;sy++) {
 		w[sx][sy][0] = 0;
-		w[sx][sy][NUM+1] = 0;
+		w[sx][sy][NUMZ+1] = 0;
 	  }
 
-        for (sz=0;sz<=NUM+1;sz++)
+        for (sz=0;sz<=NUMZ+1;sz++)
           for (sy=0;sy<=NUM+1;sy++) {
 		w[0][sy][sz] = 0;
-		w[NUMX+1][sy][sz] = 0;
+		w[NUM+1][sy][sz] = 0;
 	  }
 
-        for (sx=0;sx<=NUMX+1;sx++)
-          for (sz=0;sz<=NUM+1;sz++) {
+        for (sx=0;sx<=NUM+1;sx++)
+          for (sz=0;sz<=NUMZ+1;sz++) {
 		w[sx][0][sz] = 0;
 		w[sx][NUM+1][sz] = 0;
 	  }
 
 	// zero out updated wavefnc for safety's sake
-        for (sx=0;sx<NUMX+2;sx++)
+        for (sx=0;sx<NUM+2;sx++)
           for (sy=0;sy<NUM+2;sy++)
-            for (sz=0;sz<NUM+2;sz++)
+            for (sz=0;sz<NUMZ+2;sz++)
 		W[sx][sy][sz] = 0;
 
 	// symmetrize the intial condition
@@ -204,18 +204,18 @@ void symmetrizeWavefunction()
 		// symmetric in z
 	  case 2:
 		// antisymmetric in z
-        	for (sx=0;sx<NUMX+2;sx++)
+        	for (sx=0;sx<NUM+2;sx++)
 		{
 		  x=sx; 	
           	  for (sy=1;sy<=NUM;sy++)
 		  {
 		    y=sy; 	
-            	    for (sz=1;sz<=NUM;sz++)
+            	    for (sz=1;sz<=NUMZ;sz++)
 		    {
 			z=sz;
-		    	if (z>NUM/2)
-		      	  z = NUM + 1 - z;
-			if (sz>NUM/2)
+		    	if (z>NUMZ/2)
+		      	  z = NUMZ + 1 - z;
+			if (sz>NUMZ/2)
 			  w[sx][sy][sz] = ((dcomp)sign)*w[x][y][z];
 		    }
 		  }
@@ -225,7 +225,7 @@ void symmetrizeWavefunction()
 		// symmetric in y
 	  case 4:
 		// antisymmetric in y
-        	for (sx=0;sx<NUMX+2;sx++)
+        	for (sx=0;sx<NUM+2;sx++)
 		{
 		  x=sx; 	
           	  for (sy=1;sy<=NUM;sy++)

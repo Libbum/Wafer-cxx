@@ -1,4 +1,5 @@
 /*
+ *
 
    ouputroutines.cpp
 
@@ -68,9 +69,9 @@ void outputSummaryData() {
 
 void outputSnapshot(dcomp ***wfnc, char* label) {
 
-  int x;
+  int z;
   static int h=NUM/2;
-  static int hx=NUMX/2;
+  static int hz=NUMZ/2;
 
   fstream out;
   char fname[255];
@@ -81,22 +82,22 @@ void outputSnapshot(dcomp ***wfnc, char* label) {
   sprintf(fname,"data/snapshot/wavefunction_%s.dat",label);
   out.open(fname, ios::out);
   out.precision(10);
-  for (int s=0;s<=NUMX+1;s++) {
-    x=(nodeID-1)*NUMX + s;	  
-    out << x << "\t";
-    out << scientific << 0.5*(wfnc[s][h][h]+wfnc[s][h+1][h+1]) << "\t";
+  for (int s=0;s<=NUM+1;s++) {
+    out << s << "\t";
+    out << scientific << 0.5*(wfnc[s][h][hz]+wfnc[s][h+1][hz+1]) << "\t";
     out << endl;
   }
   out << "&&" << endl;
   for (int s=0;s<=NUM+1;s++) {
     out << s << "\t";
-    out << scientific << 0.5*(wfnc[hx][s][h]+wfnc[hx+1][s][h+1]) << "\t";
+    out << scientific << 0.5*(wfnc[h][s][hz]+wfnc[h+1][s][hz+1]) << "\t";
     out << endl;
   }
   out << "&&" << endl;
-  for (int s=0;s<=NUM+1;s++) {
-    out << s << "\t";
-    out << scientific << 0.5*(wfnc[hx][h][s]+wfnc[hx+1][h+1][s]) << "\t";
+  for (int s=0;s<=NUMZ+1;s++) {
+    z=(nodeID-1)*NUMZ + s;	  
+    out << z << "\t";
+    out << scientific << 0.5*(wfnc[h][h][s]+wfnc[h+1][h+1][s]) << "\t";
     out << endl;
   }
   out.close();
@@ -106,7 +107,7 @@ void outputSnapshot(dcomp ***wfnc, char* label) {
 
 void outputWavefunction(dcomp ***wfnc, char* label) {
 
-  int x;
+  int z;
   fstream out;
   char fname[255];
 
@@ -117,13 +118,13 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
 
   out.open(fname, ios::out);
   out.precision(12);
-  for (int sx=1;sx<=NUMX;sx++) {
-    x=(nodeID-1)*NUMX + sx;
+  for (int sx=1;sx<=NUM;sx++) {
     for (int sy=1;sy<=NUM;sy++) {
-      for (int sz=1; sz<=NUM;sz++) {
-                out << x  << "\t";
+      for (int sz=1; sz<=NUMZ;sz++) {
+                z=(nodeID-1)*NUMZ + sz;
+                out << sx  << "\t";
                 out << sy << "\t";
-                out << sz << "\t";
+                out << z << "\t";
                 out << real(wfnc[sx][sy][sz]) << "\t";
                 out << imag(wfnc[sx][sy][sz]);
                 out << endl;
@@ -137,7 +138,7 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
 // output v 3d
 void outputPotential(char* label) {
 
-  int x;
+  int z;
   fstream out;
   char fname[255];
 
@@ -148,13 +149,13 @@ void outputPotential(char* label) {
 
   out.open(fname, ios::out);
   out.precision(12);
-  for (int sx=1;sx<=NUMX;sx++) {
-    x=(nodeID-1)*NUMX + sx;
+  for (int sx=1;sx<=NUM;sx++) {
     for (int sy=1;sy<=NUM;sy++) {
-      for (int sz=1; sz<=NUM;sz++) {
-                out << x  << "\t";
+      for (int sz=1; sz<=NUMZ;sz++) {
+                z=(nodeID-1)*NUMZ + sz;
+                out << sx  << "\t";
                 out << sy << "\t";
-                out << sz << "\t";
+                out << z << "\t";
                 out << real(v[sx][sy][sz]) << "\t";
                 out << imag(v[sx][sy][sz]);
                 out << endl;

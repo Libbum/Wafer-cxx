@@ -41,9 +41,9 @@ double distsq(int sx,int sy, int sz)
 	double dx,dy,dz,r2;
 
 	// coordinate system is centered in simulation volume 
-	dx = sx - ((double)NUMX+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMX;
+	dx = sx - ((double)NUM+1.)/2.;
 	dy = sy - ((double)NUM+1.)/2.;
-	dz = sz - ((double)NUM+1.)/2.;
+	dz = sz - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
 	r2 = (dx*dx+dy*dy+dz*dz);
 	return r2;
 }
@@ -56,9 +56,9 @@ dcomp potential(int sx,int sy, int sz)
 	double res,err;
 	
 	// coordinate system is centered in simulation volume 
-	dx = ((double) sx) - ((double)NUMX+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMX;
+	dx = ((double) sx) - ((double)NUM+1.)/2.;
 	dy = ((double) sy) - ((double)NUM+1.)/2.;
-	dz = ((double) sz) - ((double)NUM+1.)/2.;
+	dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
   r = A*sqrt(dx*dx+dy*dy+dz*dz);
 
 	switch(POTENTIAL) {
@@ -194,18 +194,18 @@ dcomp potential(int sx,int sy, int sz)
 		// Mickey Mouse's Head
 		double Dx, Dy, Dz, R;
 		if (r/A <= NUM/4) return -100.0; // head
-		Dx = ((double) sx) - ((double)NUMX+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMX;
+		Dx = sx - ((double)NUM+1.)/2. - (1/sqrt(2.)+0.25)*NUM/4;
 		Dy = sy - ((double)NUM+1.)/2. - (1/sqrt(2.)+0.25)*NUM/4;
-		Dz = sz - ((double)NUM+1.)/2. - (1/sqrt(2.)+0.25)*NUM/4;
+		Dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
 		R = sqrt(4*Dx*Dx+Dy*Dy+Dz*Dz);
 		if (R < NUM/8) return -105.0; // ear
 		Dy = sy - ((double)NUM+1.)/2. + (1/sqrt(2.)+0.25)*NUM/4;
-		Dz = sz - ((double)NUM+1.)/2. - (1/sqrt(2.)+0.25)*NUM/4;
+		Dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
 		R = sqrt(4*Dx*Dx+Dy*Dy+Dz*Dz);
 		if (R < NUM/8) return -105.0; // ear
-		Dx = ((double) sx) - ((double)NUMX+1.)/2. - ((double)NUM/8.)+ ( ((double)nodeID) - ((double)numNodes)/2. )*NUMX;
+		Dx = sx - ((double)NUM+1.)/2.;
 		Dy = sy - ((double)NUM+1.)/2.;
-		Dz = sz - ((double)NUM+1.)/2.;
+		Dz = ((double) sz) - ((double)NUMZ+1.)/2. - ((double)NUM/8.)+ ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
 		R = sqrt(Dx*Dx+Dy*Dy+Dz*Dz);
 		if (R < NUM/6) return -100.0; // nose
 		return 0;
@@ -273,9 +273,9 @@ dcomp potential(int sx,int sy, int sz)
 		break;
     case 22: //Mexican Hat
     {
-      double tx = -((double) GR + A) + ((double) sx+(nodeID-1)*NUMX)*((2.0*((double) GR))/((double) NUM - 1));
+      double tx = -((double) GR + A) + ((double) sx)*((2.0*((double) GR))/((double) NUM - 1));
       double ty = -((double) GR + A) + ((double) sy)*((2.0*((double) GR))/((double) NUM - 1));
-      double tz = -((double) GR + A) + ((double) sz)*((2.0*((double) GR))/((double) NUM - 1));
+      double tz = -((double) GR + A) + ((double) sz+(nodeID-1)*NUMZ)*((2.0*((double) GR))/((double) NUM - 1));
      // if (( nodeID == 1) && ( sy == 0 ) && ( sz == 0)) {
       //if ((sx == 0 ) && ( sy == 0 ) && ( sz == 0)) {
      //   cout << "tx " << tx << ", ty " << ty << ", tz " << tz << ", sx " << sx << ", numNodes " << numNodes << endl;
@@ -295,9 +295,9 @@ dcomp potentialSub(int sx, int sy, int sz)
 	double iV,rV;
 
 	// coordinate system is centered in simulation volume 
-	dx = ((double) sx) - ((double)NUMX+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMX;
+	dx = ((double) sx) - ((double)NUM+1.)/2.;
 	dy = ((double) sy) - ((double)NUM+1.)/2.;
-	dz = ((double) sz) - ((double)NUM+1.)/2.;
+	dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
 	r = A*sqrt(dx*dx+dy*dy+dz*dz);
 
 	switch(POTENTIAL) {
