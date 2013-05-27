@@ -54,35 +54,35 @@ void allocateMemory() {
 
         // indices x,y,z
         
-	w = new dcomp**[NUM+2]; 
-	for (int sx=0;sx<NUM+2;sx++) w[sx] = new dcomp*[NUM+2];
-	for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) w[sx][sy] = new dcomp[NUMZ+2];
+	w = new dcomp**[NUMX+2]; 
+	for (int sx=0;sx<NUMX+2;sx++) w[sx] = new dcomp*[NUMY+2];
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) w[sx][sy] = new dcomp[DISTNUMZ+2];
 
-	W = new dcomp**[NUM+2]; 
-	for (int sx=0;sx<NUM+2;sx++) W[sx] = new dcomp*[NUM+2];
-	for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) W[sx][sy] = new dcomp[NUMZ+2];
+	W = new dcomp**[NUMX+2]; 
+	for (int sx=0;sx<NUMX+2;sx++) W[sx] = new dcomp*[NUMY+2];
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) W[sx][sy] = new dcomp[DISTNUMZ+2];
 
-    W2 = new dcomp**[NUM+2];
-    for (int sx=0;sx<NUM+2;sx++) W2[sx] = new dcomp*[NUM+2];
-    for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) W2[sx][sy] = new dcomp[NUMZ+2];
+    W2 = new dcomp**[NUMX+2];
+    for (int sx=0;sx<NUMX+2;sx++) W2[sx] = new dcomp*[NUMY+2];
+    for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) W2[sx][sy] = new dcomp[DISTNUMZ+2];
 
-    v = new dcomp**[NUM+2]; 
-	for (int sx=0;sx<NUM+2;sx++) v[sx] = new dcomp*[NUM+2];
-	for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) v[sx][sy] = new dcomp[NUMZ+2];
+    v = new dcomp**[NUMX+2]; 
+	for (int sx=0;sx<NUMX+2;sx++) v[sx] = new dcomp*[NUMY+2];
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) v[sx][sy] = new dcomp[DISTNUMZ+2];
 
-	a = new dcomp**[NUM+2]; 
-	for (int sx=0;sx<NUM+2;sx++) a[sx] = new dcomp*[NUM+2];
-	for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) a[sx][sy] = new dcomp[NUMZ+2];
+	a = new dcomp**[NUMX+2]; 
+	for (int sx=0;sx<NUMX+2;sx++) a[sx] = new dcomp*[NUMY+2];
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) a[sx][sy] = new dcomp[DISTNUMZ+2];
 
-	b = new dcomp**[NUM+2]; 
-	for (int sx=0;sx<NUM+2;sx++) b[sx] = new dcomp*[NUM+2];
-	for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) b[sx][sy] = new dcomp[NUMZ+2];
+	b = new dcomp**[NUMX+2]; 
+	for (int sx=0;sx<NUMX+2;sx++) b[sx] = new dcomp*[NUMY+2];
+	for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) b[sx][sy] = new dcomp[DISTNUMZ+2];
 
 	int snaps = 2;
 	wstore = new dcomp***[snaps]; 
-	for (int n=0;n<snaps;n++) wstore[n] = new dcomp**[NUM+2];
-	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUM+2;sx++) wstore[n][sx] = new dcomp*[NUM+2];
-	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUM+2;sx++) for (int sy=0;sy<NUM+2;sy++) wstore[n][sx][sy] = new dcomp[NUMZ+2];
+	for (int n=0;n<snaps;n++) wstore[n] = new dcomp**[NUMX+2];
+	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUMX+2;sx++) wstore[n][sx] = new dcomp*[NUMY+2];
+	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUMX+2;sx++) for (int sy=0;sy<NUMY+2;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+2];
 		
 	return;
 }
@@ -99,9 +99,9 @@ void loadPotentialArrays()
 {
         int sx,sy,sz;
 
-        for (sx=0;sx<=NUM+1;sx++)
-        for (sy=0;sy<=NUM+1;sy++)
-        for (sz=0; sz<=NUMZ+1;sz++) {
+        for (sx=0;sx<=NUMX+1;sx++)
+        for (sy=0;sy<=NUMY+1;sy++)
+        for (sz=0; sz<=DISTNUMZ+1;sz++) {
           v[sx][sy][sz] = potential(sx,sy,sz);
           b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
           a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
@@ -111,9 +111,9 @@ void loadPotentialArrays()
 // compute energy of a wave function
 dcomp wfncEnergy(dcomp*** wfnc) {
 	dcomp res=0;
-    	for (int sx=1;sx<=NUM;sx++) 
-      	  for (int sy=1;sy<=NUM;sy++) 
-       	    for (int sz=1;sz<=NUMZ;sz++) {
+    	for (int sx=1;sx<=NUMX;sx++) 
+      	  for (int sy=1;sy<=NUMY;sy++) 
+       	    for (int sz=1;sz<=DISTNUMZ;sz++) {
 		    res += v[sx][sy][sz]*conj(wfnc[sx][sy][sz])*wfnc[sx][sy][sz] - 
 			   conj(wfnc[sx][sy][sz])*(  wfnc[sx+1][sy][sz] + wfnc[sx-1][sy][sz] +
 				                 wfnc[sx][sy+1][sz] + wfnc[sx][sy-1][sz] +
@@ -130,9 +130,9 @@ dcomp computeEnergy()
 // compute norm squared
 dcomp wfncNorm2(dcomp*** wfnc) {
 	dcomp norm=0;
-    	for (int sx=1;sx<=NUM;sx++) 
-      	  for (int sy=1;sy<=NUM;sy++) 
-       	    for (int sz=1; sz<=NUMZ;sz++) { 
+    	for (int sx=1;sx<=NUMX;sx++) 
+      	  for (int sy=1;sy<=NUMY;sy++) 
+       	    for (int sz=1; sz<=DISTNUMZ;sz++) { 
 	      norm += conj(wfnc[sx][sy][sz])*wfnc[sx][sy][sz]; 
 	    }
 	return norm;
@@ -141,28 +141,24 @@ dcomp wfncNorm2(dcomp*** wfnc) {
 // compute expectation value of vinfinity
 dcomp vInfinityExpectationValue(dcomp*** wfnc) {
 	dcomp expectation=0;
-    	for (int sx=1;sx<=NUM;sx++) 
-      	  for (int sy=1;sy<=NUM;sy++) 
-       	    for (int sz=1; sz<=NUMZ;sz++) { 
+    	for (int sx=1;sx<=NUMX;sx++) 
+      	  for (int sy=1;sy<=NUMY;sy++) 
+       	    for (int sz=1; sz<=DISTNUMZ;sz++) { 
 	      expectation += conj(wfnc[sx][sy][sz])*wfnc[sx][sy][sz]*potentialSub(sx,sy,sz); 
 	    }
 	return expectation;
 }
 
-
-// #ad.
 // compute expectation value of r^2
 dcomp r2ExpectationValue(dcomp*** wfnc) {
 	dcomp expectation=0;
-    	for (int sx=1;sx<=NUM;sx++) 
-      	  for (int sy=1;sy<=NUM;sy++) 
-       	    for (int sz=1; sz<=NUMZ;sz++) { 
+    	for (int sx=1;sx<=NUMX;sx++) 
+      	  for (int sy=1;sy<=NUMY;sy++) 
+       	    for (int sz=1; sz<=DISTNUMZ;sz++) { 
 	      expectation += conj(wfnc[sx][sy][sz])*wfnc[sx][sy][sz]*distsq(sx,sy,sz); 
 	    }
 	return expectation;
 }
-
-
 
 inline dcomp updateRule(int sx, int sy, int sz, double step) 
 {
@@ -176,10 +172,10 @@ inline dcomp updateRule(int sx, int sy, int sz, double step)
 // load updated left and right boundaries into W
 void updateBoundaries(double step) {
 
-        for (int sx=0;sx<NUM+2;sx++)
-      	  for (int sy=0;sy<NUM+2;sy++)
-       	    for (int sz=1;sz<=NUMZ;sz+=NUMZ-1) {
-				if (sx>=1 && sx<=NUM && sy>=1 && sy<=NUM) 
+        for (int sx=0;sx<NUMX+2;sx++)
+      	  for (int sy=0;sy<NUMY+2;sy++)
+       	    for (int sz=1;sz<=DISTNUMZ;sz+=DISTNUMZ-1) {
+				if (sx>=1 && sx<=NUMX && sy>=1 && sy<=NUMY) 
 					W[sx][sy][sz] = updateRule(sx,sy,sz,step);
 				else 
 					W[sx][sy][sz] = w[sx][sy][sz]; 
@@ -189,12 +185,12 @@ void updateBoundaries(double step) {
 // update the grid; note you should always call updatedBondaries before calling this routine
 void updateInterior(double step) {
 
-    	for (int sx=0;sx<NUM+2;sx++) 
-      	  for (int sy=0;sy<NUM+2;sy++)
-       	    for (int sz=0;sz<NUMZ+2;sz++) {
+    	for (int sx=0;sx<NUMX+2;sx++) 
+      	  for (int sy=0;sy<NUMY+2;sy++)
+       	    for (int sz=0;sz<DISTNUMZ+2;sz++) {
 		// no need to update the two slices which were already loaded by updatedBoundaries
-		if (sz==1 || sz==NUMZ) continue;
-		if (sx>=1 && sx<=NUM && sy>=1 && sy<=NUM && sz>=1 && sz<=NUMZ)
+		if (sz==1 || sz==DISTNUMZ) continue;
+		if (sx>=1 && sx<=NUMX && sy>=1 && sy<=NUMY && sz>=1 && sz<=DISTNUMZ)
 		  W[sx][sy][sz] = updateRule(sx,sy,sz,step);
 		else 
 		  W[sx][sy][sz] = w[sx][sy][sz]; 
@@ -204,9 +200,9 @@ void updateInterior(double step) {
 void recordSnapshot(dcomp*** wfnc) { //, int step
 	//int snap = (int) step/SNAPUPDATE;
   //int nsnaps = (int) step/SNAPUPDATE;
-  for (int sx=0;sx<=NUM+1;sx++) 
-      	  for (int sy=0;sy<=NUM+1;sy++)
-       	    for (int sz=0; sz<=NUMZ+1;sz++) {
+  for (int sx=0;sx<=NUMX+1;sx++) 
+      	  for (int sy=0;sy<=NUMY+1;sy++)
+       	    for (int sz=0; sz<=DISTNUMZ+1;sz++) {
 		wstore[1][sx][sy][sz] = wstore[0][sx][sy][sz];
 		wstore[0][sx][sy][sz] = wfnc[sx][sy][sz];
             }
@@ -214,8 +210,8 @@ void recordSnapshot(dcomp*** wfnc) { //, int step
 
 void normalizeWavefunction(dcomp*** wfnc) {
   dcomp norm = sqrt(normalizationCollect);
-    	for (int sx=0;sx<=NUM+1;sx++) 
-      	  for (int sy=0;sy<=NUM+1;sy++)
-       	    for (int sz=0; sz<=NUMZ+1;sz++) 
+    	for (int sx=0;sx<=NUMX+1;sx++) 
+      	  for (int sy=0;sy<=NUMY+1;sy++)
+       	    for (int sz=0; sz<=DISTNUMZ+1;sz++) 
 		wfnc[sx][sy][sz] /= norm;
 }

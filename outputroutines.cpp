@@ -63,15 +63,16 @@ void outputSummaryData() {
       cout << "==> Ground State Energy : " << fixed << ener << endl;
       cout << "==> Ground State Binding Energy : " << binding << endl;
       cout << "==> Ground State r_RMS : " << sqrt(real(rRMS2)) << endl;  // #ad.
-      cout << "==> Ground State L/r_RMS : " << float(NUM)/sqrt(real(rRMS2)) << endl;  // #ad.
+      cout << "==> Ground State L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;  // #ad.
 
 }
 
 void outputSnapshot(dcomp ***wfnc, char* label) {
 
   int z;
-  static int h=NUM/2;
-  static int hz=NUMZ/2;
+  static int hx=NUMX/2;
+  static int hy=NUMY/2;
+  static int hz=DISTNUMZ/2;
 
   fstream out;
   char fname[255];
@@ -82,22 +83,22 @@ void outputSnapshot(dcomp ***wfnc, char* label) {
   sprintf(fname,"data/snapshot/wavefunction_%s.dat",label);
   out.open(fname, ios::out);
   out.precision(10);
-  for (int s=0;s<=NUM+1;s++) {
+  for (int s=0;s<=NUMX+1;s++) {
     out << s << "\t";
-    out << scientific << 0.5*(wfnc[s][h][hz]+wfnc[s][h+1][hz+1]) << "\t";
+    out << scientific << 0.5*(wfnc[s][hy][hz]+wfnc[s][hy+1][hz+1]) << "\t";
     out << endl;
   }
   out << "&&" << endl;
-  for (int s=0;s<=NUM+1;s++) {
+  for (int s=0;s<=NUMY+1;s++) {
     out << s << "\t";
-    out << scientific << 0.5*(wfnc[h][s][hz]+wfnc[h+1][s][hz+1]) << "\t";
+    out << scientific << 0.5*(wfnc[hx][s][hz]+wfnc[hx+1][s][hz+1]) << "\t";
     out << endl;
   }
   out << "&&" << endl;
-  for (int s=0;s<=NUMZ+1;s++) {
-    z=(nodeID-1)*NUMZ + s;	  
+  for (int s=0;s<=DISTNUMZ+1;s++) {
+    z=(nodeID-1)*DISTNUMZ + s;	  
     out << z << "\t";
-    out << scientific << 0.5*(wfnc[h][h][s]+wfnc[h+1][h+1][s]) << "\t";
+    out << scientific << 0.5*(wfnc[hx][hy][s]+wfnc[hx+1][hy+1][s]) << "\t";
     out << endl;
   }
   out.close();
@@ -118,10 +119,10 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
 
   out.open(fname, ios::out);
   out.precision(12);
-  for (int sx=1;sx<=NUM;sx++) {
-    for (int sy=1;sy<=NUM;sy++) {
-      for (int sz=1; sz<=NUMZ;sz++) {
-                z=(nodeID-1)*NUMZ + sz;
+  for (int sx=1;sx<=NUMX;sx++) {
+    for (int sy=1;sy<=NUMY;sy++) {
+      for (int sz=1; sz<=DISTNUMZ;sz++) {
+                z=(nodeID-1)*DISTNUMZ + sz;
                 out << sx  << "\t";
                 out << sy << "\t";
                 out << z << "\t";
@@ -149,10 +150,10 @@ void outputPotential(char* label) {
 
   out.open(fname, ios::out);
   out.precision(12);
-  for (int sx=1;sx<=NUM;sx++) {
-    for (int sy=1;sy<=NUM;sy++) {
-      for (int sz=1; sz<=NUMZ;sz++) {
-                z=(nodeID-1)*NUMZ + sz;
+  for (int sx=1;sx<=NUMX;sx++) {
+    for (int sy=1;sy<=NUMY;sy++) {
+      for (int sz=1; sz<=DISTNUMZ;sz++) {
+                z=(nodeID-1)*DISTNUMZ + sz;
                 out << sx  << "\t";
                 out << sy << "\t";
                 out << z << "\t";
@@ -168,12 +169,12 @@ void outputPotential(char* label) {
 
 // output v along principal axes
 void dumpPotential() {
-
-  int h=NUM/2;
+//WARNING: This is probably no good for arbitrary box. Currently not in use so it's not checked.
+  int h=NUMZ/2;
   fstream out;
 
   out.open("data/potential.dat", ios::out);
-  for (int s=0;s<=NUM+1;s++) {
+  for (int s=0;s<=NUMZ+1;s++) {
                 out << s << "\t";
                 out << v[s][h][h] << "\t";
                 out << v[h][s][h] << "\t";

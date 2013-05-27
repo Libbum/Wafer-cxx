@@ -41,9 +41,9 @@ double distsq(int sx,int sy, int sz)
 	double dx,dy,dz,r2;
 
 	// coordinate system is centered in simulation volume 
-	dx = sx - ((double)NUM+1.)/2.;
-	dy = sy - ((double)NUM+1.)/2.;
-	dz = sz - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
+	dx = sx - ((double)NUMX+1.)/2.;
+	dy = sy - ((double)NUMY+1.)/2.;
+	dz = sz - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 	r2 = (dx*dx+dy*dy+dz*dz);
 	return r2;
 }
@@ -56,9 +56,9 @@ dcomp potential(int sx,int sy, int sz)
 	double res,err;
 	
 	// coordinate system is centered in simulation volume 
-	dx = ((double) sx) - ((double)NUM+1.)/2.;
-	dy = ((double) sy) - ((double)NUM+1.)/2.;
-	dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
+	dx = ((double) sx) - ((double)NUMX+1.)/2.;
+	dy = ((double) sy) - ((double)NUMY+1.)/2.;
+	dz = ((double) sz) - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
   r = A*sqrt(dx*dx+dy*dy+dz*dz);
 
 	switch(POTENTIAL) {
@@ -68,23 +68,23 @@ dcomp potential(int sx,int sy, int sz)
 		break;
 	  case 1:
 		// cubic well
-		if ( (sx>NUM/4 && sx<=3*NUM/4) && (sy>NUM/4 && sy<=3*NUM/4) && (sz>NUM/4 && sz<=3*NUM/4) )
+		if ( (sx>NUMX/4 && sx<=3*NUMX/4) && (sy>NUMY/4 && sy<=3*NUMY/4) && (sz>NUMZ/4 && sz<=3*NUMZ/4) )
 			return -10.0;
 		else
 			return 0.0;
 		break;
 	  case 2:
 		// quadrilateral-well in center of cube with short side in z direction
-		if ( (sx>NUM/4 && sx<=3*NUM/4) && (sy>NUM/4 && sy<=3*NUM/4) && (sz>3*NUM/8 && sz<=5*NUM/8) )
+		if ( (sx>NUMX/4 && sx<=3*NUMX/4) && (sy>NUMY/4 && sy<=3*NUMY/4) && (sz>3*NUMZ/8 && sz<=5*NUMZ/8) )
 			return -10.0;
 		else
 			return 0.0;
 		break;
 	  case 3:
 		// 3d periodic
-		temp  = sin(2*M_PI*(sx-1)/(NUM-1))*sin(2*M_PI*(sx-1)/(NUM-1));
-		temp *= sin(2*M_PI*(sy-1)/(NUM-1))*sin(2*M_PI*(sy-1)/(NUM-1));
-		temp *= sin(2*M_PI*(sz-1)/(NUM-1))*sin(2*M_PI*(sz-1)/(NUM-1));
+		temp  = sin(2*M_PI*(sx-1)/(NUMX-1))*sin(2*M_PI*(sx-1)/(NUMX-1));
+		temp *= sin(2*M_PI*(sy-1)/(NUMY-1))*sin(2*M_PI*(sy-1)/(NUMY-1));
+		temp *= sin(2*M_PI*(sz-1)/(NUMZ-1))*sin(2*M_PI*(sz-1)/(NUMZ-1));
 		return -temp+1;
 		break;
 	  case 4:
@@ -193,29 +193,29 @@ dcomp potential(int sx,int sy, int sz)
 	  case 16:
 		// Mickey Mouse's Head
 		double Dx, Dy, Dz, R;
-		if (r/A <= NUM/4) return -100.0; // head
-		Dx = sx - ((double)NUM+1.)/2. - (1/sqrt(2.)+0.25)*NUM/4;
-		Dy = sy - ((double)NUM+1.)/2. - (1/sqrt(2.)+0.25)*NUM/4;
-		Dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
+		if (r/A <= NUMZ/4) return -100.0; // head
+		Dx = sx - ((double)NUMX+1.)/2. - (1/sqrt(2.)+0.25)*NUMY/4;
+		Dy = sy - ((double)NUMY+1.)/2. - (1/sqrt(2.)+0.25)*NUMX/4;
+		Dz = ((double) sz) - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 		R = sqrt(4*Dx*Dx+Dy*Dy+Dz*Dz);
-		if (R < NUM/8) return -105.0; // ear
-		Dy = sy - ((double)NUM+1.)/2. + (1/sqrt(2.)+0.25)*NUM/4;
-		Dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
+		if (R < NUMZ/8) return -105.0; // ear
+		Dy = sy - ((double)NUMY+1.)/2. + (1/sqrt(2.)+0.25)*NUMY/4;
+		Dz = ((double) sz) - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 		R = sqrt(4*Dx*Dx+Dy*Dy+Dz*Dz);
-		if (R < NUM/8) return -105.0; // ear
-		Dx = sx - ((double)NUM+1.)/2.;
-		Dy = sy - ((double)NUM+1.)/2.;
-		Dz = ((double) sz) - ((double)NUMZ+1.)/2. - ((double)NUM/8.)+ ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
+		if (R < NUMZ/8) return -105.0; // ear
+		Dx = sx - ((double)NUMX+1.)/2.;
+		Dy = sy - ((double)NUMY+1.)/2.;
+		Dz = ((double) sz) - ((double)DISTNUMZ+1.)/2. - ((double)NUMZ/8.)+ ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 		R = sqrt(Dx*Dx+Dy*Dy+Dz*Dz);
-		if (R < NUM/6) return -100.0; // nose
+		if (R < NUMZ/6) return -100.0; // nose
 		return 0;
 		break;
 	  case 17:
 		// Dodecahedron
 		double x, y, z;
-		x = dx/((NUM-1)/2);
-		y = dy/((NUM-1)/2);
-		z = dz/((NUM-1)/2);
+		x = dx/((NUMX-1)/2);
+		y = dy/((NUMY-1)/2);
+		z = dz/((NUMZ-1)/2);
 		if (12.70820393249937 + 11.210068307552588*x >= 14.674169922690343*z && 11.210068307552588*x <= 12.70820393249937 + 14.674169922690343*z && 5.605034153776295*(3.23606797749979*x - 1.2360679774997896*z) <= 6.*(4.23606797749979 + 5.23606797749979*y) && 18.1382715378281*x + 3.464101615137755*z <= 12.70820393249937 && 9.06913576891405*x + 15.70820393249937*y <= 12.70820393249937 + 3.464101615137755*z && 9.70820393249937*y <= 12.70820393249937 + 5.605034153776294*x + 14.674169922690343*z && 12.70820393249937 + 5.605034153776294*x + 9.70820393249937*y + 14.674169922690343*z >= 0. && 15.70820393249937*y + 3.464101615137755*z <= 12.70820393249937 + 9.06913576891405*x && 5.605034153776295*(-6.47213595499958*x - 1.2360679774997896*z) <= 25.41640786499874 && 3.464101615137755*z <= 9.06913576891405*x + 3.*(4.23606797749979 + 5.23606797749979*y) && 1.7320508075688772*(3.23606797749979*x + 8.47213595499958*z) <= 3.*(4.23606797749979 + 3.23606797749979*y) && 5.605034153776294*x + 9.70820393249937*y + 14.674169922690343*z <= 12.70820393249937) return -100.0;
 		else
 		  return 0.;
@@ -233,9 +233,9 @@ dcomp potential(int sx,int sy, int sz)
 	  case 20:
 		// Complex Dodecahedron
 		// double x, y, z;
-		x = dx/((NUM-1)/2);
-		y = dy/((NUM-1)/2);
-		z = dz/((NUM-1)/2);
+		x = dx/((NUMX-1)/2);
+		y = dy/((NUMY-1)/2);
+		z = dz/((NUMZ-1)/2);
 		if (12.70820393249937 + 11.210068307552588*x >= 14.674169922690343*z && 11.210068307552588*x <= 12.70820393249937 + 14.674169922690343*z && 5.605034153776295*(3.23606797749979*x - 1.2360679774997896*z) <= 6.*(4.23606797749979 + 5.23606797749979*y) && 18.1382715378281*x + 3.464101615137755*z <= 12.70820393249937 && 9.06913576891405*x + 15.70820393249937*y <= 12.70820393249937 + 3.464101615137755*z && 9.70820393249937*y <= 12.70820393249937 + 5.605034153776294*x + 14.674169922690343*z && 12.70820393249937 + 5.605034153776294*x + 9.70820393249937*y + 14.674169922690343*z >= 0. && 15.70820393249937*y + 3.464101615137755*z <= 12.70820393249937 + 9.06913576891405*x && 5.605034153776295*(-6.47213595499958*x - 1.2360679774997896*z) <= 25.41640786499874 && 3.464101615137755*z <= 9.06913576891405*x + 3.*(4.23606797749979 + 5.23606797749979*y) && 1.7320508075688772*(3.23606797749979*x + 8.47213595499958*z) <= 3.*(4.23606797749979 + 3.23606797749979*y) && 5.605034153776294*x + 9.70820393249937*y + 14.674169922690343*z <= 12.70820393249937) return dcomp(-100.,-100.);
 		else
 		  return 0.;
@@ -273,9 +273,9 @@ dcomp potential(int sx,int sy, int sz)
 		break;
     case 22: //Mexican Hat
     {
-      double tx = -((double) GR + A) + ((double) sx)*((2.0*((double) GR))/((double) NUM - 1));
-      double ty = -((double) GR + A) + ((double) sy)*((2.0*((double) GR))/((double) NUM - 1));
-      double tz = -((double) GR + A) + ((double) sz+(nodeID-1)*NUMZ)*((2.0*((double) GR))/((double) NUM - 1));
+      double tx = -((double) GR + A) + ((double) sx)*((2.0*((double) GR))/((double) NUMX - 1));
+      double ty = -((double) GR + A) + ((double) sy)*((2.0*((double) GR))/((double) NUMY - 1));
+      double tz = -((double) GR + A) + ((double) sz+(nodeID-1)*DISTNUMZ)*((2.0*((double) GR))/((double) NUMZ - 1));
      // if (( nodeID == 1) && ( sy == 0 ) && ( sz == 0)) {
       //if ((sx == 0 ) && ( sy == 0 ) && ( sz == 0)) {
      //   cout << "tx " << tx << ", ty " << ty << ", tz " << tz << ", sx " << sx << ", numNodes " << numNodes << endl;
@@ -295,9 +295,9 @@ dcomp potentialSub(int sx, int sy, int sz)
 	double iV,rV;
 
 	// coordinate system is centered in simulation volume 
-	dx = ((double) sx) - ((double)NUM+1.)/2.;
-	dy = ((double) sy) - ((double)NUM+1.)/2.;
-	dz = ((double) sz) - ((double)NUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*NUMZ;
+	dx = ((double) sx) - ((double)NUMX+1.)/2.;
+	dy = ((double) sy) - ((double)NUMY+1.)/2.;
+	dz = ((double) sz) - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 	r = A*sqrt(dx*dx+dy*dy+dz*dz);
 
 	switch(POTENTIAL) {

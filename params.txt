@@ -2,7 +2,9 @@
 SIG		1.0
 
 // number of spatial grid points; should be divisible by the number of computational nodes
-NUM 		124
+NUMX 		84
+NUMY 		84
+NUMZ 		84
 
 // spatial grid spacing
 A		0.1
@@ -11,7 +13,7 @@ A		0.1
 EPS		0.003
 
 // If using S-M Potential, how far should aEPS take you?
-MINTSTEP     1.e-8
+MINTSTEP     1.e-9
 
 // convergence tolerance for ground state energy
 TOLERANCE	1.e-6
@@ -26,7 +28,7 @@ UPDATE		1000
 SNAPUPDATE	300
 
 // set to one to dump the full 3d wavefncs to disk at the end of the run
-SAVEWAVEFNCS	0
+SAVEWAVEFNCS	1
 
 //
 // potential to simulate
@@ -87,11 +89,11 @@ INITSYMMETRY	0
 MASS  15.9994
 
 //Aluminium cluster data
-//ALX   4
+ALX   1.85
 
-//ALY   5.5
+ALY   2.6837
 
 ALZ   4
 
 //Grid range of potential (for matlab scaling)
-GR   6.15
+GR   4.15

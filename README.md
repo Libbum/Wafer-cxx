@@ -29,4 +29,7 @@ module openmpi/1.6.3
 TODO
 ====
 
+- [ ] Symmetry settings have not been checked for arbitrary box
+- [ ] dumpPotential will not work for arbitrary box
+- [ ] Potentials other than mexican hat have not been verified for arbitrary box
 - [X] Pull EPS check into parameters so it's not hard coded
