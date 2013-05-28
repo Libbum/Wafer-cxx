@@ -273,9 +273,13 @@ dcomp potential(int sx,int sy, int sz)
 		break;
     case 22: //Mexican Hat
     {
-      double tx = -((double) GR + A) + ((double) sx)*((2.0*((double) GR))/((double) NUMX - 1));
-      double ty = -((double) GR + A) + ((double) sy)*((2.0*((double) GR))/((double) NUMY - 1));
-      double tz = -((double) GR + A) + ((double) sz+(nodeID-1)*DISTNUMZ)*((2.0*((double) GR))/((double) NUMZ - 1));
+      double gr; //gr is now a dynamic version of GR - no longer needed in params.txt
+      gr = NUMX*A/2-(A/2);
+      double tx = -((double) gr + A) + ((double) sx)*((2.0*((double) gr))/((double) NUMX - 1));
+      gr = NUMY*A/2-(A/2);
+      double ty = -((double) gr + A) + ((double) sy)*((2.0*((double) gr))/((double) NUMY - 1));
+      gr = NUMZ*A/2-(A/2);
+      double tz = -((double) gr + A) + ((double) sz+(nodeID-1)*DISTNUMZ)*((2.0*((double) gr))/((double) NUMZ - 1));
      // if (( nodeID == 1) && ( sy == 0 ) && ( sz == 0)) {
       //if ((sx == 0 ) && ( sy == 0 ) && ( sz == 0)) {
      //   cout << "tx " << tx << ", ty " << ty << ", tz " << tz << ", sx " << sx << ", numNodes " << numNodes << endl;

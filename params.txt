@@ -2,8 +2,6 @@
 SIG		1.0
 
 // number of spatial grid points; should be divisible by the number of computational nodes
-NUMX 		84
-NUMY 		84
 NUMZ 		84
 
 // spatial grid spacing
@@ -95,5 +93,3 @@ ALY   2.6837
 
 ALZ   4
 
-//Grid range of potential (for matlab scaling)
-GR   4.15

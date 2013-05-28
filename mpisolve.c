@@ -28,7 +28,7 @@ typedef std::numeric_limits< double > dbl;
 int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
 int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
-double  ALX=4.7,ALY=4,ALZ=2.5788,GR=4.9; //Aluminium Clusters & Grid Range
+double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
 
 // mpi vars
 int nodeID,numNodes;
@@ -104,8 +104,8 @@ int main( int argc, char *argv[] )
     }
     // node 0 is the master
     if (nodeID == 0) {
-    times(&starttime); // load start time into starttime structure
-    print_line();
+        times(&starttime); // load start time into starttime structure
+        print_line();
 		cout << "Parameters from file" << endl;
 		print_line();
 		readParametersFromFile((char *)"params.txt",1);
@@ -115,10 +115,16 @@ int main( int argc, char *argv[] )
 			print_line();
 			readParametersFromCommandLine(argc,argv,1);
 		}
+        //Find NUMX and NUMY Values
+        NUMX = ceil((2*ALX+A)/A);
+        NUMY = ceil((2*ALY+A)/A);
+        cout << "Calculated values for arbitrary grid: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
     }
     else {
-    readParametersFromFile((char *)"params.txt",0);
-	readParametersFromCommandLine(argc,argv,0);
+        readParametersFromFile((char *)"params.txt",0);
+	    readParametersFromCommandLine(argc,argv,0);
+        NUMX = ceil((2*ALX+A)/A);
+        NUMY = ceil((2*ALY+A)/A);
     }
 	
     if (NUMZ%(numNodes-1)!=0) {
@@ -253,9 +259,7 @@ void solveInitialize() {
       	cout << "Spatial Step Size (A): " << A << endl;
       	cout << "Temporal Step Size (EPS): " << EPS << endl;
       	cout << "Standard Deviation of initial wavefunction noise (SIG): " << SIG << endl;
-      	cout << "Box Length (A*" << NUMX << "): " << A*NUMX << endl;
-      	cout << "Box Width  (A*" << NUMY << "): " << A*NUMY << endl;
-      	cout << "Box Height (A*" << NUMZ << "): " << A*NUMZ << endl;
+      	cout << "Box Dimensions: X = " << A*NUMX << ", Y = " << A*NUMY << ", Z = " << A*NUMZ << endl;
       	print_line();
       	cout.width(dwidth); cout << "Time";
       	cout.width(dwidth); cout << "Energy";

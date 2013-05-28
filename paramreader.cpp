@@ -24,8 +24,6 @@ using namespace std;
 // appropriate type.  lots of hardcoding here
 void setParameter(char *key, const char *value) {
 	// integer params
-	if (strcmp(key,"NUMX")==0) NUMX=atoi(value);
-	if (strcmp(key,"NUMY")==0) NUMY=atoi(value);
 	if (strcmp(key,"NUMZ")==0) NUMZ=atoi(value);
 	if (strcmp(key,"UPDATE")==0) UPDATE=atoi(value);
 	if (strcmp(key,"SNAPUPDATE")==0) SNAPUPDATE=atoi(value);
@@ -49,7 +47,6 @@ void setParameter(char *key, const char *value) {
     if (strcmp(key,"ALX")==0) ALX=atof(value);
     if (strcmp(key,"ALY")==0) ALY=atof(value);
     if (strcmp(key,"ALZ")==0) ALZ=atof(value);
-    if (strcmp(key,"GR")==0) GR=atof(value);
   return;
 }
 
