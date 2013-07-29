@@ -63,7 +63,7 @@ void setInitialConditions(int seedMult)
 			for (sx=0;sx<NUMX+2;sx++)
 				for (sy=0;sy<NUMY+2;sy++)
 					for (sz=0; sz<DISTNUMZ+2;sz++)
-						w[sx][sy][sz] = randGauss(sig);
+                        w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
 		inputLatticeSize = round(pow((numNodes-1)*lines.size(),1/3.));
