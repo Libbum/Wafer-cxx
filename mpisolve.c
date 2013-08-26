@@ -37,7 +37,7 @@ int nodeID,numNodes;
 fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
-int debug = DEBUG_ON;
+int debug = DEBUG_OFF;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
@@ -376,12 +376,6 @@ void solve() {
 			symmetrizeWavefunction();
             // normalize wavefunction
             normalizeWavefunction(w);
-			// record and output snapshot
-	//		sprintf(label,"%d_%d",nodeID,step); 
-	//		outputSnapshot(w,label);
-            // check convergence and break if tolerance is achieved
-			// otherwise, record snapshot for use in excited state 
-			// computation and keep going
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
             if (!isfinite(real(energytot))) {
