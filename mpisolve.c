@@ -87,9 +87,9 @@ int main( int argc, char *argv[] )
     MPI_Status status;
     MPI_Group all_group;
    
-    char hostname[256];
-    gethostname(hostname,255);
-    cout << "Starting node " << nodeID << " of " << numNodes << " on " << hostname << endl;
+    //char hostname[256];
+    //gethostname(hostname,255);
+    //cout << "Starting node " << nodeID << " of " << numNodes << " on " << hostname << endl;
 
     // setup group consisting of computational nodes only for internal communications
     MPI_Comm_group(MPI_COMM_WORLD, &all_group);
@@ -263,7 +263,6 @@ void solveInitialize() {
       	print_line();
       	cout.width(dwidth); cout << "Time";
       	cout.width(dwidth); cout << "Energy";
-      	cout.width(dwidth); cout << "Binding Energy";
       	cout.width(dwidth); cout << "r_RMS";   
       	cout << endl;
       	print_line();
@@ -287,7 +286,6 @@ void solveRestart() {
             print_line();
       	    cout.width(dwidth); cout << "Time";
       	    cout.width(dwidth); cout << "Energy";
-      	    cout.width(dwidth); cout << "Binding Energy";
       	    cout.width(dwidth); cout << "r_RMS";   
       	    cout << endl;
       	    print_line();

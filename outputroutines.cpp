@@ -30,23 +30,16 @@ typedef std::numeric_limits< double > dbl;
 void outputMeasurements(const double time) {
 
 	dcomp ener = energyCollect/normalizationCollect;
-	dcomp binding = ener - vInfinityCollect/normalizationCollect;
-	dcomp rRMS2 = rRMS2Collect/normalizationCollect;   // #ad.
+	dcomp rRMS2 = rRMS2Collect/normalizationCollect;
 
 	// output to screen
 
 	cout.precision(12);
 	cout.width(dwidth); cout << time;
-        cout.width(dwidth); cout << setprecision (7) << ener;
-        cout.width(dwidth); cout << setprecision (7) << binding;
-	cout.width(dwidth); cout << setprecision (7) << sqrt(real(rRMS2));   // #ad.
+    cout.width(35); cout << setprecision (dbl::digits10) << ener;
+	cout.width(15); cout << setprecision (7) << sqrt(real(rRMS2)); 
 	cout << endl;
 
-	// output to files
-
-	//energy_out << time;
-	//energy_out << "\t" << ener;
-	//energy_out << endl;
 }
 
 void outputSummaryData() {
