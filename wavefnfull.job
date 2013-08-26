@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -l walltime=150:00:00
+#PBS -N wfnfull
+#PBS -l nodes=41
+
+#This job assumes an A=0.1 to A=0.01 run
+
+cd $PBS_O_WORKDIR
+
+qalter $PBS_JOBID -o $PBS_O_WORKDIR/$PBS_JOBNAME.${PBS_JOBID//.trifid*/}.job.o -e $PBS_O_WORKDIR/$PBS_JOBNAME.${PBS_JOBID//.trifid*/}.job.e
+
+#Delete any oid data files
+rm data/*.dat
+
+#run low resolution job
+mpirun -np 41 mpisolve 
+
+#update parameter file
+sed -i "s/NUMZ\s*80/NUMZ    800/" params.txt
+sed -i "s/^A\s*0.1/A      0.01/" params.txt
+sed -i "s/INITCONDTYPE\s*1/INITCONDTYPE    0/" params.txt
+
+#run high resolution job
+echo "Altered parameters for high resolution, spawning new workers..."
+mpirun -np 41 mpisolve 
+
+# Output summary information
+qstat -f ${PBS_JOBID//.trifid*/} > $PBS_JOBNAME.${PBS_JOBID//.trifid*/}.job.s

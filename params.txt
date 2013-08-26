@@ -2,10 +2,10 @@
 SIG		1.0
 
 // number of spatial grid points; should be divisible by the number of computational nodes
-NUMZ 		80
+NUMZ    80
 
 // spatial grid spacing
-A		0.1
+A       0.1
 
 // temporal grid spacing - should be <= A*A/3
 EPS		3.e-5
@@ -66,7 +66,7 @@ POTENTIAL	22
 //    3		constant of 0.1 in interior 
 //    4		boolean test grid; mod(i%2)mod(j%2)mod(k%2)
 //
-INITCONDTYPE	1
+INITCONDTYPE    1
 
 //
 // initial symmetry constraint
