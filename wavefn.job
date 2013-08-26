@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -l walltime=150:00:00
+# PBS -l vmem=96GB
+#PBS -N wavefn
+#PBS -l nodes=41
+
+cd $PBS_O_WORKDIR
+
+qalter $PBS_JOBID -o $PBS_O_WORKDIR/$PBS_JOBNAME.${PBS_JOBID//.trifid*/}.job.o -e $PBS_O_WORKDIR/$PBS_JOBNAME.${PBS_JOBID//.trifid*/}.job.e
+
+mpirun -np 41 mpisolve 
+
+
+# Output summary information
+qstat -f ${PBS_JOBID//.trifid*/} > $PBS_JOBNAME.${PBS_JOBID//.trifid*/}.job.s
