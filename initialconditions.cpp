@@ -41,6 +41,7 @@ void setInitialConditions(int seedMult)
 	int sx,sy,sz,tx,ty,tz;
 	double dx,dy,dz,r,costheta,cosphi,temp,temp2;
 	fstream input;
+    fstream debug_out;
 	char fname[32];
 	string line;
 	vector<string> lines;
@@ -69,17 +70,23 @@ void setInitialConditions(int seedMult)
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
 		
+        //OK, so this needs to be re-written. 
         //Lattice size per node
-        inputLatticeSize = NUMX*NUMY*(NUMZ/(numNodes-1));
+        inputLatticeSize = NUMX*NUMY*(NUMZ/(numNodes-1));  //round(pow((numNodes-1)*lines.size(),1/3.));
         //input data per node
 		fileSize = lines.size();
                 
+        sprintf(fname,"debug/debug_%d.txt",nodeID);
+        debug_out.open(fname, ios::out);
+        debug_out << "ils: " << inputLatticeSize << ", fileSize: " << fileSize << endl;
         if (inputLatticeSize > fileSize) strideout = inputLatticeSize/fileSize;
 		if (inputLatticeSize < fileSize) stridein = fileSize/inputLatticeSize;
         
+        debug_out << "strideout: " << strideout << ", stridein: " << stridein << endl;
 		for (sx=1;sx<=NUMX;sx++)
 			for (sy=1;sy<=NUMY;sy++)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
+					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
 						linenumber  = (sx-1)*inputLatticeSize*inputLatticeSize + (sy-1)*inputLatticeSize + (sz-1);
 					}					
@@ -89,6 +96,7 @@ void setInitialConditions(int seedMult)
 						ty = ceil(sy/((double)strideout));
 						tz = ceil(sz/((double)strideout));
 						linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
+						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}
 			        if (stridein>1) {
 						// If input wavefunction has higher resolution, sample it						
@@ -96,6 +104,7 @@ void setInitialConditions(int seedMult)
 						ty = sy*stridein;
 						tz = sz*stridein;
 						linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
+						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}					
 					line = lines.at(linenumber);
 					int space_index = line.find_last_of("\t");
@@ -107,8 +116,15 @@ void setInitialConditions(int seedMult)
 					std::istringstream stream2;
 					stream2.str(line.substr(space_index2,space_index-space_index2));
 					stream2 >> temp2; // real part
+					//if (debug && nodeID==1) cout << "line #" << linenumber << " : " << line << endl;
+					//if (debug && nodeID==1) cout << "real : " << temp2 << endl;
+					//if (debug && nodeID==1) cout << "imag : " << temp << endl;
+					//debug_out << "line #" << linenumber << " : " << line << endl;
+					//debug_out << "real : " << temp2 << endl;
+					//debug_out << "imag : " << temp << endl;
 					w[sx][sy][sz] = dcomp(temp2,temp);
 				}
+        debug_out.close();  
 		input.close();
 		break;
 	  case 1:

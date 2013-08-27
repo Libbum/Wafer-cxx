@@ -37,7 +37,7 @@ int nodeID,numNodes;
 fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
-int debug = DEBUG_OFF;
+int debug = DEBUG_ON;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
