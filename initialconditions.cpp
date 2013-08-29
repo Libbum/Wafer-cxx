@@ -71,11 +71,8 @@ void setInitialConditions(int seedMult)
                         w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
-		
-        //OK, so this needs to be re-written. 
-        //Lattice size per node
-        //inputLatticeSize = NUMX*NUMY*(NUMZ/(numNodes-1));  //round(pow((numNodes-1)*lines.size(),1/3.));
-        //input data per node
+	
+        //Find parameters from input file so that readin works
 		fileSize = lines.size();
         oldnumy = 0;
         minz = 100000;
@@ -101,6 +98,8 @@ void setInitialConditions(int seedMult)
        
         olddnumz = maxz-minz+1;
 
+		if (nodeID==1) cout << "Previous run parameters: NUMY = " << oldnumy << ", DISTNUMZ = " << olddnumz << endl;
+
         sprintf(fname,"debug/debug_%d.txt",nodeID);
         debug_out.open(fname, ios::out);
         debug_out << "numy: " << oldnumy << ", minz = " << minz << ", maxz = " << maxz << ", dnumz = " << olddnumz << endl;
@@ -114,7 +113,6 @@ void setInitialConditions(int seedMult)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
 					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
-						//linenumber  = (sx-1)*inputLatticeSize*inputLatticeSize + (sy-1)*inputLatticeSize + (sz-1);
 						linenumber  = (sx-1)*oldnumy*olddnumz + (sy-1)*olddnumz + sz;
 					}					
 			        if (strideout>1) { 
@@ -123,13 +121,6 @@ void setInitialConditions(int seedMult)
 						ty = ceil(sy/((double)strideout));
 						tz = ceil(sz/((double)strideout));
 						linenumber  = (tx-1)*oldnumy*olddnumz + (ty-1)*olddnumz + tz;
-					    //if (linenumber > fileSize) {
-                        //debug_out << linenumber << ", " << sx << ", " << sy << ", " << sz << "; " << tx << ", " << ty << ", " << tz << endl;
-                        //}
-						//tx = ceil(sx/((double)strideout));
-						//ty = ceil(sy/((double)strideout));
-						//tz = ceil(sz/((double)strideout));
-						//linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}
 			        if (stridein>1) {
@@ -137,7 +128,6 @@ void setInitialConditions(int seedMult)
 						tx = sx*stridein;
 						ty = sy*stridein;
 						tz = sz*stridein;
-						//linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
 						linenumber  = (tx-1)*oldnumy*olddnumz + (ty-1)*olddnumz + tz;
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}					
