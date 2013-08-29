@@ -36,7 +36,7 @@ void outputMeasurements(const double time) {
 
 	cout.precision(12);
 	cout.width(dwidth); cout << time;
-    cout.width(35); cout << setprecision (dbl::digits10) << ener;
+        cout.width(35); cout << setprecision (dbl::digits10) << ener;
 	cout.width(15); cout << setprecision (7) << sqrt(real(rRMS2)); 
 	cout << endl;
 

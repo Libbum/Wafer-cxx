@@ -38,7 +38,7 @@ using namespace std;
 void setInitialConditions(int seedMult)
 {
   	double sig=SIG; // standard deviation
-	int sx,sy,sz,tx,ty,tz;
+	int sx,sy,sz,tx,ty,tz,ii,oldnumy,olddnumz,idx1,idx2,idx3,tmp;
 	double dx,dy,dz,r,costheta,cosphi,temp,temp2;
 	fstream input;
     fstream debug_out;
@@ -75,14 +75,28 @@ void setInitialConditions(int seedMult)
         inputLatticeSize = NUMX*NUMY*(NUMZ/(numNodes-1));  //round(pow((numNodes-1)*lines.size(),1/3.));
         //input data per node
 		fileSize = lines.size();
-                
+        oldnumy = 0;
+        olddnumz = 0;
+        for (ii=0; ii<fileSize; ii++) {
+            //iterate through and find NUMY and DISTNUMZ of file
+            line = lines.at(ii);
+            idx1 = line.find_first_of("\t"); //one before numy
+            idx2 = line.substr(idx1+1,line.length()).find_first_of("\t"); //one before numz
+            tmp = atoi( line.substr(idx1+1,idx1+idx2-1).c_str() ); //should be numy
+            if (tmp > oldnumy) {
+                oldnumy = tmp;
+            }
+
+            idx3 = line.substr(idx1+idx2+2,line.length()).find_first_of("\t"); //one after numz
+            tmp = atoi( line.substr(idx1+idx2+2,idx1+idx2+idx3-1).c_str() ); //should be numz
+        }
         sprintf(fname,"debug/debug_%d.txt",nodeID);
         debug_out.open(fname, ios::out);
-        debug_out << "ils: " << inputLatticeSize << ", fileSize: " << fileSize << endl;
+        debug_out << "numy: " << oldnumy << ", numzrow = " << tmp << endl;
         if (inputLatticeSize > fileSize) strideout = inputLatticeSize/fileSize;
 		if (inputLatticeSize < fileSize) stridein = fileSize/inputLatticeSize;
-        
-        debug_out << "strideout: " << strideout << ", stridein: " << stridein << endl;
+         
+        //debug_out << "strideout: " << strideout << ", stridein: " << stridein << endl;
 		for (sx=1;sx<=NUMX;sx++)
 			for (sy=1;sy<=NUMY;sy++)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
@@ -92,10 +106,17 @@ void setInitialConditions(int seedMult)
 					}					
 			        if (strideout>1) { 
 						// If input wavefunction has lower resolution, spread it out
-						tx = ceil(sx/((double)strideout));
-						ty = ceil(sy/((double)strideout));
-						tz = ceil(sz/((double)strideout));
-						linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
+						tx = ceil(sx/((double)5.0));
+						ty = ceil(sy/((double)5.0));
+						tz = ceil(sz/((double)5.0));
+						linenumber  = (tx-1)*143*2 + (ty-1)*2 + tz;
+					    //if (linenumber > fileSize) {
+                        //debug_out << linenumber << ", " << sx << ", " << sy << ", " << sz << "; " << tx << ", " << ty << ", " << tz << endl;
+                        //}
+						//tx = ceil(sx/((double)strideout));
+						//ty = ceil(sy/((double)strideout));
+						//tz = ceil(sz/((double)strideout));
+						//linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}
 			        if (stridein>1) {
