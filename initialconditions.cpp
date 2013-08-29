@@ -44,6 +44,8 @@ void setInitialConditions(int seedMult)
     fstream debug_out;
 	char fname[32];
 	string line;
+    string delim = "\t";
+    string token = "";
 	vector<string> lines;
 	int inputLatticeSize,fileSize,stridein=1,strideout=1,linenumber;
 	
@@ -80,19 +82,32 @@ void setInitialConditions(int seedMult)
         for (ii=0; ii<fileSize; ii++) {
             //iterate through and find NUMY and DISTNUMZ of file
             line = lines.at(ii);
-            idx1 = line.find_first_of("\t"); //one before numy
-            idx2 = line.substr(idx1+1,line.length()).find_first_of("\t"); //one before numz
-            tmp = atoi( line.substr(idx1+1,idx1+idx2-1).c_str() ); //should be numy
+            
+            line.erase(0, line.find(delim) + delim.length()); //remove numx
+            
+            token = line.substr(0, line.find(delim)); //numy
+            tmp = atoi( token.c_str() ); //should be numy
             if (tmp > oldnumy) {
                 oldnumy = tmp;
             }
+            
+            line.erase(0, line.find(delim) + delim.length());
 
-            idx3 = line.substr(idx1+idx2+2,line.length()).find_first_of("\t"); //one after numz
-            tmp = atoi( line.substr(idx1+idx2+2,idx1+idx2+idx3-1).c_str() ); //should be numz
+            token = line.substr(0, line.find(delim)); //numz
+            
+            //idx1 = line.find_first_of("\t"); //one before numy
+            //idx2 = line.substr(idx1+1,line.length()).find_first_of("\t"); //one before numz
+            //tmp = atoi( line.substr(idx1+1,idx1+idx2-1).c_str() ); //should be numy
+            //if (tmp > oldnumy) {
+                //oldnumy = tmp;
+            //}
+
+            //idx3 = line.substr(idx1+idx2+2,line.length()).find_first_of("\t"); //one after numz
+            //tmp = atoi( line.substr(idx1+idx2+2,idx1+idx2+idx3-1).c_str() ); //should be numz
         }
         sprintf(fname,"debug/debug_%d.txt",nodeID);
         debug_out.open(fname, ios::out);
-        debug_out << "numy: " << oldnumy << ", numzrow = " << tmp << endl;
+        debug_out << "numy: " << oldnumy << ", numzrow = " << token << endl;
         if (inputLatticeSize > fileSize) strideout = inputLatticeSize/fileSize;
 		if (inputLatticeSize < fileSize) stridein = fileSize/inputLatticeSize;
          
