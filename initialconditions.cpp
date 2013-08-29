@@ -41,7 +41,6 @@ void setInitialConditions(int seedMult)
 	int sx,sy,sz,tx,ty,tz,ii,oldnumy,minz,maxz,olddnumz,tmp;
 	double dx,dy,dz,r,costheta,cosphi,temp,temp2;
 	fstream input;
-    fstream debug_out;
 	char fname[32];
 	string line;
     string delim = "\t";
@@ -100,14 +99,9 @@ void setInitialConditions(int seedMult)
 
 		if (nodeID==1) cout << "Previous run parameters: NUMY = " << oldnumy << ", DISTNUMZ = " << olddnumz << endl;
 
-        sprintf(fname,"debug/debug_%d.txt",nodeID);
-        debug_out.open(fname, ios::out);
-        debug_out << "numy: " << oldnumy << ", minz = " << minz << ", maxz = " << maxz << ", dnumz = " << olddnumz << endl;
-
         if (DISTNUMZ > olddnumz) strideout = DISTNUMZ/olddnumz;
 		if (DISTNUMZ < olddnumz) stridein = olddnumz/DISTNUMZ;
          
-        //debug_out << "strideout: " << strideout << ", stridein: " << stridein << endl;
 		for (sx=1;sx<=NUMX;sx++)
 			for (sy=1;sy<=NUMY;sy++)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
@@ -144,12 +138,9 @@ void setInitialConditions(int seedMult)
 					//if (debug && nodeID==1) cout << "line #" << linenumber << " : " << line << endl;
 					//if (debug && nodeID==1) cout << "real : " << temp2 << endl;
 					//if (debug && nodeID==1) cout << "imag : " << temp << endl;
-					//debug_out << "line #" << linenumber << " : " << line << endl;
-					//debug_out << "real : " << temp2 << endl;
-					//debug_out << "imag : " << temp << endl;
 					w[sx][sy][sz] = dcomp(temp2,temp);
 				}
-        debug_out.close();  
+
 		input.close();
 		break;
 	  case 1:
