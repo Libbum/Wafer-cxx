@@ -38,7 +38,7 @@ using namespace std;
 void setInitialConditions(int seedMult)
 {
   	double sig=SIG; // standard deviation
-	int sx,sy,sz,tx,ty,tz,ii,oldnumy,olddnumz,idx1,idx2,idx3,tmp;
+	int sx,sy,sz,tx,ty,tz,ii,oldnumy,minz,maxz,olddnumz,tmp;
 	double dx,dy,dz,r,costheta,cosphi,temp,temp2;
 	fstream input;
     fstream debug_out;
@@ -47,7 +47,7 @@ void setInitialConditions(int seedMult)
     string delim = "\t";
     string token = "";
 	vector<string> lines;
-	int inputLatticeSize,fileSize,stridein=1,strideout=1,linenumber;
+	int fileSize,stridein=1,strideout=1,linenumber;
 	
 	
 	//cout << "==> Initializing variables\n";
@@ -74,11 +74,12 @@ void setInitialConditions(int seedMult)
 		
         //OK, so this needs to be re-written. 
         //Lattice size per node
-        inputLatticeSize = NUMX*NUMY*(NUMZ/(numNodes-1));  //round(pow((numNodes-1)*lines.size(),1/3.));
+        //inputLatticeSize = NUMX*NUMY*(NUMZ/(numNodes-1));  //round(pow((numNodes-1)*lines.size(),1/3.));
         //input data per node
 		fileSize = lines.size();
         oldnumy = 0;
-        olddnumz = 0;
+        minz = 100000;
+        maxz = 0;
         for (ii=0; ii<fileSize; ii++) {
             //iterate through and find NUMY and DISTNUMZ of file
             line = lines.at(ii);
@@ -86,30 +87,26 @@ void setInitialConditions(int seedMult)
             line.erase(0, line.find(delim) + delim.length()); //remove numx
             
             token = line.substr(0, line.find(delim)); //numy
-            tmp = atoi( token.c_str() ); //should be numy
-            if (tmp > oldnumy) {
-                oldnumy = tmp;
-            }
+            tmp = atoi( token.c_str() ); //numy to int
+            if (tmp > oldnumy) oldnumy = tmp;
             
-            line.erase(0, line.find(delim) + delim.length());
+            line.erase(0, line.find(delim) + delim.length()); //remove numy
 
             token = line.substr(0, line.find(delim)); //numz
-            
-            //idx1 = line.find_first_of("\t"); //one before numy
-            //idx2 = line.substr(idx1+1,line.length()).find_first_of("\t"); //one before numz
-            //tmp = atoi( line.substr(idx1+1,idx1+idx2-1).c_str() ); //should be numy
-            //if (tmp > oldnumy) {
-                //oldnumy = tmp;
-            //}
+            tmp = atoi( token.c_str() ); //numz to int
 
-            //idx3 = line.substr(idx1+idx2+2,line.length()).find_first_of("\t"); //one after numz
-            //tmp = atoi( line.substr(idx1+idx2+2,idx1+idx2+idx3-1).c_str() ); //should be numz
+            if (tmp > maxz) maxz = tmp;
+            if (tmp < minz) minz = tmp;
         }
+       
+        olddnumz = maxz-minz+1;
+
         sprintf(fname,"debug/debug_%d.txt",nodeID);
         debug_out.open(fname, ios::out);
-        debug_out << "numy: " << oldnumy << ", numzrow = " << token << endl;
-        if (inputLatticeSize > fileSize) strideout = inputLatticeSize/fileSize;
-		if (inputLatticeSize < fileSize) stridein = fileSize/inputLatticeSize;
+        debug_out << "numy: " << oldnumy << ", minz = " << minz << ", maxz = " << maxz << ", dnumz = " << olddnumz << endl;
+
+        if (DISTNUMZ > olddnumz) strideout = DISTNUMZ/olddnumz;
+		if (DISTNUMZ < olddnumz) stridein = olddnumz/DISTNUMZ;
          
         //debug_out << "strideout: " << strideout << ", stridein: " << stridein << endl;
 		for (sx=1;sx<=NUMX;sx++)
@@ -117,14 +114,15 @@ void setInitialConditions(int seedMult)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
 					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
-						linenumber  = (sx-1)*inputLatticeSize*inputLatticeSize + (sy-1)*inputLatticeSize + (sz-1);
+						//linenumber  = (sx-1)*inputLatticeSize*inputLatticeSize + (sy-1)*inputLatticeSize + (sz-1);
+						linenumber  = (sx-1)*oldnumy*olddnumz + (sy-1)*olddnumz + sz;
 					}					
 			        if (strideout>1) { 
 						// If input wavefunction has lower resolution, spread it out
-						tx = ceil(sx/((double)5.0));
-						ty = ceil(sy/((double)5.0));
-						tz = ceil(sz/((double)5.0));
-						linenumber  = (tx-1)*143*2 + (ty-1)*2 + tz;
+						tx = ceil(sx/((double)strideout));
+						ty = ceil(sy/((double)strideout));
+						tz = ceil(sz/((double)strideout));
+						linenumber  = (tx-1)*oldnumy*olddnumz + (ty-1)*olddnumz + tz;
 					    //if (linenumber > fileSize) {
                         //debug_out << linenumber << ", " << sx << ", " << sy << ", " << sz << "; " << tx << ", " << ty << ", " << tz << endl;
                         //}
@@ -139,7 +137,8 @@ void setInitialConditions(int seedMult)
 						tx = sx*stridein;
 						ty = sy*stridein;
 						tz = sz*stridein;
-						linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
+						//linenumber  = (tx-1)*inputLatticeSize*inputLatticeSize + (ty-1)*inputLatticeSize + (tz-1);
+						linenumber  = (tx-1)*oldnumy*olddnumz + (ty-1)*olddnumz + tz;
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}					
 					line = lines.at(linenumber);
