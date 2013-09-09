@@ -40,7 +40,7 @@ void setInitialConditions(int seedMult)
   	double sig=SIG; // standard deviation
 	int sx,sy,sz,tx,ty,tz,ii,oldnumy,minz,maxz,olddnumz,tmp;
 	double dx,dy,dz,r,costheta,cosphi,temp,temp2;
-	fstream input;
+	fstream input; //, debug_out;
 	char fname[32];
 	string line;
     string delim = "\t";
@@ -70,7 +70,10 @@ void setInitialConditions(int seedMult)
                         w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
-	
+       
+        //sprintf(fname,"debug/debug_%d.txt",nodeID);
+        //debug_out.open(fname, ios::out);
+       
         //Find parameters from input file so that readin works
 		fileSize = lines.size();
         oldnumy = 0;
@@ -107,7 +110,7 @@ void setInitialConditions(int seedMult)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
 					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
-						linenumber  = (sx-1)*oldnumy*olddnumz + (sy-1)*olddnumz + sz;
+						linenumber  = (sx-1)*oldnumy*olddnumz + (sy-1)*olddnumz + (sz-1);
 					}					
 			        if (strideout>1) { 
 						// If input wavefunction has lower resolution, spread it out
@@ -126,6 +129,7 @@ void setInitialConditions(int seedMult)
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}					
 					line = lines.at(linenumber);
+                    //debug_out << "Line " << linenumber << ": " << line << endl;
 					int space_index = line.find_last_of("\t");
 					string linemod = line.substr(0,space_index-1);	
 					int space_index2 = linemod.find_last_of("\t");
@@ -135,12 +139,12 @@ void setInitialConditions(int seedMult)
 					std::istringstream stream2;
 					stream2.str(line.substr(space_index2,space_index-space_index2));
 					stream2 >> temp2; // real part
-					//if (debug && nodeID==1) cout << "line #" << linenumber << " : " << line << endl;
+                    //if (debug && nodeID==1) cout << "line #" << linenumber << " : " << line << endl;
 					//if (debug && nodeID==1) cout << "real : " << temp2 << endl;
 					//if (debug && nodeID==1) cout << "imag : " << temp << endl;
 					w[sx][sy][sz] = dcomp(temp2,temp);
 				}
-
+        //debug_out.close();
 		input.close();
 		break;
 	  case 1:
