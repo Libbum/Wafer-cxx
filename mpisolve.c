@@ -464,7 +464,7 @@ void evolve(int nsteps) {
 		
 		// first update boundary so that the send can be happening while we update the interior
 		updateBoundaries(EPS);
-		
+
 		// wait and make sure send buffers are ready
 		if (i>1) {
 			if (nodeID+1 < numNodes) MPI_Wait(&rightSend,&rightSendStatus);

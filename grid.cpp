@@ -171,15 +171,17 @@ inline dcomp updateRule(int sx, int sy, int sz, double step)
 
 // load updated left and right boundaries into W
 void updateBoundaries(double step) {
-
-        for (int sx=0;sx<NUMX+2;sx++)
-      	  for (int sy=0;sy<NUMY+2;sy++)
+        for (int sx=0;sx<NUMX+2;sx++) {
+      	  for (int sy=0;sy<NUMY+2;sy++) {
        	    for (int sz=1;sz<=DISTNUMZ;sz+=DISTNUMZ-1) {
-				if (sx>=1 && sx<=NUMX && sy>=1 && sy<=NUMY) 
+				if (sx>=1 && sx<=NUMX && sy>=1 && sy<=NUMY) {
 					W[sx][sy][sz] = updateRule(sx,sy,sz,step);
-				else 
+                                } else { 
 					W[sx][sy][sz] = w[sx][sy][sz]; 
+                                }
 			}
+          }
+        }
 }
 
 // update the grid; note you should always call updatedBondaries before calling this routine
