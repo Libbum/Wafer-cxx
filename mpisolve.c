@@ -271,7 +271,7 @@ void solveInitialize() {
 
 void solveRestart() {
         double EPSold = EPS;
-        EPS = EPSold / 10;
+        EPS = EPSold / 2;
 
         if (nodeID==1) { 
             print_line();
@@ -422,10 +422,20 @@ void solve() {
 
 // solve finalize
 void solveFinalize() {
-	
+
+    char label[64];
 	// this routine currently computes the first excited state energy and wavefunction
 	if (EPS >= MINTSTEP) {
-       findExcitedStates();
+       //Comment if higher order states are wanted
+	    if (SAVEWAVEFNCS) {
+		// save 3d wavefunction for states
+	    	sprintf(label,"0_%d",nodeID); 
+	    	outputWavefunction(w,label);
+        // output potential for debugging
+            outputPotential(label);
+	    }
+       //Uncomment if higher order states are wanted
+       //findExcitedStates();
     } else {
        if (nodeID==1) cout << "ERROR: MINTSTEP value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
     }
