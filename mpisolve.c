@@ -252,7 +252,7 @@ void solveInitialize() {
 	
 	// output some summary information
 	if (nodeID==1) { 
-		print_line();
+	print_line();
       	cout << "==> Number of computational nodes : " << numNodes-1 << endl; 
       	cout << "==> DISTNUMZ : " << DISTNUMZ << endl; 
       	print_line();
@@ -278,7 +278,7 @@ void solveRestart() {
             cout << "Temporal Step Size (EPS = " << EPSold << ") too large; rescaling to EPS = " << EPS << " and restarting..." << endl;
         }
 
-	    loadPotentialArrays(); //to update a and b with new eps
+	loadPotentialArrays(); //to update a and b with new eps
         //Reinitialise w and W to ICs (usually rand gaussian)
         setInitialConditions(nodeID+1);
 

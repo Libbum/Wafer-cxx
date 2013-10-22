@@ -280,11 +280,17 @@ dcomp potential(int sx,int sy, int sz)
       double ty = -((double) gr + A) + ((double) sy)*((2.0*((double) gr))/((double) NUMY - 1));
       gr = NUMZ*A/2-(A/2);
       double tz = -((double) gr + A) + ((double) sz+(nodeID-1)*DISTNUMZ)*((2.0*((double) gr))/((double) NUMZ - 1));
-     // if (( nodeID == 1) && ( sy == 0 ) && ( sz == 0)) {
+      //if (( nodeID == 1) && ( sy == 0 ) && ( sz == 0)) {
       //if ((sx == 0 ) && ( sy == 0 ) && ( sz == 0)) {
-     //   cout << "tx " << tx << ", ty " << ty << ", tz " << tz << ", sx " << sx << ", numNodes " << numNodes << endl;
-     // }
-      return mexHatPotential(tx,ty,tz);
+        //cout << "tx " << tx << ", ty " << ty << ", tz " << tz << ", sx " << sx << ", numNodes " << numNodes << endl;
+      //}
+
+      //temp setup to test new N potential port
+      double spec[] = {1, 1, 1, 1, 1, 1, 2};
+      double *species;
+      species = spec;
+      int sizeC = sizeof(spec)/sizeof(double);
+      return mexHatPotential(tx,ty,tz,species,sizeC);
     }
     break;
     default:

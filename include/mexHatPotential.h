@@ -48,10 +48,10 @@ extern "C"
 void matRightDivide(double *A, double *B, ptrdiff_t M, ptrdiff_t N);
 void matMultiply(double *A, double *B, double *C, ptrdiff_t M, ptrdiff_t N);
 void matInverse(double *A, ptrdiff_t N);
-double dist(double *pointsi, double *pointsj);
+double dist(double *pointsi, double *pointsj, int sizeC);
 void gammasm(double *za, double *zb, double *r, double *gambfa, double *gamfafb);
-double electroneg(double *system);
-dcomp makepot(double *points);
-dcomp mexHatPotential(double dx, double dy, double dz);
+double electroneg(double *system, double *species, int sizeC);
+dcomp makepot(double *points, double *species, int sizeC);
+dcomp mexHatPotential(double dx, double dy, double dz, double *species, int sizeC);
 
 #endif /* __mexHatPotential_h__ */
