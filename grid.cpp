@@ -99,6 +99,11 @@ void loadPotentialArrays()
 {
         int sx,sy,sz;
 
+        if ((POTENTIAL == 22) && (CLUSTER == 1)) {
+           //Need to load cluster data and we really only want to do it once.
+           cout << "CLUSTER FROM FILE" << endl;
+        }
+
         for (sx=0;sx<=NUMX+1;sx++)
         for (sy=0;sy<=NUMY+1;sy++)
         for (sz=0; sz<=DISTNUMZ+1;sz++) {

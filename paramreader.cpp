@@ -32,6 +32,7 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"INITSYMMETRY")==0) INITSYMMETRY=atoi(value);
 	if (strcmp(key,"NF")==0) NF=atoi(value);
 	if (strcmp(key,"SAVEWAVEFNCS")==0) SAVEWAVEFNCS=atoi(value);
+        if (strcmp(key,"CLUSTER")==0) CLUSTER=atoi(value);
 	// double/float params
 	if (strcmp(key,"A")==0) A=atof(value);
 	if (strcmp(key,"EPS")==0) EPS=atof(value);

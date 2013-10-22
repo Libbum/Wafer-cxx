@@ -26,9 +26,10 @@ typedef std::numeric_limits< double > dbl;
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
 int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
-int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0;
+int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
+double *CLUSTFILE;
 
 // mpi vars
 int nodeID,numNodes;
@@ -427,7 +428,7 @@ void solveFinalize() {
 	// this routine currently computes the first excited state energy and wavefunction
 	if (EPS >= MINTSTEP) {
        //Comment if higher order states are wanted
-	    if (SAVEWAVEFNCS) {
+	    if (SAVEWAVEFNCS==1) {
 		// save 3d wavefunction for states
 	    	sprintf(label,"0_%d",nodeID); 
 	    	outputWavefunction(w,label);
