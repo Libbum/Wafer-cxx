@@ -162,22 +162,22 @@ double electroneg(double *system, double *species, int sizeC)
     /* Set chij */
     for (i = 0; i<sizeC; i++)
     {
-        if (species[i] == 1) /*(i != CLUSTER-1)*/
+        if (species[i] == 1) 
         {
             /* Aluminium */
-            chij[i] = chi[1]; /* THIS IS ACTALLY BACKWARDS TO FIT WITH MATLAB VERSION. CHECK E.N. NOTES. */
+            chij[i] = chi[0]; 
         }
         else
         {
             /* Oxygen */
-            chij[i] = chi[0];
+            chij[i] = chi[1];
         }
     }
     
     /* Solve B12, B13 and system neutral mu */
     for (i = 0; i<sizeC; i++)
     {
-        if (species[i] == 1) /*(i != CLUSTER-1)*/
+        if (species[i] == 1)
         {
             /* Aluminium */
             iatom = 0;
@@ -190,7 +190,7 @@ double electroneg(double *system, double *species, int sizeC)
         jloop = 0;
         for (j = 0; j<sizeC; j++)
         {
-            if (species[j] == 1) /*(j != CLUSTER-1)*/
+            if (species[j] == 1) 
             {
                 /* Aluminium */
                 jatom = 0;
@@ -292,9 +292,8 @@ dcomp makepot(double *points, double *species, int sizeC)
     /* Variables for SM */
     double r;
     double UBuckTot = 0, URydTot = 0, UEAMTot = 0, UElecNegTot = 0;
-    /*double UBuck[CLUSTER][CLUSTER][3] = {0}, URyd[CLUSTER][CLUSTER][3] = {0}, rhoEAM[CLUSTER][CLUSTER][2] = {0}, UEAM[CLUSTER][CLUSTER][2] = {0};*/
-    double *UBuck, *URyd, *rhoEAM, *UEAM;
-    
+    double rhoEAM[] = {0, 0};
+
     /* SM Constants
      * everything in ev or AA
      * From Al2O3 SM potential
@@ -330,11 +329,6 @@ dcomp makepot(double *points, double *species, int sizeC)
     /* Values correspond to Al core; O core */
     double AfuncEAM[] = {1.987699,2.116850};
     
-    UBuck = (double *)calloc(sizeC*sizeC,sizeof(double));
-    URyd = (double *)calloc(sizeC*sizeC,sizeof(double));
-    rhoEAM = (double *)calloc(sizeC*sizeC*2,sizeof(double));
-    UEAM = (double *)calloc(sizeC*sizeC,sizeof(double));
-  
     for (i = 0; i < sizeC; i++) /* over mesh in x */
     {
         for (j = 0; j < sizeC; j++) /* over mesh in y*/
@@ -342,101 +336,77 @@ dcomp makepot(double *points, double *species, int sizeC)
             if (j > i)
             {
                 /* find r */
-                r = dist(points+i, points+j, sizeC); /*points+(3*j)*/
+                r = dist(points+i, points+j, sizeC);
                 
                 /* if statements check range. If r is not in the range the
                  * potential is not calculated */
                 if ((r >= RangeBuck[0]) && (r <= RangeBuck[1]))
                 {
-                    if ((species[i] == 1) && (species[j] == 1))/*((i != CLUSTER-1) && (j != CLUSTER-1))*/
+                    if ((species[i] == 1) && (species[j] == 1))
                     {
                         /*Al Al*/
-                        *(UBuck + sizeC*j + i) = ABuck[0]*exp(-r/rhoBuck[0])-(CBuck[0]/pow(r,6)); /*UBuck[i][j][0]*/
+                        UBuckTot += ABuck[0]*exp(-r/rhoBuck[0])-(CBuck[0]/pow(r,6));
                     }
                     else if ((species[i] == 2) && (species[j] == 2))
                     {
                         /*O O*/
-                        *(UBuck + sizeC*j + i) = ABuck[2]*exp(-r/rhoBuck[2])-(CBuck[2]/pow(r,6)); /*UBuck[i][j][2]*/
+                        UBuckTot += ABuck[2]*exp(-r/rhoBuck[2])-(CBuck[2]/pow(r,6));
                     }
                     else
                     {
                         /*Al O*/
-                        *(UBuck + sizeC*j + i) = ABuck[1]*exp(-r/rhoBuck[1])-(CBuck[1]/pow(r,6)); /*UBuck[i][j][1]*/
+                        UBuckTot += ABuck[1]*exp(-r/rhoBuck[1])-(CBuck[1]/pow(r,6));
                     }
                 }
                 if ((r >= RangeRyd[0]) && (r <= RangeRyd[1]))
                 {
-                    if ((species[i] == 1) && (species[j] == 1))/*((i != CLUSTER-1) && (j != CLUSTER-1))*/
+                    if ((species[i] == 1) && (species[j] == 1))
                     {
                         /*Al Al*/
-                        *(URyd + sizeC*j + i) = -ARyd[0]*(1+BRyd[0]*((r/r0Ryd[0])-1))*exp(-BRyd[0]*((r/r0Ryd[0])-1)); /*URyd[i][j][0]*/
+                        URydTot += -ARyd[0]*(1+BRyd[0]*((r/r0Ryd[0])-1))*exp(-BRyd[0]*((r/r0Ryd[0])-1));
                     }
                     else if ((species[i] == 2) && (species[j] == 2))
                     {
                         /*O O*/
-                        *(URyd + sizeC*j + i) = -ARyd[2]*(1+BRyd[2]*((r/r0Ryd[2])-1))*exp(-BRyd[2]*((r/r0Ryd[2])-1)); /*URyd[i][j][2]*/
+                        URydTot += -ARyd[2]*(1+BRyd[2]*((r/r0Ryd[2])-1))*exp(-BRyd[2]*((r/r0Ryd[2])-1));
                     }
                     else
                     {
                         /*Al O*/
-                        *(URyd + sizeC*j + i) = -ARyd[1]*(1+BRyd[1]*((r/r0Ryd[1])-1))*exp(-BRyd[1]*((r/r0Ryd[1])-1)); /*URyd[i][j][1]*/
+                        URydTot += -ARyd[1]*(1+BRyd[1]*((r/r0Ryd[1])-1))*exp(-BRyd[1]*((r/r0Ryd[1])-1));
                     }   
                 }
                 if ((r >= RangeEAM[0]) && (r <= RangeEAM[1]))
                 {
-                    *(rhoEAM + (sizeC*sizeC)*0 + sizeC*j + i) = AEAM[0]*pow(r,nEAM)*exp(-BEAM[0]*(r-r0EAM[0])); /*rhoEAM[i][j][0]*/
-                    *(rhoEAM + (sizeC*sizeC)*1 + sizeC*j + i) = AEAM[1]*pow(r,nEAM)*exp(-BEAM[1]*(r-r0EAM[1])); /*rhoEAM[i][j][1]*/
+                    rhoEAM[0] = AEAM[0]*pow(r,nEAM)*exp(-BEAM[0]*(r-r0EAM[0])); 
+                    rhoEAM[1] = AEAM[1]*pow(r,nEAM)*exp(-BEAM[1]*(r-r0EAM[1]));
                     /* check species of i and j to find what EAM params to use. */
                     
                     /* UEAM values: 0=Al Al, 1=Al O, 2=O O;
                      * rhoEAM/AfuncEAM values: 0=Al, 1=O; */
-                    if ((species[i] == 1) && (species[j] == 1))/*((i != CLUSTER-1) && (j != CLUSTER-1))*/
+                    if ((species[i] == 1) && (species[j] == 1))
                     {
                         /*Al Al*/
-                        *(UEAM + sizeC*j + i) = -(AfuncEAM[0]*2)*sqrt(*(rhoEAM + (sizeC*sizeC)*0 + sizeC*j + i)); /*UEAM[i][j][0]*/
+                        UEAMTot += -(AfuncEAM[0]*2)*sqrt(rhoEAM[0]); 
                     }
                     else if ((species[i] == 2) && (species[j] == 2))
                     {
                         /*O O*/
-                        *(UEAM + sizeC*j + i) = -(AfuncEAM[1]*2)*sqrt(*(rhoEAM + (sizeC*sizeC)*1 + sizeC*j + i)); /*UEAM[i][j][2]*/
+                        UEAMTot += -(AfuncEAM[1]*2)*sqrt(rhoEAM[1]);
                     }
                     else
                     {
                         /*Al O*/
-                        *(UEAM + sizeC*j + i) = -(AfuncEAM[0]*sqrt(*(rhoEAM + (sizeC*sizeC)*0 + sizeC*j + i))+AfuncEAM[1]*sqrt(*(rhoEAM + (sizeC*sizeC)*1 + sizeC*j + i))); /*UEAM[i][j][1]*/
+                        UEAMTot += -(AfuncEAM[0]*sqrt(rhoEAM[0])+AfuncEAM[1]*sqrt(rhoEAM[1]));
                     }
                 }
-                
-                /* Sum totals */
-                if (!(*(UBuck + sizeC*j + i) != *(UBuck + sizeC*j + i))) /* NaN Check */
-                {
-                    UBuckTot += *(UBuck + sizeC*j + i);
-                }
-                URydTot += *(URyd + sizeC*j + i);
-                UEAMTot += *(UEAM + sizeC*j + i); 
             }
         }
     }
    
-    /*
-    for (i = 0; i<sizeC; i++)
-    {
-        for (j = 0; j<sizeC; j++)
-        {
-            if (j > i) 
-            {
-            }
-        }
-    }*/
-   
     UElecNegTot = electroneg(points,species,sizeC);
 
-    free(UBuck);
-    free(URyd);
-    free(rhoEAM);
-    free(UEAM);
-    //Curently potential is all in eV. Check to see if total is > 0 in \mueV, 
-    //truncate if so.
+    //Curently potential is all in eV. Check to see if total is > 0, truncate if so.
     if ((UBuckTot + URydTot + UEAMTot + UElecNegTot) > 0.0) 
     {
       return (dcomp)0.0;
@@ -450,7 +420,7 @@ dcomp makepot(double *points, double *species, int sizeC)
 
 dcomp mexHatPotential(double dx, double dy, double dz, double *species, int sizeC)
   //dx,dy,dz are the coords of the system centered on the simulation volume
-  //Essentially oxycube. Assume NUM is a global. Man need to #include something though
+  //Essentially oxycube. Assume NUM is a global. 
 {
     //Top Al, Bottom Al, 3rd nn Al (X left), 4th nn Al (X right), 5th nn Al (Y left), 6th nn Al (Y right), Oxygen Position
     //double cluster[][3] = { { 0.0, 0.0, ALZ }, { 0.0, 0.0, -ALZ }, { ALX, 0.0, 0.0 }, { -ALX, 0.0, 0.0 }, { 0.0, ALY, 0.0 }, { 0.0, -ALY, 0.0 }, { ALX*1.5, ALY*1.5, ALZ*1.5 }, { -ALX*1.5, ALY*1.5, ALZ*1.5 }, { ALX*1.5, -ALY*1.5, ALZ*1.5 }, { -ALX*1.5, -ALY*1.5, ALZ*1.5 }, { ALX*1.5, ALY*1.5, -ALZ*1.5 }, { -ALX*1.5, ALY*1.5, -ALZ*1.5 }, { ALX*1.5, -ALY*1.5, -ALZ*1.5 }, { -ALX*1.5, -ALY*1.5, -ALZ*1.5 }, { dx, dy, dz } };
