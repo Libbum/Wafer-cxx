@@ -15,5 +15,6 @@
 
 void readParametersFromFile(char *filename, int echo);
 void readParametersFromCommandLine(int argc, char** argv, int echo);
+void readClusterData(char *filename, int clusterSize, int echo);
 
 #endif /* __paramreader_h__ */

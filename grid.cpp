@@ -87,6 +87,16 @@ void allocateMemory() {
 	return;
 }
 
+void allocateClusterMemory(int clusterSize) {
+   clust = (double *)calloc(clusterSize*3,sizeof(double));
+   species = (double *)calloc(clusterSize+1,sizeof(double));
+}
+
+void deallocateClusterMemory() {
+   free(clust);
+   free(species);
+}
+
 // "copies" updated arrays using pointer swap
 void copyDown() {
 	tmp = w;
@@ -98,11 +108,6 @@ void copyDown() {
 void loadPotentialArrays()
 {
         int sx,sy,sz;
-
-        if ((POTENTIAL == 22) && (CLUSTER == 1)) {
-           //Need to load cluster data and we really only want to do it once.
-           cout << "CLUSTER FROM FILE" << endl;
-        }
 
         for (sx=0;sx<=NUMX+1;sx++)
         for (sy=0;sy<=NUMY+1;sy++)

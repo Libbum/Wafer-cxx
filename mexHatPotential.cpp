@@ -433,7 +433,6 @@ dcomp mexHatPotential(double dx, double dy, double dz, double *species, int size
     //GR2
     if (CLUSTER == 1) {
        cluster = clust;
-       cout << "using global cluster data" << endl;
     } else {
        cluster = clust;
     }

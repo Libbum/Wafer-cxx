@@ -113,3 +113,52 @@ void readParametersFromCommandLine(int argc, char** argv, int echo) {
 	}
 	return;
 }
+
+//
+// Read cluster data from cluster.xyz
+//
+void readClusterData(char *filename, int clusterSize, int echo) {
+    fstream input;
+    string line, speciesstr, tmp;
+    double xval, yval, zval;
+
+    input.open(filename, ios::in);
+    //first line is the number of atoms
+    getline(input,line);
+    getline(input,line); // ignore the comment line
+
+
+    if ((nodeID==1) && echo) cout << clusterSize << " atoms in cluster:" << endl;
+
+    for (int i = 0; i < clusterSize; i++) {
+        getline(input,line);
+        speciesstr = line.substr(0, line.find(' ')); //species
+        line.erase(0, line.find(' ') + 1); //remove numx
+        line.erase(0, line.find_first_not_of(' ')); //remove whitespace padding
+        tmp = line.substr(0, line.find(' '));
+        xval = atof(tmp.c_str()); //x value
+        line.erase(0, line.find(' ') + 1); //remove x
+        line.erase(0, line.find_first_not_of(' ')); //remove whitespace padding
+        tmp = line.substr(0, line.find(' '));
+        yval = atof(tmp.c_str()); //y value
+        line.erase(0, line.find(' ') + 1); //remove y
+        line.erase(0, line.find_first_not_of(' ')); //remove whitespace padding
+        tmp = line.substr(0, line.find(' '));
+        zval = atof(tmp.c_str()); //z value
+        
+        if (speciesstr.compare("Al") == 0) {
+            *(species+i) = 1; //Aluminium
+        } else {
+            *(species+i) = 2; //Oxygen
+        }
+
+        *(clust+(clusterSize*0)+i) = xval;
+        *(clust+(clusterSize*1)+i) = yval;
+        *(clust+(clusterSize*2)+i) = zval;
+        
+        if ((nodeID==1) && echo) cout << speciesstr << "(" << *(species+i) << "), " << *(clust+(clusterSize*0)+i) << ", " << *(clust+(clusterSize*1)+i) << ", " << *(clust+(clusterSize*2)+i) << endl;
+    }
+    *(species+clusterSize) = 2; //final oxygen
+    input.close();	
+    return;	
+}

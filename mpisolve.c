@@ -29,7 +29,12 @@ int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
 int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
-double *CLUSTFILE;
+
+// species data if cluster is used
+double *species;
+
+// cluster xyz coors if cluster is used
+double *clust;
 
 // mpi vars
 int nodeID,numNodes;
@@ -107,15 +112,15 @@ int main( int argc, char *argv[] )
     if (nodeID == 0) {
         times(&starttime); // load start time into starttime structure
         print_line();
-		cout << "Parameters from file" << endl;
+	cout << "Parameters from file" << endl;
+	print_line();
+	readParametersFromFile((char *)"params.txt",1);
+	if (argc>1) {
 		print_line();
-		readParametersFromFile((char *)"params.txt",1);
-		if (argc>1) {
-			print_line();
-			cout << "Parameters from commandline" << endl;
-			print_line();
-			readParametersFromCommandLine(argc,argv,1);
-		}
+		cout << "Parameters from commandline" << endl;
+		print_line();
+		readParametersFromCommandLine(argc,argv,1);
+	}
         //Find NUMX and NUMY Values
         NUMX = ceil((2*ALX+A)/A);
         NUMY = ceil((2*ALY+A)/A);
@@ -123,7 +128,7 @@ int main( int argc, char *argv[] )
     }
     else {
         readParametersFromFile((char *)"params.txt",0);
-	    readParametersFromCommandLine(argc,argv,0);
+	readParametersFromCommandLine(argc,argv,0);
         NUMX = ceil((2*ALX+A)/A);
         NUMY = ceil((2*ALY+A)/A);
     }
@@ -244,6 +249,27 @@ void solveInitialize() {
 		cout << "==> Loading Potential Arrays" << endl;
 		flush(cout);
 	}
+
+        if ((POTENTIAL == 22) && (CLUSTER == 1)) {
+           //Need to load cluster data and we really only want to do it once (per node).
+           fstream input;
+           string line;
+           int clusterSize;
+           //just the size so we can allocate memory first 
+           input.open("cluster.xyz", ios::in);
+           if (!input) {
+              if (nodeID == 1) cout << "==> Error : No cluster.xyz file present. Falling back to AL{X,Y,Z} values." << endl;
+              CLUSTER = 0;
+           } else {
+    
+              getline(input,line);
+              clusterSize = atoi(line.c_str());
+              allocateClusterMemory(clusterSize);
+              readClusterData((char *)"cluster.xyz", clusterSize, 1);
+           }
+
+           input.close();
+        }
 	loadPotentialArrays();
 	
 	if (nodeID==1) print_line();
@@ -279,7 +305,7 @@ void solveRestart() {
             cout << "Temporal Step Size (EPS = " << EPSold << ") too large; rescaling to EPS = " << EPS << " and restarting..." << endl;
         }
 
-	loadPotentialArrays(); //to update a and b with new eps
+	loadPotentialArrays(); //to update a and b with new eps, wont need to reload cluster data if it's needed though.
         //Reinitialise w and W to ICs (usually rand gaussian)
         setInitialConditions(nodeID+1);
 
@@ -440,6 +466,7 @@ void solveFinalize() {
     } else {
        if (nodeID==1) cout << "ERROR: MINTSTEP value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
     }
+    deallocateClusterMemory();
 }
 
 // evolves solution nsteps

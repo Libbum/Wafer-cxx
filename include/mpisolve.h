@@ -43,7 +43,6 @@ extern "C"
 
 extern int DISTNUMZ,NUMX,NUMY,NUMZ,UPDATE,SNAPUPDATE,POTENTIAL,INITCONDTYPE,INITSYMMETRY,NF,SAVEWAVEFNCS,CLUSTER;
 extern double A,STEPS,EPS,MINTSTEP,SIG,MASS,T,TC,SIGMA,XI,TOLERANCE,ALX,ALY,ALZ;
-extern double *CLUSTFILE;
 
 extern int nodeID, numNodes, debug;
 
@@ -51,6 +50,9 @@ extern dcomp energyCollect;
 extern dcomp normalizationCollect;
 extern dcomp vInfinityCollect;
 extern dcomp rRMS2Collect;    // #ad.
+
+extern double *species;
+extern double *clust;
 
 /* debug values */
 #define DEBUG_OFF		0
