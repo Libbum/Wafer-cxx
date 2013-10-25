@@ -31,7 +31,7 @@ double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
 
 // species data if cluster is used
-double *species;
+double *clustSpecies;
 
 // cluster xyz coors if cluster is used
 double *clust;
@@ -121,9 +121,29 @@ int main( int argc, char *argv[] )
 		print_line();
 		readParametersFromCommandLine(argc,argv,1);
 	}
-        //Find NUMX and NUMY Values
+        //Find NUMX and NUMY Values. These are overwritten in the next loop if it's invoked.
         NUMX = ceil((2*ALX+A)/A);
         NUMY = ceil((2*ALY+A)/A);
+        if ((POTENTIAL == 22) && (CLUSTER == 1)) {
+           //Need to load cluster data and we really only want to do it once (per node).
+           fstream input;
+           string line;
+           int clusterSize;
+           //just the size so we can allocate memory first 
+           input.open("cluster.xyz", ios::in);
+           if (!input) {
+              cout << "==> Error : No cluster.xyz file present. Falling back to AL{X,Y,Z} values." << endl;
+              CLUSTER = 0;
+           } else {
+    
+              getline(input,line);
+              clusterSize = atoi(line.c_str());
+              allocateClusterMemory(clusterSize);
+              readClusterData((char *)"cluster.xyz", clusterSize, 1);
+           }
+
+           input.close();
+        }
         cout << "Calculated values for arbitrary grid: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
     }
     else {
@@ -131,6 +151,25 @@ int main( int argc, char *argv[] )
 	readParametersFromCommandLine(argc,argv,0);
         NUMX = ceil((2*ALX+A)/A);
         NUMY = ceil((2*ALY+A)/A);
+        if ((POTENTIAL == 22) && (CLUSTER == 1)) {
+           //Need to load cluster data and we really only want to do it once (per node).
+           fstream input;
+           string line;
+           int clusterSize;
+           //just the size so we can allocate memory first 
+           input.open("cluster.xyz", ios::in);
+           if (!input) {
+              CLUSTER = 0;
+           } else {
+    
+              getline(input,line);
+              clusterSize = atoi(line.c_str());
+              allocateClusterMemory(clusterSize);
+              readClusterData((char *)"cluster.xyz", clusterSize, 0);
+           }
+
+           input.close();
+        }
     }
 	
     if (NUMZ%(numNodes-1)!=0) {
@@ -250,26 +289,6 @@ void solveInitialize() {
 		flush(cout);
 	}
 
-        if ((POTENTIAL == 22) && (CLUSTER == 1)) {
-           //Need to load cluster data and we really only want to do it once (per node).
-           fstream input;
-           string line;
-           int clusterSize;
-           //just the size so we can allocate memory first 
-           input.open("cluster.xyz", ios::in);
-           if (!input) {
-              if (nodeID == 1) cout << "==> Error : No cluster.xyz file present. Falling back to AL{X,Y,Z} values." << endl;
-              CLUSTER = 0;
-           } else {
-    
-              getline(input,line);
-              clusterSize = atoi(line.c_str());
-              allocateClusterMemory(clusterSize);
-              readClusterData((char *)"cluster.xyz", clusterSize, 1);
-           }
-
-           input.close();
-        }
 	loadPotentialArrays();
 	
 	if (nodeID==1) print_line();

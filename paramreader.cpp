@@ -120,7 +120,7 @@ void readParametersFromCommandLine(int argc, char** argv, int echo) {
 void readClusterData(char *filename, int clusterSize, int echo) {
     fstream input;
     string line, speciesstr, tmp;
-    double xval, yval, zval;
+    double xval, yval, zval, xmax=0, ymax=0;
 
     input.open(filename, ios::in);
     //first line is the number of atoms
@@ -147,18 +147,27 @@ void readClusterData(char *filename, int clusterSize, int echo) {
         zval = atof(tmp.c_str()); //z value
         
         if (speciesstr.compare("Al") == 0) {
-            *(species+i) = 1; //Aluminium
+            *(clustSpecies+i) = 1; //Aluminium
         } else {
-            *(species+i) = 2; //Oxygen
+            *(clustSpecies+i) = 2; //Oxygen
         }
 
         *(clust+(clusterSize*0)+i) = xval;
         *(clust+(clusterSize*1)+i) = yval;
         *(clust+(clusterSize*2)+i) = zval;
         
-        if ((nodeID==1) && echo) cout << speciesstr << "(" << *(species+i) << "), " << *(clust+(clusterSize*0)+i) << ", " << *(clust+(clusterSize*1)+i) << ", " << *(clust+(clusterSize*2)+i) << endl;
+        if (xval > xmax) xmax = xval;
+        if (yval > ymax) ymax = yval;
+    
+        if ((nodeID==1) && echo) cout << speciesstr << "(" << *(clustSpecies+i) << "), " << *(clust+(clusterSize*0)+i) << ", " << *(clust+(clusterSize*1)+i) << ", " << *(clust+(clusterSize*2)+i) << endl;
     }
-    *(species+clusterSize) = 2; //final oxygen
+    *(clustSpecies+clusterSize) = 2; //final oxygen
     input.close();	
+    
+    //NUMZ (& DISTNUMZ) Should already be calculated and in params.txt
+    //use max values of cluster to set new values for NUM{X,Y} 
+    NUMX = ceil((2*xmax+A)/A);
+    NUMY = ceil((2*ymax+A)/A);
+
     return;	
 }

@@ -52,6 +52,6 @@ double dist(double *pointsi, double *pointsj, int sizeC);
 void gammasm(double *za, double *zb, double *r, double *gambfa, double *gamfafb);
 double electroneg(double *system, double *species, int sizeC);
 dcomp makepot(double *points, double *species, int sizeC);
-dcomp mexHatPotential(double dx, double dy, double dz, double *species, int sizeC);
+dcomp mexHatPotential(double dx, double dy, double dz);
 
 #endif /* __mexHatPotential_h__ */

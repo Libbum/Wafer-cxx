@@ -51,7 +51,7 @@ extern dcomp normalizationCollect;
 extern dcomp vInfinityCollect;
 extern dcomp rRMS2Collect;    // #ad.
 
-extern double *species;
+extern double *clustSpecies;
 extern double *clust;
 
 /* debug values */

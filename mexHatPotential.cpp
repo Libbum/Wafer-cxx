@@ -418,7 +418,7 @@ dcomp makepot(double *points, double *species, int sizeC)
 
 }
 
-dcomp mexHatPotential(double dx, double dy, double dz, double *species, int sizeC)
+dcomp mexHatPotential(double dx, double dy, double dz)
   //dx,dy,dz are the coords of the system centered on the simulation volume
   //Essentially oxycube. Assume NUM is a global. 
 {
@@ -427,18 +427,45 @@ dcomp mexHatPotential(double dx, double dy, double dz, double *species, int size
     //NO CAGE 7 49
     
     
-    double clust[] = {0, 0,  ALX,  -ALX, 0, 0,  dx, 0, 0, 0, 0,  ALY,  -ALY, dy,  ALZ,  -ALZ, 0, 0, 0, 0, dz};
-    double *cluster;
    // cluster = (double *)calloc(sizeC*3,sizeof(double));
     //GR2
     if (CLUSTER == 1) {
-       cluster = clust;
+        //generate from cluster data
+        dcomp V;
+        int sizeC = sizeof(clust)/sizeof(double);
+        
+        double *cluster = (double *)calloc((sizeC*3)+3,sizeof(double)); //current cluster plus dx,dy,dz
+
+        for (int j = 0; j<sizeC+1; j++)
+        {
+            if (j != sizeC)
+            {
+                // Add atoms 
+                *(cluster+((sizeC+1)*0)+j) = *(clust+(sizeC*0)+j); 
+                *(cluster+((sizeC+1)*1)+j) = *(clust+(sizeC*1)+j); 
+                *(cluster+((sizeC+1)*2)+j) = *(clust+(sizeC*2)+j); 
+            }
+            else
+            {
+                // Delocalised Oxygen 
+                *(cluster+((sizeC+1)*0)+j) = dx; 
+                *(cluster+((sizeC+1)*1)+j) = dy; 
+                *(cluster+((sizeC+1)*2)+j) = dz; 
+            }                
+        }
+
+        V = makepot(cluster,clustSpecies,sizeC);
+        free(cluster);
+        return V;
     } else {
-       cluster = clust;
+        //generate from AL{X,Y,Z} parameters, assuming species is all aluminium
+        double species[] = {1, 1, 1, 1, 1, 1, 2};
+        double cluster[] = {0, 0,  ALX,  -ALX, 0, 0,  dx, 0, 0, 0, 0,  ALY,  -ALY, dy,  ALZ,  -ALZ, 0, 0, 0, 0, dz};
+        int sizeC = sizeof(species)/sizeof(double);
+        return makepot(&cluster[0],&species[0],sizeC);
     }
     //double cluster[][3] = { { 0.0, 0.0, ALZ }, { 0.0, 0.0, -ALZ }, { ALX, 0.0, 0.0 }, { -ALX, 0.0, 0.0 }, { 0.0, ALY, 0.0 }, { 0.0, -ALY, 0.0 }, { 0, 0, -12.3 }, { -6.15, 0, -10.652 }, { -10.652, 0, -6.15 }, { -12.3, 0, 0 }, { -10.652, 0, 6.15 }, { -6.15, 0, 10.652 }, { 0, 0, 12.3 }, { 0, 0, -12.3 }, { -3.075, -5.3261, -10.652 }, { -5.3261, -9.225, -6.15 }, { -6.15, -10.652, 0 }, { -5.3261, -9.225, 6.15 }, { -3.075, -5.3261, 10.652 }, { 0, 0, 12.3 }, { 0, 0, -12.3 }, { 3.075, -5.3261, -10.652 }, { 5.3261, -9.225, -6.15 }, { 6.15, -10.652, 0 }, { 5.3261, -9.225, 6.15 }, { 3.075, -5.3261, 10.652 }, { 0, 0, 12.3 }, { 0, 0, -12.3 }, { 6.15, 0, -10.652 }, { 10.652, 0, -6.15 }, { 12.3, 0, 0 }, { 10.652, 0, 6.15 }, { 6.15, 0, 10.652 }, { 0, 0, 12.3 }, { 0, 0, -12.3 }, { 3.075, 5.3261, -10.652 }, { 5.3261, 9.225, -6.15 }, { 6.15, 10.652, 0 }, { 5.3261, 9.225, 6.15 }, { 3.075, 5.3261, 10.652 }, { 0, 0, 12.3 }, { 0, 0, -12.3 }, { -3.075, 5.3261, -10.652 }, { -5.3261, 9.225, -6.15 }, { -6.15, 10.652, 0 }, { -5.3261, 9.225, 6.15 }, { -3.075, 5.3261, 10.652 }, { 0, 0, 12.3 }, { 0, 0, -12.3 }, { -6.15, 0, -10.652 }, { -10.652, 0, -6.15 }, { -12.3, 0, 0 }, { -10.652, 0, 6.15 }, { -6.15, 0, 10.652 }, { 0, 0, 12.3 }, { dx, dy, dz } };
     //GR1.5 SPHERE 56, 3136
     //double cluster[][3] = { { 0.0, 0.0, ALZ }, { 0.0, 0.0, -ALZ }, { ALX, 0.0, 0.0 }, { -ALX, 0.0, 0.0 }, { 0.0, ALY, 0.0 }, { 0.0, -ALY, 0.0 }, {0, 0, -9.225 }, { -4.6125, 0, -7.9891 }, { -7.9891, 0, -4.6125 }, { -9.225, 0, 0 }, { -7.9891, 0, 4.6125 }, { -4.6125, 0, 7.9891 }, { 0, 0, 9.225 }, { 0, 0, -9.225 }, { -2.3062, -3.9945, -7.9891 }, { -3.9945, -6.9188, -4.6125 }, { -4.6125, -7.9891, 0 }, { -3.9945, -6.9188, 4.6125 }, { -2.3062, -3.9945, 7.9891 }, { 0, 0, 9.225 }, { 0, 0, -9.225 }, { 2.3063, -3.9945, -7.9891 }, { 3.9945, -6.9188, -4.6125 }, { 4.6125, -7.9891, 0 }, { 3.9945, -6.9188, 4.6125 }, { 2.3063, -3.9945, 7.9891 }, { 0, 0, 9.225 }, { 0, 0, -9.225 }, { 4.6125, 0, -7.9891 }, { 7.9891, 0, -4.6125 }, { 9.225, 0, 0 }, { 7.9891, 0, 4.6125 }, { 4.6125, 0, 7.9891 }, { 0, 0, 9.225 }, { 0, 0, -9.225 }, { 2.3063, 3.9945, -7.9891 }, { 3.9945, 6.9188, -4.6125 }, { 4.6125, 7.9891, 0 }, { 3.9945, 6.9188, 4.6125 }, { 2.3063, 3.9945, 7.9891 }, { 0, 0, 9.225 }, { 0, 0, -9.225 }, { -2.3062, 3.9945, -7.9891 }, { -3.9945, 6.9188, -4.6125 }, { -4.6125, 7.9891, 0 }, { -3.9945, 6.9188, 4.6125 }, { -2.3062, 3.9945, 7.9891 }, { 0, 0, 9.225 }, { 0, 0, -9.225 }, { -4.6125, 0, -7.9891 }, { -7.9891, 0, -4.6125 }, { -9.225, 0, 0 }, { -7.9891, 0, 4.6125 }, { -4.6125, 0, 7.9891 }, { 0, 0, 9.225 }, { dx, dy, dz } };
     /*Run potential builder*/
-    return makepot(cluster,species,sizeC);
 }

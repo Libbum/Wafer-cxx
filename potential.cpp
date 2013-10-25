@@ -285,12 +285,7 @@ dcomp potential(int sx,int sy, int sz)
         //cout << "tx " << tx << ", ty " << ty << ", tz " << tz << ", sx " << sx << ", numNodes " << numNodes << endl;
       //}
 
-      //temp setup to test new N potential port
-      double spec[] = {1, 1, 1, 1, 1, 1, 2};
-      double *species;
-      species = spec;
-      int sizeC = sizeof(spec)/sizeof(double);
-      return mexHatPotential(tx,ty,tz,species,sizeC);
+      return mexHatPotential(tx,ty,tz);
     }
     break;
     default:

@@ -89,12 +89,12 @@ void allocateMemory() {
 
 void allocateClusterMemory(int clusterSize) {
    clust = (double *)calloc(clusterSize*3,sizeof(double));
-   species = (double *)calloc(clusterSize+1,sizeof(double));
+   clustSpecies = (double *)calloc(clusterSize+1,sizeof(double));
 }
 
 void deallocateClusterMemory() {
    free(clust);
-   free(species);
+   free(clustSpecies);
 }
 
 // "copies" updated arrays using pointer swap
