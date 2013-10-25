@@ -338,6 +338,16 @@ dcomp makepot(double *points, double *species, int sizeC)
                 /* find r */
                 r = dist(points+i, points+j, sizeC);
                 
+//if ((j == 1) && (i == 0)) { 
+    //double *pointsi, *pointsj;
+
+    //pointsi = points+i;
+    //pointsj = points+j;
+    //cout << *pointsj << "," << *(pointsj+8) << "," << *(pointsj+9)  << "," << *(pointsj+10) << "," << *(pointsj+11) << "," << *(pointsj+12) << "," << *(pointsj+13) << "," << *(pointsj+14) << endl;
+    //
+    //return(sqrt(pow(*pointsj-*pointsi,2)+pow(*(pointsj+(sizeC*1))-*(pointsi+(sizeC*1)),2)+pow(*(pointsj+(sizeC*2))-*(pointsi+(sizeC*2)),2)));
+    //cout << sizeC << ", " << species[j] << ", " << *(points) << ", " << *(points+1) << ", " << *(points+2) << endl;
+//}
                 /* if statements check range. If r is not in the range the
                  * potential is not calculated */
                 if ((r >= RangeBuck[0]) && (r <= RangeBuck[1]))
@@ -432,25 +442,24 @@ dcomp mexHatPotential(double dx, double dy, double dz)
     if (CLUSTER == 1) {
         //generate from cluster data
         dcomp V;
-        int sizeC = sizeof(clust)/sizeof(double);
+        int sizeC = sizeof(clustSpecies)+1;
         
-        double *cluster = (double *)calloc((sizeC*3)+3,sizeof(double)); //current cluster plus dx,dy,dz
-
-        for (int j = 0; j<sizeC+1; j++)
+        double *cluster = (double *)calloc(sizeC*3,sizeof(double)); 
+        for (int j = 0; j<sizeC; j++)
         {
-            if (j != sizeC)
+            if (j < sizeC-1)
             {
                 // Add atoms 
-                *(cluster+((sizeC+1)*0)+j) = *(clust+(sizeC*0)+j); 
-                *(cluster+((sizeC+1)*1)+j) = *(clust+(sizeC*1)+j); 
-                *(cluster+((sizeC+1)*2)+j) = *(clust+(sizeC*2)+j); 
+                *(cluster+(sizeC*0)+j) = *(clust+(sizeC*0)+j); 
+                *(cluster+(sizeC*1)+j) = *(clust+(sizeC*1)+j); 
+                *(cluster+(sizeC*2)+j) = *(clust+(sizeC*2)+j); 
             }
             else
             {
                 // Delocalised Oxygen 
-                *(cluster+((sizeC+1)*0)+j) = dx; 
-                *(cluster+((sizeC+1)*1)+j) = dy; 
-                *(cluster+((sizeC+1)*2)+j) = dz; 
+                *(cluster+(sizeC*0)+j) = dx; 
+                *(cluster+(sizeC*1)+j) = dy; 
+                *(cluster+(sizeC*2)+j) = dz; 
             }                
         }
 

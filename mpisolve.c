@@ -138,8 +138,9 @@ int main( int argc, char *argv[] )
     
               getline(input,line);
               clusterSize = atoi(line.c_str());
-              allocateClusterMemory(clusterSize);
-              readClusterData((char *)"cluster.xyz", clusterSize, 1);
+              allocateClusterMemory(clusterSize+1);
+              print_line();
+              readClusterData((char *)"cluster.xyz", clusterSize+1, 1);
            }
 
            input.close();
@@ -164,8 +165,8 @@ int main( int argc, char *argv[] )
     
               getline(input,line);
               clusterSize = atoi(line.c_str());
-              allocateClusterMemory(clusterSize);
-              readClusterData((char *)"cluster.xyz", clusterSize, 0);
+              allocateClusterMemory(clusterSize+1);
+              readClusterData((char *)"cluster.xyz", clusterSize+1, 0);
            }
 
            input.close();

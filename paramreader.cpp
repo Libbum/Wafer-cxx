@@ -128,9 +128,9 @@ void readClusterData(char *filename, int clusterSize, int echo) {
     getline(input,line); // ignore the comment line
 
 
-    if ((nodeID==1) && echo) cout << clusterSize << " atoms in cluster:" << endl;
+    if (echo) cout << clusterSize << " atoms in cluster (these " << clusterSize-1 << " cage atoms and the delocalised oxygen):" << endl;
 
-    for (int i = 0; i < clusterSize; i++) {
+    for (int i = 0; i < clusterSize-1; i++) { //the minus one leaves room for the oxygen
         getline(input,line);
         speciesstr = line.substr(0, line.find(' ')); //species
         line.erase(0, line.find(' ') + 1); //remove numx
@@ -159,9 +159,9 @@ void readClusterData(char *filename, int clusterSize, int echo) {
         if (xval > xmax) xmax = xval;
         if (yval > ymax) ymax = yval;
     
-        if ((nodeID==1) && echo) cout << speciesstr << "(" << *(clustSpecies+i) << "), " << *(clust+(clusterSize*0)+i) << ", " << *(clust+(clusterSize*1)+i) << ", " << *(clust+(clusterSize*2)+i) << endl;
+        if (echo) cout << speciesstr << "(" << *(clustSpecies+i) << "), " << *(clust+(clusterSize*0)+i) << ", " << *(clust+(clusterSize*1)+i) << ", " << *(clust+(clusterSize*2)+i) << endl;
     }
-    *(clustSpecies+clusterSize) = 2; //final oxygen
+    *(clustSpecies+clusterSize-1) = 2; //final oxygen
     input.close();	
     
     //NUMZ (& DISTNUMZ) Should already be calculated and in params.txt
