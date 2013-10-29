@@ -291,6 +291,12 @@ void solveInitialize() {
 	}
 
 	loadPotentialArrays();
+	if (SAVEWAVEFNCS==1) {
+	   char label[64];
+       sprintf(label,"0_%d",nodeID); 
+       // output potential for debugging
+       outputPotential(label);
+    }
 	
 	if (nodeID==1) print_line();
 	
@@ -479,7 +485,7 @@ void solveFinalize() {
 	    	sprintf(label,"0_%d",nodeID); 
 	    	outputWavefunction(w,label);
         // output potential for debugging
-            outputPotential(label);
+            //outputPotential(label);
 	    }
        //Uncomment if higher order states are wanted
        //findExcitedStates();
