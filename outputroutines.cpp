@@ -31,12 +31,16 @@ void outputMeasurements(const double time) {
 
 	dcomp ener = energyCollect/normalizationCollect;
 	dcomp rRMS2 = rRMS2Collect/normalizationCollect;
-
+  
 	// output to screen
 
 	cout.precision(12);
 	cout.width(dwidth); cout << time;
-        cout.width(35); cout << setprecision (dbl::digits10) << ener;
+    if (POTENTIAL==22) {
+       cout.width(35); cout << setprecision (dbl::digits10) << ener*1e6/239.2311;
+    } else {
+       cout.width(35); cout << setprecision (dbl::digits10) << ener;
+    }
 	cout.width(15); cout << setprecision (7) << sqrt(real(rRMS2)); 
 	cout << endl;
 
@@ -53,8 +57,13 @@ void outputSummaryData() {
       //cout << "==> Total energy : " << energyCollect << endl;
       //cout << "==> Normalization2 : " << normalizationCollect << endl;
       cout.precision(dbl::digits10);
-      cout << "==> Ground State Energy : " << fixed << ener << endl;
-      cout << "==> Ground State Binding Energy : " << binding << endl;
+      if (POTENTIAL==22) {
+         cout << "==> Ground State Energy : " << fixed << ener*1e6/239.2311 << " (ueV)" << endl;
+         cout << "==> Ground State Binding Energy : " << binding*1e6/239.2311 << " (ueV)" << endl;
+      } else {
+         cout << "==> Ground State Energy : " << fixed << ener << endl;
+         cout << "==> Ground State Binding Energy : " << binding << endl;
+      }
       cout << "==> Ground State r_RMS : " << sqrt(real(rRMS2)) << endl;  // #ad.
       cout << "==> Ground State L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;  // #ad.
 
@@ -136,10 +145,16 @@ void outputPotential(char* label) {
   fstream out;
   char fname[255];
 
+  double convert = 1e6/239.2311; //For POTENTIAL == 22
+
   // output full 3d wfnc
   sprintf(fname,"data/potential_%s.dat",label);
 
-  cout << "==> Dumping potential to " << fname << endl;
+  if (POTENTIAL==22) {
+      cout << "==> Dumping potential to " << fname << " (ueV)" << endl;
+  } else {
+      cout << "==> Dumping potential to " << fname << endl;
+  }
 
   out.open(fname, ios::out);
   out.precision(12);
@@ -150,8 +165,13 @@ void outputPotential(char* label) {
                 out << sx  << "\t";
                 out << sy << "\t";
                 out << z << "\t";
-                out << real(v[sx][sy][sz]) << "\t";
-                out << imag(v[sx][sy][sz]);
+                if (POTENTIAL==22) {
+                    out << real(v[sx][sy][sz])*convert << "\t";
+                    out << imag(v[sx][sy][sz])*convert;
+                } else {
+                    out << real(v[sx][sy][sz]) << "\t";
+                    out << imag(v[sx][sy][sz]);
+                }
                 out << endl;
   }}}
   out.close();
