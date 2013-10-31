@@ -87,9 +87,9 @@ void allocateMemory() {
 	return;
 }
 
-void allocateClusterMemory(int clusterSize) {
-   clust = (double *)calloc(clusterSize*3,sizeof(double));
-   clustSpecies = (double *)calloc(clusterSize,sizeof(double));
+void allocateClusterMemory() {
+   clust = (double *)calloc(CLUSTSIZE*3,sizeof(double));
+   clustSpecies = (double *)calloc(CLUSTSIZE,sizeof(double));
 }
 
 void deallocateClusterMemory() {

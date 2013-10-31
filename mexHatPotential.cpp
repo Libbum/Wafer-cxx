@@ -442,28 +442,27 @@ dcomp mexHatPotential(double dx, double dy, double dz)
     if (CLUSTER == 1) {
         //generate from cluster data
         dcomp V;
-        int sizeC = sizeof(clustSpecies)+1;
         
-        double *cluster = (double *)calloc(sizeC*3,sizeof(double)); 
-        for (int j = 0; j<sizeC; j++)
+        double *cluster = (double *)calloc(CLUSTSIZE*3,sizeof(double)); 
+        for (int j = 0; j<CLUSTSIZE; j++)
         {
-            if (j < sizeC-1)
+            if (j < CLUSTSIZE-1)
             {
                 // Add atoms 
-                *(cluster+(sizeC*0)+j) = *(clust+(sizeC*0)+j); 
-                *(cluster+(sizeC*1)+j) = *(clust+(sizeC*1)+j); 
-                *(cluster+(sizeC*2)+j) = *(clust+(sizeC*2)+j); 
+                *(cluster+(CLUSTSIZE*0)+j) = *(clust+(CLUSTSIZE*0)+j); 
+                *(cluster+(CLUSTSIZE*1)+j) = *(clust+(CLUSTSIZE*1)+j); 
+                *(cluster+(CLUSTSIZE*2)+j) = *(clust+(CLUSTSIZE*2)+j); 
             }
             else
             {
                 // Delocalised Oxygen 
-                *(cluster+(sizeC*0)+j) = dx; 
-                *(cluster+(sizeC*1)+j) = dy; 
-                *(cluster+(sizeC*2)+j) = dz; 
+                *(cluster+(CLUSTSIZE*0)+j) = dx; 
+                *(cluster+(CLUSTSIZE*1)+j) = dy; 
+                *(cluster+(CLUSTSIZE*2)+j) = dz; 
             }                
         }
 
-        V = makepot(cluster,clustSpecies,sizeC);
+        V = makepot(cluster,clustSpecies,CLUSTSIZE);
         free(cluster);
         return V;
     } else {

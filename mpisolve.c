@@ -26,7 +26,7 @@ typedef std::numeric_limits< double > dbl;
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
 int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
-int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0;
+int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0,CLUSTSIZE=7;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
 
@@ -128,7 +128,6 @@ int main( int argc, char *argv[] )
            //Need to load cluster data and we really only want to do it once (per node).
            fstream input;
            string line;
-           int clusterSize;
            //just the size so we can allocate memory first 
            input.open("cluster.xyz", ios::in);
            if (!input) {
@@ -137,10 +136,10 @@ int main( int argc, char *argv[] )
            } else {
     
               getline(input,line);
-              clusterSize = atoi(line.c_str());
-              allocateClusterMemory(clusterSize+1);
+              CLUSTSIZE = atoi(line.c_str())+1;
+              allocateClusterMemory();
               print_line();
-              readClusterData((char *)"cluster.xyz", clusterSize+1, 1);
+              readClusterData((char *)"cluster.xyz", 1);
            }
 
            input.close();
@@ -156,7 +155,6 @@ int main( int argc, char *argv[] )
            //Need to load cluster data and we really only want to do it once (per node).
            fstream input;
            string line;
-           int clusterSize;
            //just the size so we can allocate memory first 
            input.open("cluster.xyz", ios::in);
            if (!input) {
@@ -164,9 +162,9 @@ int main( int argc, char *argv[] )
            } else {
     
               getline(input,line);
-              clusterSize = atoi(line.c_str());
-              allocateClusterMemory(clusterSize+1);
-              readClusterData((char *)"cluster.xyz", clusterSize+1, 0);
+              CLUSTSIZE = atoi(line.c_str())+1;
+              allocateClusterMemory();
+              readClusterData((char *)"cluster.xyz", 0);
            }
 
            input.close();

@@ -51,7 +51,7 @@ dcomp computeEnergy();
 
 // other methods
 void allocateMemory();
-void allocateClusterMemory(int clusterSize);
+void allocateClusterMemory();
 void deallocateClusterMemory();
 void deallocateMemory();
 void updateBoundaries(double eps);

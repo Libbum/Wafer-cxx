@@ -117,7 +117,7 @@ void readParametersFromCommandLine(int argc, char** argv, int echo) {
 //
 // Read cluster data from cluster.xyz
 //
-void readClusterData(char *filename, int clusterSize, int echo) {
+void readClusterData(char *filename, int echo) {
     fstream input;
     string line, speciesstr, tmp;
     double xval, yval, zval, xmax=0, ymax=0;
@@ -128,9 +128,9 @@ void readClusterData(char *filename, int clusterSize, int echo) {
     getline(input,line); // ignore the comment line
 
 
-    if (echo) cout << clusterSize << " atoms in cluster (these " << clusterSize-1 << " cage atoms and the delocalised oxygen):" << endl;
+    if (echo) cout << CLUSTSIZE << " atoms in cluster (these " << CLUSTSIZE-1 << " cage atoms and the delocalised oxygen):" << endl;
 
-    for (int i = 0; i < clusterSize-1; i++) { //the minus one leaves room for the oxygen
+    for (int i = 0; i < CLUSTSIZE-1; i++) { //the minus one leaves room for the oxygen
         getline(input,line);
         speciesstr = line.substr(0, line.find(' ')); //species
         line.erase(0, line.find(' ') + 1); //remove numx
@@ -152,16 +152,16 @@ void readClusterData(char *filename, int clusterSize, int echo) {
             *(clustSpecies+i) = 2; //Oxygen
         }
 
-        *(clust+(clusterSize*0)+i) = xval;
-        *(clust+(clusterSize*1)+i) = yval;
-        *(clust+(clusterSize*2)+i) = zval;
+        *(clust+(CLUSTSIZE*0)+i) = xval;
+        *(clust+(CLUSTSIZE*1)+i) = yval;
+        *(clust+(CLUSTSIZE*2)+i) = zval;
         
         if (xval > xmax) xmax = xval;
         if (yval > ymax) ymax = yval;
     
-        if (echo) cout << speciesstr << "(" << *(clustSpecies+i) << "), " << *(clust+(clusterSize*0)+i) << ", " << *(clust+(clusterSize*1)+i) << ", " << *(clust+(clusterSize*2)+i) << endl;
+        if (echo) cout << speciesstr << "(" << *(clustSpecies+i) << "), " << *(clust+(CLUSTSIZE*0)+i) << ", " << *(clust+(CLUSTSIZE*1)+i) << ", " << *(clust+(CLUSTSIZE*2)+i) << endl;
     }
-    *(clustSpecies+clusterSize-1) = 2; //final oxygen
+    *(clustSpecies+CLUSTSIZE-1) = 2; //final oxygen
     input.close();	
     
     //NUMZ (& DISTNUMZ) Should already be calculated and in params.txt
