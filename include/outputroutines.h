@@ -20,8 +20,10 @@ const int dwidth = 25;
 void outputMeasurements(double time);
 void outputSnapshot(dcomp ***wfnc, char* label);
 void outputWavefunction(dcomp ***wfnc, char* label);
+void outputWavefunctionBinary(dcomp ***wfnc, char* label);
 void outputSummaryData();
 void outputPotential(char* label);
+void outputPotentialBinary(char* label);
 void dumpPotential();
 void print_line();
 

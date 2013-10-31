@@ -295,7 +295,7 @@ void solveInitialize() {
 	   char label[64];
        sprintf(label,"0_%d",nodeID); 
        // output potential for debugging
-       outputPotential(label);
+       outputPotentialBinary(label);
     }
 	
 	if (nodeID==1) print_line();
@@ -483,7 +483,7 @@ void solveFinalize() {
 	    if (SAVEWAVEFNCS==1) {
 		// save 3d wavefunction for states
 	    	sprintf(label,"0_%d",nodeID); 
-	    	outputWavefunction(w,label);
+	    	outputWavefunctionBinary(w,label);
         // output potential for debugging
             //outputPotential(label);
 	    }
@@ -631,9 +631,9 @@ void findExcitedStates() {
 	if (SAVEWAVEFNCS) {
 		// save 3d wavefunction for states
 		sprintf(label,"0_%d",nodeID); 
-		outputWavefunction(w,label);
+		outputWavefunctionBinary(w,label);
 		sprintf(label,"1_%d",nodeID); 
-		outputWavefunction(W,label);
+		outputWavefunctionBinary(W,label);
     // output potential for debugging
     outputPotential(label);
 	}
@@ -706,7 +706,7 @@ void findExcitedStates() {
 	if (SAVEWAVEFNCS) {
 		// save 3d wavefunction for states
 		sprintf(label,"2_%d",nodeID); 
-		outputWavefunction(W2,label);
+		outputWavefunctionBinary(W2,label);
   }
 	return;
 }

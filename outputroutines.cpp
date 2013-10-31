@@ -138,6 +138,38 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
 
 }
 
+void outputWavefunctionBinary(dcomp ***wfnc, char* label) {
+
+  int z;
+  fstream out;
+  char fname[255];
+  double tmp;
+
+  // output full 3d wfnc
+  sprintf(fname,"data/wavefunction_%s.dat",label);
+
+  cout << "==> Dumping wave function to " << fname << endl;
+
+  out.open(fname, ios::out|ios::binary);
+  out.precision(12);
+  for (int sx=1;sx<=NUMX;sx++) {
+    for (int sy=1;sy<=NUMY;sy++) {
+      for (int sz=1; sz<=DISTNUMZ;sz++) {
+                z=(nodeID-1)*DISTNUMZ + sz;
+                out.write(reinterpret_cast<const char*>(&sx), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&sy), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&z), sizeof(int));
+                tmp = real(wfnc[sx][sy][sz]);
+                out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
+                tmp = imag(wfnc[sx][sy][sz]);
+                out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
+  }}}
+  out.close();
+
+  return;
+
+}
+
 // output v 3d
 void outputPotential(char* label) {
 
@@ -179,6 +211,51 @@ void outputPotential(char* label) {
   return;
 
 }
+
+// output v 3d
+void outputPotentialBinary(char* label) {
+
+  int z;
+  fstream out;
+  char fname[255];
+  double convert = 1e6/239.2311; //For POTENTIAL == 22
+  double tmp;
+  // output full 3d wfnc
+  sprintf(fname,"data/potential_%s.dat",label);
+
+  if (POTENTIAL==22) {
+      cout << "==> Dumping potential to " << fname << " (ueV)" << endl;
+  } else {
+      cout << "==> Dumping potential to " << fname << endl;
+  }
+
+  out.open(fname, ios::out|ios::binary);
+  out.precision(12);
+  for (int sx=1;sx<=NUMX;sx++) {
+    for (int sy=1;sy<=NUMY;sy++) {
+      for (int sz=1; sz<=DISTNUMZ;sz++) {
+                z=(nodeID-1)*DISTNUMZ + sz;
+                out.write(reinterpret_cast<const char*>(&sx), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&sy), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&z), sizeof(int));
+                if (POTENTIAL==22) {
+                    tmp = real(v[sx][sy][sz])*convert; 
+                    out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
+                    tmp = imag(v[sx][sy][sz])*convert; 
+                    out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
+                } else {
+                    tmp = real(v[sx][sy][sz]); 
+                    out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
+                    tmp = imag(v[sx][sy][sz]); 
+                    out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
+                }
+  }}}
+  out.close();
+
+  return;
+
+}
+
 
 // output v along principal axes
 void dumpPotential() {
