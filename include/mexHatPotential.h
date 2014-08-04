@@ -12,7 +12,7 @@
 typedef complex<double> dcomp;
 extern double ALX,ALY,ALZ;
 
-#if defined(VAYU)
+#if defined(RAIJIN)
 
 extern "C"
 {
@@ -39,7 +39,7 @@ extern "C"
 
 #else
 
-#error "One of VAYU or TRIFID must be defined"
+#error "One of RAIJIN or TRIFID must be defined"
 
 #endif
 

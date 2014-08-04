@@ -16,8 +16,8 @@ module load openmpi-gcc/1.7.0
 module load lapack/3.4.2
 
 
-Vayu
-====
+Raijin
+======
 
 module load intel-mkl/13.2.146 
 

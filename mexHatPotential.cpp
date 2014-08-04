@@ -11,13 +11,13 @@
 #include <iostream>
 #include <complex>
 
-#if defined(VAYU)
+#if defined(RAIJIN)
 #include <mkl.h>
 #define LP_INT MKL_INT
 #elif defined(TRIFID)
 #define LP_INT int
 #else
-#error "One of VAYU or TRIFID must be defined"
+#error "One of RAIJIN or TRIFID must be defined"
 #endif
 //#include <Accelerate/Accelerate.h> //For Lapack & Blas
 

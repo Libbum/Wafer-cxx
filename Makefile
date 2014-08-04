@@ -18,7 +18,7 @@ else
 INCLUDES += -I$(MKL)/include
 LAPACK = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread  
 LIBS = -L$(MKL)/lib/intel64 
-CPPFLAGS += -DVAYU=1
+CPPFLAGS += -DRAIJIN=1
 endif
 
 CC = mpicxx
