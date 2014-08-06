@@ -747,8 +747,8 @@ void sendRightBoundary(dcomp*** wfnc) {
 	}
 	for (int sx=0;sx<NUMX+2;sx++)
 		for (int sy=0;sy<NUMY+2;sy++) {
-			rightSendBuffer[sy*(NUMY+2)+sx%(NUMX+2)] = real(wfnc[sx][sy][DISTNUMZ]);
-			rightSendBuffer[sy*(NUMY+2)+sx%(NUMX+2) + (NUMX+2)*(NUMY+2)] = imag(wfnc[sx][sy][DISTNUMZ]);
+			rightSendBuffer[sx*(NUMY+2)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
+			rightSendBuffer[sx*(NUMY+2)+sy + (NUMX+2)*(NUMY+2)] = imag(wfnc[sx][sy][DISTNUMZ]);
 		}
 	MPI_Isend(rightSendBuffer, 2*(NUMX+2)*(NUMY+2), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
 }
@@ -762,8 +762,8 @@ void sendLeftBoundary(dcomp*** wfnc) {
 	}
 	for (int sx=0;sx<NUMX+2;sx++)
 		for (int sy=0;sy<NUMY+2;sy++) { 
-			leftSendBuffer[sy*(NUMY+2)+sx%(NUMX+2)] = real(wfnc[sx][sy][1]);
-			leftSendBuffer[sy*(NUMY+2)+sx%(NUMX+2) + (NUMX+2)*(NUMY+2)] = imag(wfnc[sx][sy][1]);
+			leftSendBuffer[sx*(NUMY+2)+sy] = real(wfnc[sx][sy][1]);
+			leftSendBuffer[sx*(NUMY+2)+sy + (NUMX+2)*(NUMY+2)] = imag(wfnc[sx][sy][1]);
 		}
 	MPI_Isend(leftSendBuffer, 2*(NUMX+2)*(NUMY+2), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
 }
@@ -781,7 +781,7 @@ inline void loadRightBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array right boundary
 	for (int sx=0;sx<NUMX+2;sx++)
 		for (int sy=0;sy<NUMY+2;sy++)
-			wfnc[sx][sy][DISTNUMZ+1] = dcomp(rightReceiveBuffer[sy*(NUMY+2)+sx%(NUMX+2)],rightReceiveBuffer[sy*(NUMY+2)+sx%(NUMX+2)+(NUMX+2)*(NUMY+2)]);
+			wfnc[sx][sy][DISTNUMZ+1] = dcomp(rightReceiveBuffer[sx*(NUMY+2)+sy],rightReceiveBuffer[sx*(NUMY+2)+sy+(NUMX+2)*(NUMY+2)]);
 }
 
 void receiveLeftBoundary() {
@@ -797,5 +797,5 @@ inline void loadLeftBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array left boundary
 	for (int sx=0;sx<NUMX+2;sx++)
 		for (int sy=0;sy<NUMY+2;sy++)
-			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sy*(NUMY+2)+sx%(NUMX+2)],leftReceiveBuffer[sy*(NUMY+2)+sx%(NUMX+2)+(NUMX+2)*(NUMY+2)]);
+			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+2)+sy],leftReceiveBuffer[sx*(NUMY+2)+sy+(NUMX+2)*(NUMY+2)]);
 }
