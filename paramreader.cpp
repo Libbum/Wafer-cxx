@@ -25,6 +25,8 @@ using namespace std;
 void setParameter(char *key, const char *value) {
 	// integer params
 	if (strcmp(key,"NUMZ")==0) NUMZ=atoi(value);
+	if (strcmp(key,"NUMX")==0) NUMX=atoi(value);
+	if (strcmp(key,"NUMY")==0) NUMY=atoi(value);
 	if (strcmp(key,"UPDATE")==0) UPDATE=atoi(value);
 	if (strcmp(key,"SNAPUPDATE")==0) SNAPUPDATE=atoi(value);
 	if (strcmp(key,"POTENTIAL")==0) POTENTIAL=atoi(value);

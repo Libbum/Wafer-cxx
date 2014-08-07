@@ -123,7 +123,9 @@ int main( int argc, char *argv[] )
 	}
         //Find NUMX and NUMY Values. These are overwritten in the next loop if it's invoked.
         NUMX = ceil((2*ALX+A)/A);
-        NUMY = ceil((2*ALY+A)/A);
+        if (ALY != 500) { //a value of 500 means unbound. Don't set the grid to separation length
+            NUMY = ceil((2*ALY+A)/A);
+        }
         if ((POTENTIAL == 22) && (CLUSTER == 1)) {
            //Need to load cluster data and we really only want to do it once (per node).
            fstream input;
@@ -144,13 +146,19 @@ int main( int argc, char *argv[] )
 
            input.close();
         }
-        cout << "Calculated values for arbitrary grid: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
+        if (ALY == 500) {
+            cout << "Unbound cluster. Grid values: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
+        } else {
+            cout << "Calculated values for arbitrary grid: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
+        }
     }
     else {
         readParametersFromFile((char *)"params.txt",0);
-	readParametersFromCommandLine(argc,argv,0);
+	    readParametersFromCommandLine(argc,argv,0);
         NUMX = ceil((2*ALX+A)/A);
-        NUMY = ceil((2*ALY+A)/A);
+        if (ALY != 500) { //a value of 500 means unbound. Don't set the grid to separation length
+            NUMY = ceil((2*ALY+A)/A);
+        }
         if ((POTENTIAL == 22) && (CLUSTER == 1)) {
            //Need to load cluster data and we really only want to do it once (per node).
            fstream input;
@@ -208,7 +216,7 @@ int main( int argc, char *argv[] )
 		// cluster is ready
 		if (debug) debug_out << "==> Cluster ready" << endl;
 	
-        // Currently the master process does nothing.  
+                // Currently the master process does nothing.  
 		// It simply starts and waits for the others
 		
 		// master loops and waits for children to report that they are done
@@ -216,7 +224,7 @@ int main( int argc, char *argv[] )
 		do {
 			MPI_Recv(&done, 1, MPI_INT, MPI_ANY_SOURCE, DONE, MPI_COMM_WORLD, &status); 
 			checksum += done;
-            if (debug) debug_out << "Received: checkout from computational node" << endl;
+                if (debug) debug_out << "Received: checkout from computational node" << endl;
 			sleep(0.1); // sleep 0.1 seconds between checks in order to reduce CPU usage of master
 		} while( checksum < numNodes-1 ); 
 	        
@@ -278,6 +286,7 @@ int main( int argc, char *argv[] )
 // solve initialize
 void solveInitialize() {
 	
+		if (debug == DEBUG_FULL) debug_out << "Initialise" << endl;
 	// allocate memory
 	allocateMemory();
 	
@@ -288,7 +297,9 @@ void solveInitialize() {
 		flush(cout);
 	}
 
+		if (debug == DEBUG_FULL) debug_out << "Allocated memory" << endl;
 	loadPotentialArrays();
+		if (debug == DEBUG_FULL) debug_out << "Loaded potential" << endl;
 	if (SAVEWAVEFNCS==1) {
 	   char label[64];
        sprintf(label,"0_%d",nodeID); 
@@ -486,7 +497,7 @@ void solveFinalize() {
             //outputPotential(label);
 	    }
        //Uncomment if higher order states are wanted
-       //findExcitedStates();
+       findExcitedStates();
     } else {
        if (nodeID==1) cout << "ERROR: MINTSTEP value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
     }

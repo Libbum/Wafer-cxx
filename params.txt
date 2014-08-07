@@ -2,13 +2,17 @@
 SIG		1.0
 
 // number of spatial grid points; should be divisible by the number of computational nodes
-NUMZ    770
+NUMZ    403
+
+// can be used if grid is needed below pair separation bounds (pseudo-unbound
+// sets for example)
+NUMY    403
 
 // spatial grid spacing
 A      0.01
 
 // temporal grid spacing - should be <= A*A/3
-EPS		1e-5
+EPS		3e-5
 
 // If using S-M Potential, how far should aEPS take you?
 MINTSTEP     1.e-9
@@ -66,7 +70,7 @@ POTENTIAL	22
 //    3		constant of 0.1 in interior 
 //    4		boolean test grid; mod(i%2)mod(j%2)mod(k%2)
 //
-INITCONDTYPE    0
+INITCONDTYPE    1
 
 //
 // initial symmetry constraint
@@ -86,16 +90,10 @@ INITSYMMETRY	0
 // Currently Mass of Oxygen in amu 
 MASS  15.9994
 
-//
-// Input Cluster type
-//
-// 0 Using ALX, ALY, ALZ Below
-// 1 Read from cluster.xyz
-//
-CLUSTER   0
+// Read from cluster file? 1 Yes, 0 No
+CLUSTER  0
 
 //Aluminium cluster data
-ALX   2.8278
-ALY   2.8278
-ALZ   3.8000
-
+ALX   1.4
+ALY   500.0
+ALZ   500.0 
