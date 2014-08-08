@@ -497,7 +497,7 @@ void solveFinalize() {
             //outputPotential(label);
 	    }
        //Uncomment if higher order states are wanted
-       findExcitedStates();
+     //  findExcitedStates();
     } else {
        if (nodeID==1) cout << "ERROR: MINTSTEP value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
     }
