@@ -35,6 +35,8 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"NF")==0) NF=atoi(value);
 	if (strcmp(key,"SAVEWAVEFNCS")==0) SAVEWAVEFNCS=atoi(value);
         if (strcmp(key,"CLUSTER")==0) CLUSTER=atoi(value);
+        if (strcmp(key,"BOXSIZE")==0) BOXSIZE=atoi(value);
+        if (strcmp(key,"OUTPOT")==0) OUTPOT=atoi(value);
 	// double/float params
 	if (strcmp(key,"A")==0) A=atof(value);
 	if (strcmp(key,"EPS")==0) EPS=atof(value);
@@ -167,9 +169,14 @@ void readClusterData(char *filename, int echo) {
     input.close();	
     
     //NUMZ (& DISTNUMZ) Should already be calculated and in params.txt
-    //use max values of cluster to set new values for NUM{X,Y} 
-    NUMX = ceil((2*xmax+A)/A);
-    NUMY = ceil((2*ymax+A)/A);
+    if (BOXSIZE>0) { //Boxsize is set, use it.
+        NUMX = ceil((2*BOXSIZE+A)/A);
+        NUMY = ceil((2*BOXSIZE+A)/A);
+    } else {
+        //use max values of cluster to set new values for NUM{X,Y} 
+        NUMX = ceil((2*xmax+A)/A);
+        NUMY = ceil((2*ymax+A)/A);
+    }
 
     return;	
 }

@@ -2,17 +2,18 @@
 SIG		1.0
 
 // number of spatial grid points; should be divisible by the number of computational nodes
-NUMZ    403
+NUMZ    405
 
 // can be used if grid is needed below pair separation bounds (pseudo-unbound
 // sets for example)
-NUMY    403
+NUMY    405
+NUMX    405
 
 // spatial grid spacing
 A      0.01
 
 // temporal grid spacing - should be <= A*A/3
-EPS		3e-5
+EPS		5e-7
 
 // If using S-M Potential, how far should aEPS take you?
 MINTSTEP     1.e-9
@@ -31,6 +32,9 @@ SNAPUPDATE	300
 
 // set to one to dump the full 3d wavefncs to disk at the end of the run
 SAVEWAVEFNCS	1
+
+// Set to one to also dump potential (before calculation for debugging)
+OUTPOT  1
 
 //
 // potential to simulate
@@ -70,7 +74,7 @@ POTENTIAL	22
 //    3		constant of 0.1 in interior 
 //    4		boolean test grid; mod(i%2)mod(j%2)mod(k%2)
 //
-INITCONDTYPE    1
+INITCONDTYPE    0
 
 //
 // initial symmetry constraint
@@ -91,9 +95,13 @@ INITSYMMETRY	0
 MASS  15.9994
 
 // Read from cluster file? 1 Yes, 0 No
-CLUSTER  0
+CLUSTER  1
+
+//If reading in a cluster, shall we only calculate a certain region? This
+//value in Angstroms is from the origin to the box perimeter
+BOXSIZE  2
 
 //Aluminium cluster data
-ALX   1.4
+ALX   500.0
 ALY   500.0
 ALZ   500.0 

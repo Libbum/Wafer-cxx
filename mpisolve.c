@@ -26,7 +26,7 @@ typedef std::numeric_limits< double > dbl;
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
 int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
-int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0,CLUSTSIZE=7;
+int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0,CLUSTSIZE=7,BOXSIZE=0,OUTPOT=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
 
@@ -122,7 +122,9 @@ int main( int argc, char *argv[] )
 		readParametersFromCommandLine(argc,argv,1);
 	}
         //Find NUMX and NUMY Values. These are overwritten in the next loop if it's invoked.
-        NUMX = ceil((2*ALX+A)/A);
+        if (ALX != 500) { //a value of 500 means unbound. Don't set the grid to separation length
+            NUMX = ceil((2*ALX+A)/A);
+        }
         if (ALY != 500) { //a value of 500 means unbound. Don't set the grid to separation length
             NUMY = ceil((2*ALY+A)/A);
         }
@@ -138,7 +140,7 @@ int main( int argc, char *argv[] )
            } else {
     
               getline(input,line);
-              CLUSTSIZE = atoi(line.c_str())+1;
+              CLUSTSIZE = atoi(line.c_str())+1; //first line of XYZ file
               allocateClusterMemory();
               print_line();
               readClusterData((char *)"cluster.xyz", 1);
@@ -146,7 +148,7 @@ int main( int argc, char *argv[] )
 
            input.close();
         }
-        if (ALY == 500) {
+        if ((ALY == 500) || (ALX == 500)) {
             cout << "Unbound cluster. Grid values: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
         } else {
             cout << "Calculated values for arbitrary grid: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
@@ -155,7 +157,9 @@ int main( int argc, char *argv[] )
     else {
         readParametersFromFile((char *)"params.txt",0);
 	    readParametersFromCommandLine(argc,argv,0);
-        NUMX = ceil((2*ALX+A)/A);
+        if (ALX != 500) { //a value of 500 means unbound. Don't set the grid to separation length
+            NUMX = ceil((2*ALX+A)/A);
+        }
         if (ALY != 500) { //a value of 500 means unbound. Don't set the grid to separation length
             NUMY = ceil((2*ALY+A)/A);
         }
@@ -298,13 +302,16 @@ void solveInitialize() {
 	}
 
 		if (debug == DEBUG_FULL) debug_out << "Allocated memory" << endl;
+		if (debug == DEBUG_FULL) debug_out << "NUMX = " << NUMX << ", NUMY = " << NUMY << endl;
 	loadPotentialArrays();
 		if (debug == DEBUG_FULL) debug_out << "Loaded potential" << endl;
 	if (SAVEWAVEFNCS==1) {
 	   char label[64];
        sprintf(label,"0_%d",nodeID); 
        // output potential for debugging
-       outputPotentialBinary(label);
+       if (OUTPOT) {
+           outputPotentialBinary(label);
+       }
     }
 	
 	if (nodeID==1) print_line();
