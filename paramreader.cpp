@@ -35,7 +35,6 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"NF")==0) NF=atoi(value);
 	if (strcmp(key,"SAVEWAVEFNCS")==0) SAVEWAVEFNCS=atoi(value);
         if (strcmp(key,"CLUSTER")==0) CLUSTER=atoi(value);
-        if (strcmp(key,"BOXSIZE")==0) BOXSIZE=atoi(value);
         if (strcmp(key,"OUTPOT")==0) OUTPOT=atoi(value);
 	// double/float params
 	if (strcmp(key,"A")==0) A=atof(value);
@@ -49,6 +48,7 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"TC")==0) TC=atof(value);
 	if (strcmp(key,"XI")==0) XI=atof(value);
 	if (strcmp(key,"TOLERANCE")==0) TOLERANCE=atof(value);
+        if (strcmp(key,"BOXSIZE")==0) BOXSIZE=atof(value);
     if (strcmp(key,"ALX")==0) ALX=atof(value);
     if (strcmp(key,"ALY")==0) ALY=atof(value);
     if (strcmp(key,"ALZ")==0) ALZ=atof(value);
