@@ -1,0 +1,35 @@
+#!/bin/bash
+# Sends coarse matlab wavefunctions to Trifid for processing. Assumes "1 2 3 4 5 6" by default
+
+[ -z "$1" ] && toSend=(1 2 3 4 5 6) || toSend=($1)
+
+cd /cygdrive/d/scratch/wavefn
+for i in "${toSend[@]}"
+do
+    echo Sending data from $i
+    case $i in
+    1)
+        lvl=one ;;
+    2)
+        lvl=two ;;
+    3)
+        lvl=three ;;
+    4)
+        lvl=four ;;
+    5)
+        lvl=five ;;
+    6)
+        lvl=six ;;
+    7)
+        lvl=seven ;;
+    8)
+        lvl=eight ;;
+    9)
+        lvl=nine ;;
+    esac
+    cd $lvl
+    scp -C *.dat Trifid:work/matlab/$lvl/
+    cd ..    
+done
+
+echo All files transferred.

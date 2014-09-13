@@ -1,0 +1,57 @@
+#!/bin/bash
+# Assumes dump "1 2 3 4 5 6" by default
+#Culmenates wavefunctions and stores them on the HPC ready for Jnana to grab them
+
+[ -z "$1" ] && folder=dump || folder=($1)
+[ -z "$2" ] && toRun=(1 2 3 4 5 6) || toRun=($2)
+
+echo "Check to see that "$folder" exists on HPC:/mnt/salvy/tim/qfdtd/ (Enter to continue)"
+read
+
+for i in "${toRun[@]}"
+do
+    case $i in
+    1)
+        lvl=one
+        state=gs ;;
+    2)
+        lvl=two
+        state=es1 ;;
+    3)
+        lvl=three
+        state=es2 ;;
+    4)
+        lvl=four
+        state=es3 ;;
+    5)
+        lvl=five
+        state=es4 ;;
+    6)
+        lvl=six
+        state=es5 ;;
+    esac
+
+    #grab largest *.job.* for directory
+    cd $state
+    cp $(find . -maxdepth 1 -type f -name "$state.*.job.o" | tail -n 1) ../$state.job.o
+    cd ..
+    
+    if [ $i -gt 1 ]
+    then
+        #Rename wavefunction files in each dir from _0_* to _N_*
+        for file in $state/data/wavefunction_0_*; do mv $file "${file/_0_/_$((i-1))_}"; done
+    fi
+
+    #send wavefunction files to HPC
+    scp -C $state/data/wavefunction*.dat HPC:/mnt/salvy/tim/qfdtd/$folder/
+done
+
+#send parameter files
+scp *.job.o params.txt HPC:/mnt/salvy/tim/qfdtd/$folder/
+[ -e gs/cluster.xyz ] && scp gs/cluster.xyz HPC:/mnt/salvy/tim/qfdtd/$folder/
+
+#remove temp files
+rm *.job.o
+
+echo "Files succesfully backed up to HPC:/mnt/salvy/tim/qfdtd/"$folder"/"
+

@@ -1,0 +1,47 @@
+#!/bin/bash
+# Sets up new run from matlab data. Assumes "1 2 3 4 5 6" by default
+
+echo "Have you changed params.txt? (Enter to continue, Ctrl+C to stop)"
+read
+
+
+[ -z "$1" ] && toRun=(1 2 3 4 5 6) || toRun=($1)
+
+for i in "${toRun[@]}"
+do
+    case $i in
+    1)
+        lvl=one
+        state=gs ;;
+    2)
+        lvl=two
+        state=es1 ;;
+    3)
+        lvl=three
+        state=es2 ;;
+    4)
+        lvl=four
+        state=es3 ;;
+    5)
+        lvl=five
+        state=es4 ;;
+    6)
+        lvl=six
+        state=es5 ;;
+    esac
+
+    nodes=$(($(ls ../matlab/$lvl/ | wc -l)+1))
+
+    rm $state/*.job.* #old job files
+    rm $state/data/*.dat #old wfn data
+    mv ../matlab/$lvl/*.dat $state/data/ #set up input
+   
+    #Submit scripts need correct CPU numbers 
+    sed -i 's/np.*mpi/np '$nodes' mpi/' $state/$state.job
+    sed -i 's/nodes=.*$/nodes='$nodes'/' $state/$state.job
+    
+    #Submit job    
+    cd $state; qsub $state.job; cd ..
+done
+
+echo "Done."
