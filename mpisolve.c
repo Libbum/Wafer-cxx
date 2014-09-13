@@ -26,7 +26,7 @@ typedef std::numeric_limits< double > dbl;
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
 int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
-int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,CLUSTER=0,CLUSTSIZE=7,OUTPOT=0;
+int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,RUNTYPE=0,CLUSTSIZE=7,OUTPOT=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,BOXSIZE=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
 
@@ -121,7 +121,7 @@ int main( int argc, char *argv[] )
 		print_line();
 		readParametersFromCommandLine(argc,argv,1);
 	}
-        if (CLUSTER == 1) {
+        if (RUNTYPE == 1) {
            //Need to load cluster data and we really only want to do it once (per node).
            fstream input;
            string line;
@@ -129,7 +129,7 @@ int main( int argc, char *argv[] )
            input.open("cluster.xyz", ios::in);
            if (!input) {
               cout << "==> Error : No cluster.xyz file present. Falling back to AL{X,Y,Z} values." << endl;
-              CLUSTER = 0;
+              RUNTYPE = 0;
            } else {
     
               getline(input,line);
@@ -144,6 +144,9 @@ int main( int argc, char *argv[] )
            ALY = ceil((A*NUMY-A)/2);
            ALZ = ceil((A*NUMZ-A)/2);
            cout << "Using BoxSize of " << BOXSIZE << ". Grid values: NUMX = " << NUMX << ", NUMY = " << NUMY << ", (NUMZ = " << NUMZ << ")" << endl;
+        } else if (RUNTYPE == 2) {
+            //Forced NUMn values
+             cout << "NUM values from params.txt: NUMX = " << NUMX << ", NUMY = " << NUMY << ", NUMZ = " << NUMZ << endl;
         } else {
             //Find NUMX and NUMY Values. These are overwritten in the next loop if it's invoked.
             if (ALX != 500) { //a value of 500 means unbound. Don't set the grid to separation length
@@ -163,14 +166,14 @@ int main( int argc, char *argv[] )
     else {
         readParametersFromFile((char *)"params.txt",0);
 	    readParametersFromCommandLine(argc,argv,0);
-        if (CLUSTER == 1) {
+        if (RUNTYPE == 1) {
            //Need to load cluster data and we really only want to do it once (per node).
            fstream input;
            string line;
            //just the size so we can allocate memory first 
            input.open("cluster.xyz", ios::in);
            if (!input) {
-              CLUSTER = 0;
+              RUNTYPE = 0;
            } else {
     
               getline(input,line);
@@ -183,7 +186,7 @@ int main( int argc, char *argv[] )
            ALX = ceil((A*NUMX-A)/2);
            ALY = ceil((A*NUMY-A)/2);
            ALZ = ceil((A*NUMZ-A)/2);
-        } else {
+        } else if (RUNTYPE == 0) {
             //Find NUMX and NUMY Values. These are overwritten in the next loop if it's invoked.
             if (ALX != 500) { //a value of 500 means unbound. Don't set the grid to separation length
                 NUMX = ceil((2*ALX+A)/A);
@@ -191,7 +194,7 @@ int main( int argc, char *argv[] )
             if (ALY != 500) { //a value of 500 means unbound. Don't set the grid to separation length
                 NUMY = ceil((2*ALY+A)/A);
             }
-        }
+        } //Do nothing for type 2
     }
 	
     if (NUMZ%(numNodes-1)!=0) {
