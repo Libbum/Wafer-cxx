@@ -28,7 +28,7 @@ do
         lvl=nine ;;
     esac
     cd $lvl
-    scp -C *.dat Raijin:/short/h72/qfdtd/staging/$lvl/
+    scp -C *.dat Raijin:/short/h72/tim/qfdtd/staging/$lvl/
     cd ..    
 done
 

@@ -1,39 +1,38 @@
 #!/bin/bash
 # Assumes "1 2 3 4 5 6" cwd by default
-#Culmenates wavefunctions and stores them on the HPC ready for Jnana to grab them
+#Culminates wavefunctions and stores them ready for HPC or Jnana to grab them
 
 [ -z "$1" ] && toRun=(1 2 3 4 5 6) || toRun=($1)
-[ -z "$2" ] && folder=${PWD##*/} || folder=($2)
+[ -z "$2" ] && folder=${PWD##*/} || folder=$2
 
-echo "Check to see that "$folder" exists on HPC:/mnt/salvy/tim/qfdtd/ (Enter to continue)"
-read
+mkdir /short/h72/tim/qfdtd/store/$folder
 
 for i in "${toRun[@]}"
 do
     case $i in
     1)
-        lvl=one
+        name=wfnGS
         state=gs ;;
     2)
-        lvl=two
+        name=wfnES1
         state=es1 ;;
     3)
-        lvl=three
+        name=wfnES2
         state=es2 ;;
     4)
-        lvl=four
+        name=wfnES3
         state=es3 ;;
     5)
-        lvl=five
+        name=wfnES4
         state=es4 ;;
     6)
-        lvl=six
+        name=wfnES5
         state=es5 ;;
     esac
 
     #grab largest *.job.* for directory
     cd $state
-    cp $(find . -maxdepth 1 -type f -name "$state.*.job.o" | tail -n 1) ../$state.job.o
+    cp $(find . -maxdepth 1 -type f -name "$name.*.job.o" | tail -n 1) ../$state.job.o
     cd ..
     
     if [ $i -gt 1 ]
@@ -42,16 +41,16 @@ do
         for file in $state/data/wavefunction_0_*; do mv $file "${file/_0_/_$((i-1))_}"; done
     fi
 
-    #send wavefunction files to HPC
-    scp -C $state/data/wavefunction*.dat HPC:/mnt/salvy/tim/qfdtd/$folder/
+    #send wavefunction files to the store
+    mv $state/data/wavefunction*.dat /short/h72/tim/qfdtd/store/$folder/
 done
 
 #send parameter files
-scp *.job.o params.txt HPC:/mnt/salvy/tim/qfdtd/$folder/
-[ -e gs/cluster.xyz ] && scp gs/cluster.xyz HPC:/mnt/salvy/tim/qfdtd/$folder/
+cp *.job.o params.txt /short/h72/tim/qfdtd/store/$folder/
+[ -e gs/cluster.xyz ] && cp gs/cluster.xyz /short/h72/tim/qfdtd/store/$folder/
 
 #remove temp files
 rm *.job.o
 
-echo "Files succesfully backed up to HPC:/mnt/salvy/tim/qfdtd/"$folder"/"
+echo "Files succesfully stored in /short/h72/tim/qfdtd/store/"$folder"/"
 

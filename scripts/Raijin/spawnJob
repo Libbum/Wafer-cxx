@@ -50,7 +50,7 @@ do
    
     #Submit scripts need correct CPU numbers 
     sed -i 's/np.*mpi/np '$nodes' mpi/' $state/$state.job
-    sed -i 's/ncpus=.*$/ncpus='$nodes'/' $state/$state.job
+    sed -i 's/ncpus=.*$/ncpus='$(($nodes+$nodes%16))'/' $state/$state.job #must be multiple of 16
     sed -i 's/-N wfn.*$/-N wfn'${state^^}'/' $state/$state.job
     
     #Submit job    
