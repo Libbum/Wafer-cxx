@@ -64,8 +64,8 @@ void setInitialConditions(int seedMult)
         //TODO: Check for this if at all possible.
 		if (!input) {
 			cout << "==> Error : Unable to open wavefunction file " << fname << ". Using random Gaussian instead." << endl;
-			for (sx=0;sx<NUMX+2;sx++)
-				for (sy=0;sy<NUMY+2;sy++)
+			for (sx=0;sx<NUMX+6;sx++)
+				for (sy=0;sy<NUMY+6;sy++)
 					for (sz=0; sz<DISTNUMZ+2;sz++)
                         w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		}
@@ -105,8 +105,8 @@ void setInitialConditions(int seedMult)
         if (DISTNUMZ > olddnumz) strideout = DISTNUMZ/olddnumz;
 		if (DISTNUMZ < olddnumz) stridein = olddnumz/DISTNUMZ;
          
-		for (sx=1;sx<=NUMX;sx++)
-			for (sy=1;sy<=NUMY;sy++)
+		for (sx=3;sx<=2+NUMX;sx++)
+			for (sy=3;sy<=2+NUMY;sy++)
 				for (sz=1; sz<=DISTNUMZ;sz++) {
 					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
@@ -150,20 +150,20 @@ void setInitialConditions(int seedMult)
 	  case 1:
 		// random
 		if (nodeID==1) cout << "==> Initial wavefunction : Random" << endl;
-        	for (sx=0;sx<NUMX+2;sx++)
-          	  for (sy=0;sy<NUMY+2;sy++)
+        	for (sx=0;sx<NUMX+6;sx++)
+          	  for (sy=0;sy<NUMY+6;sy++)
             	    for (sz=0; sz<DISTNUMZ+2;sz++)
                       w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		break;
 	  case 2:
 		// coulomb like
 		if (nodeID==1) cout << "==> Initial wavefunction : Coulomb" << endl;
-        	for (sx=0;sx<=NUMX+1;sx++)
-          	  for (sy=0;sy<=NUMY+1;sy++)
+        	for (sx=0;sx<=NUMX+5;sx++)
+          	  for (sy=0;sy<=NUMY+5;sy++)
             	    for (sz=0; sz<=DISTNUMZ+1;sz++) {
 		      // coordinate system is centered in simulation volume
-		      dx = sx - ((double)NUMX+1.)/2.;
-		      dy = sy - ((double)NUMY+1.)/2.;
+		      dx = sx - ((double)NUMX+5.)/2.;
+		      dy = sy - ((double)NUMY+5.)/2.;
 		      dz = sz - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 		      r = A*sqrt(dx*dx+dy*dy+dz*dz);
 		      costheta = A*dz/r;
@@ -177,16 +177,16 @@ void setInitialConditions(int seedMult)
 	  case 3:
 		// constant
 		if (nodeID==1) cout << "==> Initial wavefunction : Constant" << endl;
-        	for (sx=0;sx<=NUMX+1;sx++)
-          	  for (sy=0;sy<=NUMY+1;sy++)
+        	for (sx=0;sx<=NUMX+5;sx++)
+          	  for (sy=0;sy<=NUMY+5;sy++)
             	    for (sz=0; sz<=DISTNUMZ+1;sz++)
                       w[sx][sy][sz] = 0.1;
 		break;
 	  case 4:
 		// test grid
 		if (nodeID==1) cout << "==> Initial wavefunction : Boolean Test" << endl;
-        	for (sx=0;sx<=NUMX+1;sx++)
-          	  for (sy=0;sy<=NUMY+1;sy++)
+        	for (sx=0;sx<=NUMX+5;sx++)
+          	  for (sy=0;sy<=NUMY+5;sy++)
             	    for (sz=0; sz<=DISTNUMZ+1;sz++)
                       w[sx][sy][sz] = (sx%2)*(sy%2)*(sz%2);
 		break;
@@ -197,27 +197,27 @@ void setInitialConditions(int seedMult)
 	}
 
 	// enforce BCs
-        for (sx=0;sx<=NUMX+1;sx++)
-          for (sy=0;sy<=NUMY+1;sy++) {
+        for (sx=0;sx<=NUMX+5;sx++)
+          for (sy=0;sy<=NUMY+5;sy++) {
 		w[sx][sy][0] = 0;
 		w[sx][sy][DISTNUMZ+1] = 0;
 	  }
 
         for (sz=0;sz<=DISTNUMZ+1;sz++)
-          for (sy=0;sy<=NUMY+1;sy++) {
+          for (sy=0;sy<=NUMY+5;sy++) {
 		w[0][sy][sz] = 0;
-		w[NUMX+1][sy][sz] = 0;
+		w[NUMX+5][sy][sz] = 0;
 	  }
 
-        for (sx=0;sx<=NUMX+1;sx++)
+        for (sx=0;sx<=NUMX+5;sx++)
           for (sz=0;sz<=DISTNUMZ+1;sz++) {
 		w[sx][0][sz] = 0;
-		w[sx][NUMY+1][sz] = 0;
+		w[sx][NUMY+5][sz] = 0;
 	  }
 
 	// zero out updated wavefnc for safety's sake
-        for (sx=0;sx<NUMX+2;sx++)
-          for (sy=0;sy<NUMY+2;sy++)
+        for (sx=0;sx<NUMX+6;sx++)
+          for (sy=0;sy<NUMY+6;sy++)
             for (sz=0;sz<DISTNUMZ+2;sz++)
 		W[sx][sy][sz] = 0;
 
@@ -241,10 +241,10 @@ void symmetrizeWavefunction()
 		// symmetric in z
 	  case 2:
 		// antisymmetric in z
-        	for (sx=0;sx<NUMX+2;sx++)
+        	for (sx=0;sx<NUMX+6;sx++)
 		{
 		  x=sx; 	
-          	  for (sy=1;sy<=NUMY;sy++)
+          	  for (sy=3;sy<=2+NUMY;sy++)
 		  {
 		    y=sy; 	
             	    for (sz=1;sz<=DISTNUMZ;sz++)
@@ -262,10 +262,10 @@ void symmetrizeWavefunction()
 		// symmetric in y
 	  case 4:
 		// antisymmetric in y
-        	for (sx=0;sx<NUMX+2;sx++)
+        	for (sx=0;sx<NUMX+6;sx++)
 		{
 		  x=sx; 	
-          	  for (sy=1;sy<=NUMY;sy++)
+          	  for (sy=3;sy<=2+NUMY;sy++)
 		  {
 		    y=sy; 	
 		    if (y>NUMY/2)

@@ -85,13 +85,13 @@ void outputSnapshot(dcomp ***wfnc, char* label) {
   sprintf(fname,"data/snapshot/wavefunction_%s.dat",label);
   out.open(fname, ios::out);
   out.precision(10);
-  for (int s=0;s<=NUMX+1;s++) {
+  for (int s=0;s<=NUMX+5;s++) {
     out << s << "\t";
     out << scientific << 0.5*(wfnc[s][hy][hz]+wfnc[s][hy+1][hz+1]) << "\t";
     out << endl;
   }
   out << "&&" << endl;
-  for (int s=0;s<=NUMY+1;s++) {
+  for (int s=0;s<=NUMY+5;s++) {
     out << s << "\t";
     out << scientific << 0.5*(wfnc[hx][s][hz]+wfnc[hx+1][s][hz+1]) << "\t";
     out << endl;
@@ -121,8 +121,8 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
 
   out.open(fname, ios::out);
   out.precision(12);
-  for (int sx=1;sx<=NUMX;sx++) {
-    for (int sy=1;sy<=NUMY;sy++) {
+  for (int sx=3;sx<=2+NUMX;sx++) {
+    for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
                 out << sx  << "\t";
@@ -152,8 +152,8 @@ void outputWavefunctionBinary(dcomp ***wfnc, char* label) {
 
   out.open(fname, ios::out|ios::binary);
   out.precision(12);
-  for (int sx=1;sx<=NUMX;sx++) {
-    for (int sy=1;sy<=NUMY;sy++) {
+  for (int sx=3;sx<=2+NUMX;sx++) {
+    for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
                 out.write(reinterpret_cast<const char*>(&sx), sizeof(int));
@@ -190,8 +190,8 @@ void outputPotential(char* label) {
 
   out.open(fname, ios::out);
   out.precision(12);
-  for (int sx=1;sx<=NUMX;sx++) {
-    for (int sy=1;sy<=NUMY;sy++) {
+  for (int sx=3;sx<=2+NUMX;sx++) {
+    for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
                 out << sx  << "\t";
@@ -231,8 +231,8 @@ void outputPotentialBinary(char* label) {
 
   out.open(fname, ios::out|ios::binary);
   out.precision(12);
-  for (int sx=1;sx<=NUMX;sx++) {
-    for (int sy=1;sy<=NUMY;sy++) {
+  for (int sx=3;sx<=2+NUMX;sx++) {
+    for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
                 out.write(reinterpret_cast<const char*>(&sx), sizeof(int));

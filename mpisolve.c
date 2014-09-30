@@ -305,8 +305,8 @@ int main( int argc, char *argv[] )
 void solveInitialize() {
 	
 		if (debug == DEBUG_FULL) debug_out << "Initialise" << endl;
-	// allocate memory
-	allocateMemory();
+    	// allocate memory
+    	allocateMemory();
 	
 	// load the potential
 	if (nodeID==1) {
@@ -317,7 +317,7 @@ void solveInitialize() {
 
 		if (debug == DEBUG_FULL) debug_out << "Allocated memory" << endl;
 		if (debug == DEBUG_FULL) debug_out << "NUMX = " << NUMX << ", NUMY = " << NUMY << endl;
-	loadPotentialArrays();
+    	loadPotentialArrays();
 		if (debug == DEBUG_FULL) debug_out << "Loaded potential" << endl;
 	if (SAVEWAVEFNCS==1) {
 	   char label[64];
@@ -361,7 +361,7 @@ void solveRestart() {
             cout << "Temporal Step Size (EPS = " << EPSold << ") too large; rescaling to EPS = " << EPS << " and restarting..." << endl;
         }
 
-	loadPotentialArrays(); //to update a and b with new eps, wont need to reload cluster data if it's needed though.
+    	loadPotentialArrays(); //to update a and b with new eps, wont need to reload cluster data if it's needed though.
         //Reinitialise w and W to ICs (usually rand gaussian)
         setInitialConditions(nodeID+1);
 
@@ -430,10 +430,10 @@ void solve() {
 	int done=1; //step=0,
 	char label[64]; 
 	
-	leftSendBuffer = (double *)malloc( 2 * (NUMX+2) * (NUMY+2) * sizeof(double) );
-	rightSendBuffer = (double *)malloc( 2 * (NUMX+2) * (NUMY+2) * sizeof(double) );
-	leftReceiveBuffer = (double *)malloc( 2 * (NUMX+2) * (NUMY+2) * sizeof(double) );
-	rightReceiveBuffer = (double *)malloc( 2 * (NUMX+2) * (NUMY+2) * sizeof(double) );
+	leftSendBuffer = (double *)malloc( 2 * (NUMX+6) * (NUMY+6) * sizeof(double) );
+	rightSendBuffer = (double *)malloc( 2 * (NUMX+6) * (NUMY+6) * sizeof(double) );
+	leftReceiveBuffer = (double *)malloc( 2 * (NUMX+6) * (NUMY+6) * sizeof(double) );
+	rightReceiveBuffer = (double *)malloc( 2 * (NUMX+6) * (NUMY+6) * sizeof(double) );
 	
 	// send message to master that we are starting
 	MPI_Send( &done, 1, MPI_INT, 0, HELLO, MPI_COMM_WORLD );
@@ -620,8 +620,8 @@ void findExcitedStates() {
 	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
 	// subtract overlap
-	for (int sx=0;sx<NUMX+2;sx++) 
-		for (int sy=0;sy<NUMY+2;sy++)
+	for (int sx=0;sx<NUMX+6;sx++) 
+		for (int sy=0;sy<NUMY+6;sy++)
        	    for (int sz=0; sz<DISTNUMZ+2;sz++) 
 				W[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect*w[sx][sy][sz];
 	
@@ -691,8 +691,8 @@ void findExcitedStates() {
     MPI_Bcast(&overlapCollect2, 1, MPI_DOUBLE, 0, workers_comm);
 
 	// subtract overlap
-	for (int sx=0;sx<NUMX+2;sx++) 
-		for (int sy=0;sy<NUMY+2;sy++)
+	for (int sx=0;sx<NUMX+6;sx++) 
+		for (int sy=0;sy<NUMY+6;sy++)
             for (int sz=0; sz<DISTNUMZ+2;sz++) {
                 W2[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect2*W[sx][sy][sz] - overlapCollect*w[sx][sy][sz];
       }
@@ -777,12 +777,12 @@ void sendRightBoundary(dcomp*** wfnc) {
 		debug_out << "==> Sending : " << message << endl;
 		MPI_Isend(message, strlen(message), MPI_CHAR, nodeID+1, SYNC_RIGHT_MESSAGE, MPI_COMM_WORLD, &rightMessageSend); 
 	}
-	for (int sx=0;sx<NUMX+2;sx++)
-		for (int sy=0;sy<NUMY+2;sy++) {
-			rightSendBuffer[sx*(NUMY+2)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
-			rightSendBuffer[sx*(NUMY+2)+sy + (NUMX+2)*(NUMY+2)] = imag(wfnc[sx][sy][DISTNUMZ]);
+	for (int sx=0;sx<NUMX+6;sx++)
+		for (int sy=0;sy<NUMY+6;sy++) {
+			rightSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][DISTNUMZ]);
 		}
-	MPI_Isend(rightSendBuffer, 2*(NUMX+2)*(NUMY+2), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
+	MPI_Isend(rightSendBuffer, 2*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
 }
 
 void sendLeftBoundary(dcomp*** wfnc) {
@@ -792,12 +792,12 @@ void sendLeftBoundary(dcomp*** wfnc) {
 		debug_out << "==> Sending : " << message << endl;
 		MPI_Isend(message, strlen(message), MPI_CHAR, nodeID-1, SYNC_LEFT_MESSAGE, MPI_COMM_WORLD, &leftMessageSend); 
 	}
-	for (int sx=0;sx<NUMX+2;sx++)
-		for (int sy=0;sy<NUMY+2;sy++) { 
-			leftSendBuffer[sx*(NUMY+2)+sy] = real(wfnc[sx][sy][1]);
-			leftSendBuffer[sx*(NUMY+2)+sy + (NUMX+2)*(NUMY+2)] = imag(wfnc[sx][sy][1]);
+	for (int sx=0;sx<NUMX+6;sx++)
+		for (int sy=0;sy<NUMY+6;sy++) { 
+			leftSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][1]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][1]);
 		}
-	MPI_Isend(leftSendBuffer, 2*(NUMX+2)*(NUMY+2), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
+	MPI_Isend(leftSendBuffer, 2*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
 }
 
 void receiveRightBoundary() {
@@ -806,14 +806,14 @@ void receiveRightBoundary() {
 		MPI_Irecv(message, 255, MPI_CHAR, nodeID+1, SYNC_LEFT_MESSAGE, MPI_COMM_WORLD, &rightMessageReceive); 
 		debug_out << "==> Received : " << message << endl;
 	}
-	MPI_Irecv(rightReceiveBuffer, 2*(NUMX+2)*(NUMY+2), MPI_DOUBLE, nodeID+1, SYNC_LEFT, MPI_COMM_WORLD, &rightReceive); 
+	MPI_Irecv(rightReceiveBuffer, 2*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID+1, SYNC_LEFT, MPI_COMM_WORLD, &rightReceive); 
 }
 
 inline void loadRightBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array right boundary
-	for (int sx=0;sx<NUMX+2;sx++)
-		for (int sy=0;sy<NUMY+2;sy++)
-			wfnc[sx][sy][DISTNUMZ+1] = dcomp(rightReceiveBuffer[sx*(NUMY+2)+sy],rightReceiveBuffer[sx*(NUMY+2)+sy+(NUMX+2)*(NUMY+2)]);
+	for (int sx=0;sx<NUMX+6;sx++)
+		for (int sy=0;sy<NUMY+6;sy++)
+			wfnc[sx][sy][DISTNUMZ+1] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy],rightReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
 }
 
 void receiveLeftBoundary() {
@@ -822,12 +822,12 @@ void receiveLeftBoundary() {
 		MPI_Irecv(message, 255, MPI_CHAR, nodeID-1, SYNC_RIGHT_MESSAGE, MPI_COMM_WORLD, &leftMessageReceive); 
 		debug_out << "==> Received : "<< message << endl;
 	}
-	MPI_Irecv(leftReceiveBuffer, 2*(NUMX+2)*(NUMY+2), MPI_DOUBLE, nodeID-1, SYNC_RIGHT, MPI_COMM_WORLD, &leftReceive); 
+	MPI_Irecv(leftReceiveBuffer, 2*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID-1, SYNC_RIGHT, MPI_COMM_WORLD, &leftReceive); 
 }
 
 inline void loadLeftBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array left boundary
-	for (int sx=0;sx<NUMX+2;sx++)
-		for (int sy=0;sy<NUMY+2;sy++)
-			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+2)+sy],leftReceiveBuffer[sx*(NUMY+2)+sy+(NUMX+2)*(NUMY+2)]);
+	for (int sx=0;sx<NUMX+6;sx++)
+		for (int sy=0;sy<NUMY+6;sy++)
+			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy],leftReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
 }
