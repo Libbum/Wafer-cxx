@@ -125,8 +125,8 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
-                out << sx  << "\t";
-                out << sy << "\t";
+                out << sx-2  << "\t";
+                out << sy-2 << "\t";
                 out << z << "\t";
                 out << real(wfnc[sx][sy][sz]) << "\t";
                 out << imag(wfnc[sx][sy][sz]);
@@ -156,8 +156,8 @@ void outputWavefunctionBinary(dcomp ***wfnc, char* label) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
-                out.write(reinterpret_cast<const char*>(&sx), sizeof(int));
-                out.write(reinterpret_cast<const char*>(&sy), sizeof(int));
+                out.write(reinterpret_cast<const char*>((&sx)-2), sizeof(int));
+                out.write(reinterpret_cast<const char*>((&sy)-2), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&z), sizeof(int));
                 tmp = real(wfnc[sx][sy][sz]);
                 out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
@@ -194,8 +194,8 @@ void outputPotential(char* label) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
-                out << sx  << "\t";
-                out << sy << "\t";
+                out << sx-2  << "\t";
+                out << sy-2 << "\t";
                 out << z << "\t";
                 if (POTENTIAL==22) {
                     out << real(v[sx][sy][sz])*convert << "\t";
@@ -235,8 +235,8 @@ void outputPotentialBinary(char* label) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
-                out.write(reinterpret_cast<const char*>(&sx), sizeof(int));
-                out.write(reinterpret_cast<const char*>(&sy), sizeof(int));
+                out.write(reinterpret_cast<const char*>((&sx)-2), sizeof(int));
+                out.write(reinterpret_cast<const char*>((&sy)-2), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&z), sizeof(int));
                 if (POTENTIAL==22) {
                     tmp = real(v[sx][sy][sz])*convert; 
