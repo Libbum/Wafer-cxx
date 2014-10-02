@@ -43,7 +43,7 @@ int nodeID,numNodes;
 fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
-int debug = DEBUG_OFF;
+int debug = DEBUG_FULL;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
@@ -319,13 +319,11 @@ void solveInitialize() {
 		if (debug == DEBUG_FULL) debug_out << "NUMX = " << NUMX << ", NUMY = " << NUMY << endl;
     	loadPotentialArrays();
 		if (debug == DEBUG_FULL) debug_out << "Loaded potential" << endl;
-	if (SAVEWAVEFNCS==1) {
+	if (OUTPOT) {
 	   char label[64];
        sprintf(label,"0_%d",nodeID); 
        // output potential for debugging
-       if (OUTPOT) {
-           outputPotentialBinary(label);
-       }
+       outputPotentialBinary(label);
     }
 	
 	if (nodeID==1) print_line();
@@ -664,8 +662,6 @@ void findExcitedStates() {
 		outputWavefunctionBinary(w,label);
 		sprintf(label,"1_%d",nodeID); 
 		outputWavefunctionBinary(W,label);
-    // output potential for debugging
-    outputPotential(label);
 	}
 	
   //compute second excited state
