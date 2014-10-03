@@ -66,7 +66,7 @@ void setInitialConditions(int seedMult)
 			cout << "==> Error : Unable to open wavefunction file " << fname << ". Using random Gaussian instead." << endl;
 			for (sx=0;sx<NUMX+6;sx++)
 				for (sy=0;sy<NUMY+6;sy++)
-					for (sz=0; sz<DISTNUMZ+2;sz++)
+					for (sz=0; sz<DISTNUMZ+6;sz++)
                         w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
@@ -152,7 +152,7 @@ void setInitialConditions(int seedMult)
 		if (nodeID==1) cout << "==> Initial wavefunction : Random" << endl;
         	for (sx=0;sx<NUMX+6;sx++)
           	  for (sy=0;sy<NUMY+6;sy++)
-            	    for (sz=0; sz<DISTNUMZ+2;sz++)
+            	    for (sz=0; sz<DISTNUMZ+6;sz++)
                       w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		break;
 	  case 2:
@@ -160,11 +160,11 @@ void setInitialConditions(int seedMult)
 		if (nodeID==1) cout << "==> Initial wavefunction : Coulomb" << endl;
         	for (sx=0;sx<=NUMX+5;sx++)
           	  for (sy=0;sy<=NUMY+5;sy++)
-            	    for (sz=0; sz<=DISTNUMZ+1;sz++) {
+            	    for (sz=0; sz<=DISTNUMZ+5;sz++) {
 		      // coordinate system is centered in simulation volume
 		      dx = sx - ((double)NUMX+5.)/2.;
 		      dy = sy - ((double)NUMY+5.)/2.;
-		      dz = sz - ((double)DISTNUMZ+1.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
+		      dz = sz - ((double)DISTNUMZ+5.)/2. + ( ((double)nodeID) - ((double)numNodes)/2. )*DISTNUMZ;
 		      r = A*sqrt(dx*dx+dy*dy+dz*dz);
 		      costheta = A*dz/r;
 		      cosphi = A*dx/r;
@@ -179,7 +179,7 @@ void setInitialConditions(int seedMult)
 		if (nodeID==1) cout << "==> Initial wavefunction : Constant" << endl;
         	for (sx=0;sx<=NUMX+5;sx++)
           	  for (sy=0;sy<=NUMY+5;sy++)
-            	    for (sz=0; sz<=DISTNUMZ+1;sz++)
+            	    for (sz=0; sz<=DISTNUMZ+5;sz++)
                       w[sx][sy][sz] = 0.1;
 		break;
 	  case 4:
@@ -187,7 +187,7 @@ void setInitialConditions(int seedMult)
 		if (nodeID==1) cout << "==> Initial wavefunction : Boolean Test" << endl;
         	for (sx=0;sx<=NUMX+5;sx++)
           	  for (sy=0;sy<=NUMY+5;sy++)
-            	    for (sz=0; sz<=DISTNUMZ+1;sz++)
+            	    for (sz=0; sz<=DISTNUMZ+5;sz++)
                       w[sx][sy][sz] = (sx%2)*(sy%2)*(sz%2);
 		break;
 	  default:
@@ -200,17 +200,21 @@ void setInitialConditions(int seedMult)
         for (sx=0;sx<=NUMX+5;sx++)
           for (sy=0;sy<=NUMY+5;sy++) {
 		w[sx][sy][0] = 0;
-		w[sx][sy][DISTNUMZ+1] = 0;
+		w[sx][sy][1] = 0;
+		w[sx][sy][2] = 0;
+		w[sx][sy][2+DISTNUMZ+1] = 0;
+		w[sx][sy][2+DISTNUMZ+2] = 0;
+		w[sx][sy][2+DISTNUMZ+3] = 0;
 	  }
 
-        for (sz=0;sz<=DISTNUMZ+1;sz++)
+        for (sz=0;sz<=DISTNUMZ+5;sz++)
           for (sy=0;sy<=NUMY+5;sy++) {
 		w[0][sy][sz] = 0;
 		w[NUMX+5][sy][sz] = 0;
 	  }
 
         for (sx=0;sx<=NUMX+5;sx++)
-          for (sz=0;sz<=DISTNUMZ+1;sz++) {
+          for (sz=0;sz<=DISTNUMZ+5;sz++) {
 		w[sx][0][sz] = 0;
 		w[sx][NUMY+5][sz] = 0;
 	  }
@@ -218,7 +222,7 @@ void setInitialConditions(int seedMult)
 	// zero out updated wavefnc for safety's sake
         for (sx=0;sx<NUMX+6;sx++)
           for (sy=0;sy<NUMY+6;sy++)
-            for (sz=0;sz<DISTNUMZ+2;sz++)
+            for (sz=0;sz<DISTNUMZ+6;sz++)
 		W[sx][sy][sz] = 0;
 
 	// symmetrize the intial condition
@@ -247,7 +251,7 @@ void symmetrizeWavefunction()
           	  for (sy=3;sy<=2+NUMY;sy++)
 		  {
 		    y=sy; 	
-            	    for (sz=1;sz<=DISTNUMZ;sz++)
+            	    for (sz=3;sz<=2+DISTNUMZ;sz++)
 		    {
 			z=sz;
 		    	if (z>DISTNUMZ/2)
@@ -270,7 +274,7 @@ void symmetrizeWavefunction()
 		    y=sy; 	
 		    if (y>NUMY/2)
 		      y = NUMY + 1 - y;
-            	    for (sz=1;sz<=DISTNUMZ;sz++)
+            	    for (sz=3;sz<=2+DISTNUMZ;sz++)
 		    {
 			z=sz;
 			if (sy>NUMY/2)

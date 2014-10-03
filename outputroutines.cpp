@@ -97,7 +97,7 @@ void outputSnapshot(dcomp ***wfnc, char* label) {
     out << endl;
   }
   out << "&&" << endl;
-  for (int s=0;s<=DISTNUMZ+1;s++) {
+  for (int s=0;s<=DISTNUMZ+5;s++) {
     z=(nodeID-1)*DISTNUMZ + s;	  
     out << z << "\t";
     out << scientific << 0.5*(wfnc[hx][hy][s]+wfnc[hx+1][hy+1][s]) << "\t";
@@ -123,11 +123,11 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
   out.precision(12);
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
-      for (int sz=1; sz<=DISTNUMZ;sz++) {
+      for (int sz=3; sz<=2+DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
                 out << sx-2  << "\t";
                 out << sy-2 << "\t";
-                out << z << "\t";
+                out << z-2 << "\t";
                 out << real(wfnc[sx][sy][sz]) << "\t";
                 out << imag(wfnc[sx][sy][sz]);
                 out << endl;
@@ -154,10 +154,10 @@ void outputWavefunctionBinary(dcomp ***wfnc, char* label) {
   out.precision(12);
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
-      for (int sz=1; sz<=DISTNUMZ;sz++) {
+      for (int sz=3; sz<=2+DISTNUMZ;sz++) {
                 tx = sx-2;
                 ty = sy-2;
-                z=(nodeID-1)*DISTNUMZ + sz;
+                z=(nodeID-1)*DISTNUMZ + sz-2;
 
                 out.write(reinterpret_cast<const char*>(&tx), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&ty), sizeof(int));
@@ -195,11 +195,11 @@ void outputPotential(char* label) {
   out.precision(12);
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
-      for (int sz=1; sz<=DISTNUMZ;sz++) {
+      for (int sz=3; sz<=2+DISTNUMZ;sz++) {
                 z=(nodeID-1)*DISTNUMZ + sz;
                 out << sx-2  << "\t";
                 out << sy-2 << "\t";
-                out << z << "\t";
+                out << z-2 << "\t";
                 if (POTENTIAL==22) {
                     out << real(v[sx][sy][sz])*convert << "\t";
                     out << imag(v[sx][sy][sz])*convert;
@@ -236,10 +236,10 @@ void outputPotentialBinary(char* label) {
   out.precision(12);
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
-      for (int sz=1; sz<=DISTNUMZ;sz++) {
+      for (int sz=3; sz<=2+DISTNUMZ;sz++) {
                 tx = sx-2;
                 ty = sy-2;
-                z=(nodeID-1)*DISTNUMZ + sz;
+                z=(nodeID-1)*DISTNUMZ + sz-2;
                 out.write(reinterpret_cast<const char*>(&tx), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&ty), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&z), sizeof(int));
