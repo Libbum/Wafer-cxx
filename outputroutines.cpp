@@ -140,7 +140,7 @@ void outputWavefunction(dcomp ***wfnc, char* label) {
 
 void outputWavefunctionBinary(dcomp ***wfnc, char* label) {
 
-  int z;
+  int tx, ty, z;
   fstream out;
   char fname[255];
   double tmp;
@@ -155,9 +155,12 @@ void outputWavefunctionBinary(dcomp ***wfnc, char* label) {
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
+                tx = sx-2;
+                ty = sy-2;
                 z=(nodeID-1)*DISTNUMZ + sz;
-                out.write(reinterpret_cast<const char*>((&sx)-2), sizeof(int));
-                out.write(reinterpret_cast<const char*>((&sy)-2), sizeof(int));
+
+                out.write(reinterpret_cast<const char*>(&tx), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&ty), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&z), sizeof(int));
                 tmp = real(wfnc[sx][sy][sz]);
                 out.write(reinterpret_cast<const char*>(&tmp), sizeof(double));
@@ -215,7 +218,7 @@ void outputPotential(char* label) {
 // output v 3d
 void outputPotentialBinary(char* label) {
 
-  int z;
+  int tx, ty, z;
   fstream out;
   char fname[255];
   double convert = 1e6/239.2311; //For POTENTIAL == 22
@@ -234,9 +237,11 @@ void outputPotentialBinary(char* label) {
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=1; sz<=DISTNUMZ;sz++) {
+                tx = sx-2;
+                ty = sy-2;
                 z=(nodeID-1)*DISTNUMZ + sz;
-                out.write(reinterpret_cast<const char*>((&sx)-2), sizeof(int));
-                out.write(reinterpret_cast<const char*>((&sy)-2), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&tx), sizeof(int));
+                out.write(reinterpret_cast<const char*>(&ty), sizeof(int));
                 out.write(reinterpret_cast<const char*>(&z), sizeof(int));
                 if (POTENTIAL==22) {
                     tmp = real(v[sx][sy][sz])*convert; 
