@@ -264,7 +264,7 @@ int main( int argc, char *argv[] )
 
 		// blocking receive to wait for master to fire up and say hello
 		MPI_Recv(message, 20, MPI_CHAR, 0, HELLO, MPI_COMM_WORLD, &status); 
-		if (debug == DEBUG_FULL) debug_out << "==> Received : "<< message << endl;
+		if (debug == DEBUG_FULL) debug_out << "==> Rec Hello : "<< message << endl;
 
 		// the master said hello so now let's get to work
 		solve();
@@ -304,9 +304,8 @@ int main( int argc, char *argv[] )
 // solve initialize
 void solveInitialize() {
 	
-		if (debug == DEBUG_FULL) debug_out << "Initialise" << endl;
-    	// allocate memory
-    	allocateMemory();
+    // allocate memory
+   	allocateMemory();
 	
 	// load the potential
 	if (nodeID==1) {
@@ -386,9 +385,12 @@ void computeObservables(dcomp*** wfnc) {
 	if (debug == DEBUG_FULL) debug_out << "Energy " << energy << endl;
 	energy_re = real(energy);
 	energy_im = imag(energy);
-	//cout << energy << endl;
+	if (debug == DEBUG_FULL) debug_out << "Re Energy " << energy_re << endl;
+	if (debug == DEBUG_FULL) debug_out << "Im Energy " << energy_im << endl;
 	MPI_Reduce(&energy_re,&energy_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	if (debug == DEBUG_FULL) debug_out << "Re Energy Reduce " << energy_re_collect << endl;
 	MPI_Reduce(&energy_im,&energy_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	if (debug == DEBUG_FULL) debug_out << "Im Energy Reduce " << energy_im_collect << endl;
 	energyCollect = dcomp(energy_re_collect,energy_im_collect);
 	
 	if (debug == DEBUG_FULL) debug_out << "EnergyCollect " << energyCollect << endl;
@@ -408,6 +410,7 @@ void computeObservables(dcomp*** wfnc) {
 	double vInfinity_re=0.,vInfinity_im=0.;
 	double vInfinity_re_collect=0.,vInfinity_im_collect=0.;
 	vInfinity = vInfinityExpectationValue(wfnc);
+	if (debug == DEBUG_FULL) debug_out << "vInfinity " << vInfinity << endl;
 	vInfinity_re = real(vInfinity);
 	vInfinity_im = imag(vInfinity);	
 	MPI_Reduce(&vInfinity_re,&vInfinity_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
@@ -418,6 +421,7 @@ void computeObservables(dcomp*** wfnc) {
 	double rRMS2_re=0.,rRMS2_im=0.;
 	double rRMS2_re_collect=0.,rRMS2_im_collect=0.;
 	rRMS2 = r2ExpectationValue(wfnc);
+	if (debug == DEBUG_FULL) debug_out << "r2 " << rRMS2 << endl;
 	rRMS2_re = real(rRMS2);
 	rRMS2_im = imag(rRMS2);
 	MPI_Reduce(&rRMS2_re,&rRMS2_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
@@ -769,12 +773,6 @@ void syncBoundaries(dcomp ***wfnc) {
 }
 
 void sendRightBoundary(dcomp*** wfnc) {
-	char message[64]; 
-	if (debug > 1) {
-		sprintf(message,"%d -> %d",nodeID,nodeID+1); 
-		debug_out << "==> Sending : " << message << endl;
-		MPI_Isend(message, strlen(message), MPI_CHAR, nodeID+1, SYNC_RIGHT_MESSAGE, MPI_COMM_WORLD, &rightMessageSend); 
-	}
 	for (int sx=0;sx<NUMX+6;sx++)
 		for (int sy=0;sy<NUMY+6;sy++) {
 			rightSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
@@ -788,12 +786,6 @@ void sendRightBoundary(dcomp*** wfnc) {
 }
 
 void sendLeftBoundary(dcomp*** wfnc) {
-	char message[64]; 
-	if (debug > 1) {
-		sprintf(message,"%d -> %d",nodeID,nodeID-1); 
-		debug_out << "==> Sending : " << message << endl;
-		MPI_Isend(message, strlen(message), MPI_CHAR, nodeID-1, SYNC_LEFT_MESSAGE, MPI_COMM_WORLD, &leftMessageSend); 
-	}
 	for (int sx=0;sx<NUMX+6;sx++)
 		for (int sy=0;sy<NUMY+6;sy++) { 
 			leftSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][1]);
@@ -807,11 +799,6 @@ void sendLeftBoundary(dcomp*** wfnc) {
 }
 
 void receiveRightBoundary() {
-	char message[64]; 
-	if (debug > 1) {
-		MPI_Irecv(message, 255, MPI_CHAR, nodeID+1, SYNC_LEFT_MESSAGE, MPI_COMM_WORLD, &rightMessageReceive); 
-		debug_out << "==> Received : " << message << endl;
-	}
 	MPI_Irecv(rightReceiveBuffer, 6*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID+1, SYNC_LEFT, MPI_COMM_WORLD, &rightReceive); 
 }
 
@@ -826,11 +813,6 @@ inline void loadRightBoundaryFromBuffer(dcomp ***wfnc) {
 }
 
 void receiveLeftBoundary() {
-	char message[64];
-	if (debug > 1) {
-		MPI_Irecv(message, 255, MPI_CHAR, nodeID-1, SYNC_RIGHT_MESSAGE, MPI_COMM_WORLD, &leftMessageReceive); 
-		debug_out << "==> Received : "<< message << endl;
-	}
 	MPI_Irecv(leftReceiveBuffer, 6*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID-1, SYNC_RIGHT, MPI_COMM_WORLD, &leftReceive); 
 }
 
