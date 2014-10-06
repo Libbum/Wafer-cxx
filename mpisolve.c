@@ -391,16 +391,19 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&energy_im,&energy_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	energyCollect = dcomp(energy_re_collect,energy_im_collect);
 	
+	if (debug == DEBUG_FULL) debug_out << "EnergyCollect " << energyCollect << endl;
 	// sum normalization squared across nodes
 	double normalization_re=0.,normalization_im=0.;
 	double normalization_re_collect=0.,normalization_im_collect=0.;
 	normalization = wfncNorm2(wfnc);
+	if (debug == DEBUG_FULL) debug_out << "Normalization " << normalization << endl;
 	normalization_re = real(normalization);
 	normalization_im = imag(normalization);
 	MPI_Reduce(&normalization_re,&normalization_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&normalization_im,&normalization_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	normalizationCollect = dcomp(normalization_re_collect,normalization_im_collect);
 	
+	if (debug == DEBUG_FULL) debug_out << "NormalizationCollect " << normalizationCollect << endl;
 	// sum expectation across nodes
 	double vInfinity_re=0.,vInfinity_im=0.;
 	double vInfinity_re_collect=0.,vInfinity_im_collect=0.;
@@ -776,12 +779,12 @@ void sendRightBoundary(dcomp*** wfnc) {
 		for (int sy=0;sy<NUMY+6;sy++) {
 			rightSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
 			rightSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][DISTNUMZ]);
-			rightSendBuffer[(2*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)] = real(wfnc[sx][sy][DISTNUMZ-1]);
-			rightSendBuffer[2*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][DISTNUMZ-1]);
-			rightSendBuffer[(3*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)] = real(wfnc[sx][sy][DISTNUMZ-2]);
-			rightSendBuffer[3*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][DISTNUMZ-2]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][DISTNUMZ-1]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][DISTNUMZ-1]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][DISTNUMZ-2]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][DISTNUMZ-2]);
 		}
-	MPI_Isend(rightSendBuffer, 2*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
+	MPI_Isend(rightSendBuffer, 6*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
 }
 
 void sendLeftBoundary(dcomp*** wfnc) {
@@ -795,12 +798,12 @@ void sendLeftBoundary(dcomp*** wfnc) {
 		for (int sy=0;sy<NUMY+6;sy++) { 
 			leftSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][1]);
 			leftSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][1]);
-			leftSendBuffer[(2*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)] = real(wfnc[sx][sy][2]);
-			leftSendBuffer[2*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][2]);
-			leftSendBuffer[(3*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)] = real(wfnc[sx][sy][3]);
-			leftSendBuffer[3*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][3]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][2]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][2]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][3]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][3]);
 		}
-	MPI_Isend(leftSendBuffer, 2*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
+	MPI_Isend(leftSendBuffer, 6*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
 }
 
 void receiveRightBoundary() {
@@ -816,9 +819,9 @@ inline void loadRightBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array right boundary
 	for (int sx=0;sx<NUMX+6;sx++)
 		for (int sy=0;sy<NUMY+6;sy++) {
-			wfnc[sx][sy][DISTNUMZ+1] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy],rightReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
-			wfnc[sx][sy][DISTNUMZ+2] = dcomp(rightReceiveBuffer[(2*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)],rightReceiveBuffer[2*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))]);
-			wfnc[sx][sy][DISTNUMZ+3] = dcomp(rightReceiveBuffer[(3*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)],rightReceiveBuffer[3*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))]);
+			wfnc[sx][sy][DISTNUMZ+3] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy],rightReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
+			wfnc[sx][sy][DISTNUMZ+4] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))],rightReceiveBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))]);
+			wfnc[sx][sy][DISTNUMZ+5] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],rightReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
         }
 }
 
@@ -835,8 +838,8 @@ inline void loadLeftBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array left boundary
 	for (int sx=0;sx<NUMX+6;sx++)
 		for (int sy=0;sy<NUMY+6;sy++) {
-			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[(3*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)],leftReceiveBuffer[3*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))]);
-			wfnc[sx][sy][1] = dcomp(leftReceiveBuffer[(2*sx*(NUMY+6)+sy) + (NUMX+6)*(NUMY+6)],leftReceiveBuffer[2*(sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6))]);
+			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
+			wfnc[sx][sy][1] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))]);
 			wfnc[sx][sy][2] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy],leftReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
         }
 }
