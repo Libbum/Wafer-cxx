@@ -107,7 +107,7 @@ void setInitialConditions(int seedMult)
          
 		for (sx=3;sx<=2+NUMX;sx++)
 			for (sy=3;sy<=2+NUMY;sy++)
-				for (sz=1; sz<=DISTNUMZ;sz++) {
+				for (sz=3; sz<=2+DISTNUMZ;sz++) {
 					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
 						linenumber  = (sx-1)*oldnumy*olddnumz + (sy-1)*olddnumz + (sz-1);
