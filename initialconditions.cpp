@@ -71,7 +71,7 @@ void setInitialConditions(int seedMult)
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
        
-        //sprintf(fname,"debug/debug_%d.txt",nodeID);
+        //sprintf(fname,"debug/input_%d.txt",nodeID);
         //debug_out.open(fname, ios::out);
        
         //Find parameters from input file so that readin works
@@ -110,21 +110,21 @@ void setInitialConditions(int seedMult)
 				for (sz=3; sz<=2+DISTNUMZ;sz++) {
 					//if (debug && nodeID==1) cout << "Mark : " << sx << ", " << sy << ", " << sz << endl;
 			        if (strideout==1 && strideout==1) {
-						linenumber  = (sx-1)*oldnumy*olddnumz + (sy-1)*olddnumz + (sz-1);
+						linenumber  = (sx-3)*oldnumy*olddnumz + (sy-3)*olddnumz + (sz-3);
 					}					
 			        if (strideout>1) { 
 						// If input wavefunction has lower resolution, spread it out
-						tx = ceil(sx/((double)strideout));
-						ty = ceil(sy/((double)strideout));
-						tz = ceil(sz/((double)strideout));
+						tx = ceil((sx-2)/((double)strideout));
+						ty = ceil((sy-2)/((double)strideout));
+						tz = ceil((sz-2)/((double)strideout));
 						linenumber  = (tx-1)*oldnumy*olddnumz + (ty-1)*olddnumz + tz;
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}
 			        if (stridein>1) {
 						// If input wavefunction has higher resolution, sample it						
-						tx = sx*stridein;
-						ty = sy*stridein;
-						tz = sz*stridein;
+						tx = (sx-2)*stridein;
+						ty = (sy-2)*stridein;
+						tz = (sz-2)*stridein;
 						linenumber  = (tx-1)*oldnumy*olddnumz + (ty-1)*olddnumz + tz;
 						//if (debug && nodeID==1) cout << "Respond : " << tx << ", " << ty << ", " << tz << endl;
 					}					
