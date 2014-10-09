@@ -43,8 +43,8 @@ void setInitialConditions(int seedMult)
 	fstream input; //, debug_out;
 	char fname[32];
 	string line;
-    string delim = "\t";
-    string token = "";
+        string delim = "\t";
+        string token = "";
 	vector<string> lines;
 	int fileSize,stridein=1,strideout=1,linenumber;
 	

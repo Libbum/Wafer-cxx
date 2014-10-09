@@ -382,35 +382,26 @@ void computeObservables(dcomp*** wfnc) {
 	double energy_re=0.,energy_im=0.;
 	double energy_re_collect=0.,energy_im_collect=0.;
 	energy = wfncEnergy(wfnc);
-	if (debug == DEBUG_FULL) debug_out << "Energy " << energy << endl;
 	energy_re = real(energy);
 	energy_im = imag(energy);
-	if (debug == DEBUG_FULL) debug_out << "Re Energy " << energy_re << endl;
-	if (debug == DEBUG_FULL) debug_out << "Im Energy " << energy_im << endl;
 	MPI_Reduce(&energy_re,&energy_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-	if (debug == DEBUG_FULL) debug_out << "Re Energy Reduce " << energy_re_collect << endl;
 	MPI_Reduce(&energy_im,&energy_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-	if (debug == DEBUG_FULL) debug_out << "Im Energy Reduce " << energy_im_collect << endl;
 	energyCollect = dcomp(energy_re_collect,energy_im_collect);
 	
-	if (debug == DEBUG_FULL) debug_out << "EnergyCollect " << energyCollect << endl;
 	// sum normalization squared across nodes
 	double normalization_re=0.,normalization_im=0.;
 	double normalization_re_collect=0.,normalization_im_collect=0.;
 	normalization = wfncNorm2(wfnc);
-	if (debug == DEBUG_FULL) debug_out << "Normalization " << normalization << endl;
 	normalization_re = real(normalization);
 	normalization_im = imag(normalization);
 	MPI_Reduce(&normalization_re,&normalization_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&normalization_im,&normalization_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	normalizationCollect = dcomp(normalization_re_collect,normalization_im_collect);
 	
-	if (debug == DEBUG_FULL) debug_out << "NormalizationCollect " << normalizationCollect << endl;
 	// sum expectation across nodes
 	double vInfinity_re=0.,vInfinity_im=0.;
 	double vInfinity_re_collect=0.,vInfinity_im_collect=0.;
 	vInfinity = vInfinityExpectationValue(wfnc);
-	if (debug == DEBUG_FULL) debug_out << "vInfinity " << vInfinity << endl;
 	vInfinity_re = real(vInfinity);
 	vInfinity_im = imag(vInfinity);	
 	MPI_Reduce(&vInfinity_re,&vInfinity_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
@@ -421,7 +412,6 @@ void computeObservables(dcomp*** wfnc) {
 	double rRMS2_re=0.,rRMS2_im=0.;
 	double rRMS2_re_collect=0.,rRMS2_im_collect=0.;
 	rRMS2 = r2ExpectationValue(wfnc);
-	if (debug == DEBUG_FULL) debug_out << "r2 " << rRMS2 << endl;
 	rRMS2_re = real(rRMS2);
 	rRMS2_im = imag(rRMS2);
 	MPI_Reduce(&rRMS2_re,&rRMS2_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);

@@ -62,11 +62,11 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) W[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W[sx][sy] = new dcomp[DISTNUMZ+6];
 
-    W2 = new dcomp**[NUMX+6];
-    for (int sx=0;sx<NUMX+6;sx++) W2[sx] = new dcomp*[NUMY+6];
-    for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W2[sx][sy] = new dcomp[DISTNUMZ+6];
+        W2 = new dcomp**[NUMX+6];
+        for (int sx=0;sx<NUMX+6;sx++) W2[sx] = new dcomp*[NUMY+6];
+        for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W2[sx][sy] = new dcomp[DISTNUMZ+6];
 
-    v = new dcomp**[NUMX+6]; 
+        v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
 
