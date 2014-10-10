@@ -183,7 +183,16 @@ inline dcomp updateRule(int sx, int sy, int sz, double step)
 void updateBoundaries(double step) {
         for (int sx=0;sx<NUMX+6;sx++) {
       	  for (int sy=0;sy<NUMY+6;sy++) {
-       	    for (int sz=3;sz<=2+DISTNUMZ;sz+=DISTNUMZ-1) {
+            //Left side
+       	    for (int sz=3;sz<=5;sz++) {
+				if (sx>=3 && sx<=2+NUMX && sy>=3 && sy<=2+NUMY) {
+					W[sx][sy][sz] = updateRule(sx,sy,sz,step);
+                } else { 
+					W[sx][sy][sz] = w[sx][sy][sz]; 
+                }
+			}
+            //Right side
+       	    for (int sz=DISTNUMZ;sz<=DISTNUMZ+2;sz++) {
 				if (sx>=3 && sx<=2+NUMX && sy>=3 && sy<=2+NUMY) {
 					W[sx][sy][sz] = updateRule(sx,sy,sz,step);
                 } else { 
