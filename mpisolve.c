@@ -449,10 +449,12 @@ void solve() {
 			// broadcast observables
 			MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			MPI_Bcast(&energyCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
+		    if (debug == DEBUG_FULL) debug_out << "b4 Ecol "<< energyCollect << " Normcol " << normalizationCollect << endl;
 			// force symmetry
 			symmetrizeWavefunction();
             // normalize wavefunction
             normalizeWavefunction(w);
+		    if (debug == DEBUG_FULL) debug_out << "Ecol "<< energyCollect << " Normcol " << normalizationCollect << endl;
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
             if (!isfinite(real(energytot))) {
@@ -690,7 +692,7 @@ void findExcitedStates() {
       }
 	
    // compute observables
-  computeObservables(W2);
+   computeObservables(W2);
    
    // normalize
    MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE, 0, workers_comm);
@@ -767,10 +769,10 @@ void sendRightBoundary(dcomp*** wfnc) {
 		for (int sy=0;sy<NUMY+6;sy++) {
 			rightSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
 			rightSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][DISTNUMZ]);
-			rightSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][DISTNUMZ-1]);
-			rightSendBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][DISTNUMZ-1]);
-			rightSendBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][DISTNUMZ-2]);
-			rightSendBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][DISTNUMZ-2]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][1+DISTNUMZ]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][1+DISTNUMZ]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][2+DISTNUMZ]);
+			rightSendBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][2+DISTNUMZ]);
 		}
 	MPI_Isend(rightSendBuffer, 6*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID+1, SYNC_RIGHT, MPI_COMM_WORLD, &rightSend); 
 }
@@ -778,12 +780,12 @@ void sendRightBoundary(dcomp*** wfnc) {
 void sendLeftBoundary(dcomp*** wfnc) {
 	for (int sx=0;sx<NUMX+6;sx++)
 		for (int sy=0;sy<NUMY+6;sy++) { 
-			leftSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][1]);
-			leftSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][1]);
-			leftSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][2]);
-			leftSendBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][2]);
-			leftSendBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][3]);
-			leftSendBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][3]);
+			leftSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][3]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][3]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][4]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][4]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][5]);
+			leftSendBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))] = imag(wfnc[sx][sy][5]);
 		}
 	MPI_Isend(leftSendBuffer, 6*(NUMX+6)*(NUMY+6), MPI_DOUBLE, nodeID-1, SYNC_LEFT, MPI_COMM_WORLD, &leftSend);
 }
