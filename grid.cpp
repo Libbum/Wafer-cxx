@@ -62,11 +62,11 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) W[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W[sx][sy] = new dcomp[DISTNUMZ+6];
 
-        W2 = new dcomp**[NUMX+6];
-        for (int sx=0;sx<NUMX+6;sx++) W2[sx] = new dcomp*[NUMY+6];
-        for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W2[sx][sy] = new dcomp[DISTNUMZ+6];
+    W2 = new dcomp**[NUMX+6];
+    for (int sx=0;sx<NUMX+6;sx++) W2[sx] = new dcomp*[NUMY+6];
+    for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W2[sx][sy] = new dcomp[DISTNUMZ+6];
 
-        v = new dcomp**[NUMX+6]; 
+    v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
 
@@ -181,8 +181,8 @@ inline dcomp updateRule(int sx, int sy, int sz, double step)
 
 // load updated left and right boundaries into W
 void updateBoundaries(double step) {
-        for (int sx=0;sx<NUMX+6;sx++) {
-      	  for (int sy=0;sy<NUMY+6;sy++) {
+        for (int sx=0;sx<=NUMX+5;sx++) {
+      	  for (int sy=0;sy<=NUMY+5;sy++) {
             //Left side
        	    for (int sz=3;sz<=5;sz++) {
 				if (sx>=3 && sx<=2+NUMX && sy>=3 && sy<=2+NUMY) {
@@ -206,11 +206,11 @@ void updateBoundaries(double step) {
 // update the grid; note you should always call updatedBondaries before calling this routine
 void updateInterior(double step) {
 
-    	for (int sx=0;sx<NUMX+6;sx++) 
-      	  for (int sy=0;sy<NUMY+6;sy++)
-       	    for (int sz=0;sz<DISTNUMZ+6;sz++) {
+    	for (int sx=0;sx<=NUMX+5;sx++) 
+      	  for (int sy=0;sy<=NUMY+5;sy++)
+       	    for (int sz=0;sz<=DISTNUMZ+5;sz++) {
 		// no need to update the slices which were already loaded by updatedBoundaries
-		if (sz<3 || sz>2+DISTNUMZ) continue;
+		if (sz<=5 || sz>=DISTNUMZ) continue;
 		if (sx>=3 && sx<=2+NUMX && sy>=3 && sy<=2+NUMY && sz>=3 && sz<=2+DISTNUMZ)
 		  W[sx][sy][sz] = updateRule(sx,sy,sz,step);
 		else 
