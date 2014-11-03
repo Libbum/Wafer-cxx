@@ -812,8 +812,8 @@ inline void loadLeftBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array left boundary
 	for (int sx=0;sx<=NUMX+5;sx++)
 		for (int sy=0;sy<=NUMY+5;sy++) {
-			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
+			wfnc[sx][sy][2] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
 			wfnc[sx][sy][1] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))]);
-			wfnc[sx][sy][2] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy],leftReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
+			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy],leftReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
         }
 }
