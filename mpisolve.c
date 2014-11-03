@@ -616,9 +616,9 @@ void findExcitedStates() {
 	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
 	// subtract overlap
-	for (int sx=0;sx<NUMX+6;sx++) 
-		for (int sy=0;sy<NUMY+6;sy++)
-       	    for (int sz=0; sz<DISTNUMZ+6;sz++) 
+	for (int sx=0;sx<=NUMX+5;sx++) 
+		for (int sy=0;sy<=NUMY+5;sy++)
+       	    for (int sz=0; sz<=DISTNUMZ+5;sz++) 
 				W[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect*w[sx][sy][sz];
 	
 	// compute observables
@@ -685,9 +685,9 @@ void findExcitedStates() {
     MPI_Bcast(&overlapCollect2, 1, MPI_DOUBLE, 0, workers_comm);
 
 	// subtract overlap
-	for (int sx=0;sx<NUMX+6;sx++) 
-		for (int sy=0;sy<NUMY+6;sy++)
-            for (int sz=0; sz<DISTNUMZ+6;sz++) {
+	for (int sx=0;sx<=NUMX+5;sx++) 
+		for (int sy=0;sy<=NUMY+5;sy++)
+            for (int sz=0; sz<=DISTNUMZ+5;sz++) {
                 W2[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect2*W[sx][sy][sz] - overlapCollect*w[sx][sy][sz];
       }
 	
@@ -765,8 +765,8 @@ void syncBoundaries(dcomp ***wfnc) {
 }
 
 void sendRightBoundary(dcomp*** wfnc) {
-	for (int sx=0;sx<NUMX+6;sx++)
-		for (int sy=0;sy<NUMY+6;sy++) {
+	for (int sx=0;sx<=NUMX+5;sx++)
+		for (int sy=0;sy<=NUMY+5;sy++) {
 			rightSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][DISTNUMZ]);
 			rightSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][DISTNUMZ]);
 			rightSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][1+DISTNUMZ]);
@@ -778,8 +778,8 @@ void sendRightBoundary(dcomp*** wfnc) {
 }
 
 void sendLeftBoundary(dcomp*** wfnc) {
-	for (int sx=0;sx<NUMX+6;sx++)
-		for (int sy=0;sy<NUMY+6;sy++) { 
+	for (int sx=0;sx<=NUMX+5;sx++)
+		for (int sy=0;sy<=NUMY+5;sy++) { 
 			leftSendBuffer[sx*(NUMY+6)+sy] = real(wfnc[sx][sy][3]);
 			leftSendBuffer[sx*(NUMY+6)+sy + (NUMX+6)*(NUMY+6)] = imag(wfnc[sx][sy][3]);
 			leftSendBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))] = real(wfnc[sx][sy][4]);
@@ -796,11 +796,11 @@ void receiveRightBoundary() {
 
 inline void loadRightBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array right boundary
-	for (int sx=0;sx<NUMX+6;sx++)
-		for (int sy=0;sy<NUMY+6;sy++) {
-			wfnc[sx][sy][DISTNUMZ+3] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy],rightReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
-			wfnc[sx][sy][DISTNUMZ+4] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))],rightReceiveBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))]);
-			wfnc[sx][sy][DISTNUMZ+5] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],rightReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
+	for (int sx=0;sx<=NUMX+5;sx++)
+		for (int sy=0;sy<=NUMY+5;sy++) {
+			wfnc[sx][sy][2+DISTNUMZ+1] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy],rightReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
+			wfnc[sx][sy][2+DISTNUMZ+2] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))],rightReceiveBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))]);
+			wfnc[sx][sy][2+DISTNUMZ+3] = dcomp(rightReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],rightReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
         }
 }
 
@@ -810,8 +810,8 @@ void receiveLeftBoundary() {
 
 inline void loadLeftBoundaryFromBuffer(dcomp ***wfnc) {
 	// update w array left boundary
-	for (int sx=0;sx<NUMX+6;sx++)
-		for (int sy=0;sy<NUMY+6;sy++) {
+	for (int sx=0;sx<=NUMX+5;sx++)
+		for (int sy=0;sy<=NUMY+5;sy++) {
 			wfnc[sx][sy][0] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (4*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (5*(NUMX+6)*(NUMY+6))]);
 			wfnc[sx][sy][1] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy + (2*(NUMX+6)*(NUMY+6))],leftReceiveBuffer[sx*(NUMY+6)+sy + (3*(NUMX+6)*(NUMY+6))]);
 			wfnc[sx][sy][2] = dcomp(leftReceiveBuffer[sx*(NUMY+6)+sy],leftReceiveBuffer[sx*(NUMY+6)+sy+(NUMX+6)*(NUMY+6)]);
