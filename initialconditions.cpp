@@ -43,8 +43,8 @@ void setInitialConditions(int seedMult)
 	fstream input; //, debug_out;
 	char fname[32];
 	string line;
-        string delim = "\t";
-        string token = "";
+    string delim = "\t";
+    string token = "";
 	vector<string> lines;
 	int fileSize,stridein=1,strideout=1,linenumber;
 	
@@ -64,9 +64,9 @@ void setInitialConditions(int seedMult)
         //TODO: Check for this if at all possible.
 		if (!input) {
 			cout << "==> Error : Unable to open wavefunction file " << fname << ". Using random Gaussian instead." << endl;
-			for (sx=0;sx<NUMX+6;sx++)
-				for (sy=0;sy<NUMY+6;sy++)
-					for (sz=0; sz<DISTNUMZ+6;sz++)
+			for (sx=0;sx<=NUMX+5;sx++)
+				for (sy=0;sy<=NUMY+5;sy++)
+					for (sz=0; sz<=DISTNUMZ+5;sz++)
                         w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		}
 		while( getline( input, line ) ) lines.push_back( line ) ;
@@ -150,9 +150,9 @@ void setInitialConditions(int seedMult)
 	  case 1:
 		// random
 		if (nodeID==1) cout << "==> Initial wavefunction : Random" << endl;
-        	for (sx=0;sx<NUMX+6;sx++)
-          	  for (sy=0;sy<NUMY+6;sy++)
-            	    for (sz=0; sz<DISTNUMZ+6;sz++)
+        	for (sx=0;sx<=NUMX+5;sx++)
+          	  for (sy=0;sy<=NUMY+5;sy++)
+            	    for (sz=0; sz<=DISTNUMZ+5;sz++)
                       w[sx][sy][sz] = dcomp(randGauss(sig),0.);
 		break;
 	  case 2:
@@ -210,19 +210,27 @@ void setInitialConditions(int seedMult)
         for (sz=0;sz<=DISTNUMZ+5;sz++)
           for (sy=0;sy<=NUMY+5;sy++) {
 		w[0][sy][sz] = 0;
-		w[NUMX+5][sy][sz] = 0;
+		w[1][sy][sz] = 0;
+		w[2][sy][sz] = 0;
+		w[2+NUMX+1][sy][sz] = 0;
+		w[2+NUMX+2][sy][sz] = 0;
+		w[2+NUMX+3][sy][sz] = 0;
 	  }
 
         for (sx=0;sx<=NUMX+5;sx++)
           for (sz=0;sz<=DISTNUMZ+5;sz++) {
 		w[sx][0][sz] = 0;
-		w[sx][NUMY+5][sz] = 0;
+		w[sx][1][sz] = 0;
+		w[sx][2][sz] = 0;
+		w[sx][2+NUMY+1][sz] = 0;
+		w[sx][2+NUMY+2][sz] = 0;
+		w[sx][2+NUMY+3][sz] = 0;
 	  }
 
 	// zero out updated wavefnc for safety's sake
-        for (sx=0;sx<NUMX+6;sx++)
-          for (sy=0;sy<NUMY+6;sy++)
-            for (sz=0;sz<DISTNUMZ+6;sz++)
+        for (sx=0;sx<=NUMX+5;sx++)
+          for (sy=0;sy<=NUMY+5;sy++)
+            for (sz=0;sz<=DISTNUMZ+5;sz++)
 		W[sx][sy][sz] = 0;
 
 	// symmetrize the intial condition
@@ -245,7 +253,7 @@ void symmetrizeWavefunction()
 		// symmetric in z
 	  case 2:
 		// antisymmetric in z
-        	for (sx=0;sx<NUMX+6;sx++)
+        	for (sx=0;sx<=NUMX+5;sx++)
 		{
 		  x=sx; 	
           	  for (sy=3;sy<=2+NUMY;sy++)
@@ -266,7 +274,7 @@ void symmetrizeWavefunction()
 		// symmetric in y
 	  case 4:
 		// antisymmetric in y
-        	for (sx=0;sx<NUMX+6;sx++)
+        	for (sx=0;sx<=NUMX+5;sx++)
 		{
 		  x=sx; 	
           	  for (sy=3;sy<=2+NUMY;sy++)
