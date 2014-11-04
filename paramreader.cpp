@@ -34,6 +34,7 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"INITSYMMETRY")==0) INITSYMMETRY=atoi(value);
 	if (strcmp(key,"NF")==0) NF=atoi(value);
 	if (strcmp(key,"SAVEWAVEFNCS")==0) SAVEWAVEFNCS=atoi(value);
+	if (strcmp(key,"EXCITEDSTATES")==0) EXCITEDSTATES=atoi(value);
         if (strcmp(key,"RUNTYPE")==0) RUNTYPE=atoi(value);
         if (strcmp(key,"OUTPOT")==0) OUTPOT=atoi(value);
 	// double/float params

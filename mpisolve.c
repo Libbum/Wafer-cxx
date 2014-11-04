@@ -26,7 +26,7 @@ typedef std::numeric_limits< double > dbl;
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
 int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
-int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,RUNTYPE=0,CLUSTSIZE=7,OUTPOT=0;
+int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,RUNTYPE=0,CLUSTSIZE=7,OUTPOT=0,EXCITEDSTATES=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,BOXSIZE=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
 
@@ -43,7 +43,7 @@ int nodeID,numNodes;
 fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
-int debug = DEBUG_FULL;
+int debug = DEBUG_OFF;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
@@ -513,8 +513,10 @@ void solveFinalize() {
 	    	sprintf(label,"0_%d",nodeID); 
 	    	outputWavefunctionBinary(w,label);
 	    }
-       //Uncomment if higher order states are wanted
-     //  findExcitedStates();
+       if (EXCITEDSTATES == 1) {
+           //if higher order states are wanted
+          findExcitedStates();
+       }
     } else {
        if (nodeID==1) cout << "ERROR: MINTSTEP value exceeded. Aborting; check memory conditions and alter input parameters" << endl;
     }
@@ -639,9 +641,13 @@ void findExcitedStates() {
 		dcomp rRMS2 = rRMS2Collect/normalizationCollect;     // #ad.
 		print_line();
         cout.precision(dbl::digits10);
-		cout << "==> 1st excited state energy : " << fixed << EOne << endl; //setprecision (12) before << ener
-		cout << "==> 1st excited state binding energy : " << EOne - vinfty << endl;
-		// #ad.
+        if (POTENTIAL == 22) {
+		    cout << "==> 1st excited state energy : " << fixed << EOne*1e6/239.2311 << endl; //setprecision (12) before << ener
+		    cout << "==> 1st excited state binding energy : " << EOne*1e6/239.2311 - vinfty << endl;
+        } else {
+		    cout << "==> 1st excited state energy : " << fixed << EOne << endl; //setprecision (12) before << ener
+		    cout << "==> 1st excited state binding energy : " << EOne - vinfty << endl;
+        }
 		cout << "==> Ex. State r_RMS : " << sqrt(real(rRMS2)) << endl;
 		cout << "==> Ex. State L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;
 		
@@ -656,8 +662,8 @@ void findExcitedStates() {
 	
 	if (SAVEWAVEFNCS) {
 		// save 3d wavefunction for states
-		sprintf(label,"0_%d",nodeID); 
-		outputWavefunctionBinary(w,label);
+		//sprintf(label,"0_%d",nodeID); 
+		//outputWavefunctionBinary(w,label);
 		sprintf(label,"1_%d",nodeID); 
 		outputWavefunctionBinary(W,label);
 	}
@@ -711,8 +717,13 @@ void findExcitedStates() {
 		dcomp rRMS2 = rRMS2Collect/normalizationCollect;
 		print_line();
         cout.precision(dbl::digits10);
-		cout << "==> 2nd excited state energy : " << fixed << ener << endl; //setprecision (12) before << ener
-		cout << "==> 2nd excited state binding energy : " << ener - vinfty << endl;
+        if (POTENTIAL == 22) {
+		    cout << "==> 2nd excited state energy : " << fixed << ener*1e6/239.2311 << endl; //setprecision (12) before << ener
+		    cout << "==> 2nd excited state binding energy : " << ener*1e6/239.2311 - vinfty << endl;
+        } else {
+		    cout << "==> 2nd excited state energy : " << fixed << ener << endl; //setprecision (12) before << ener
+		    cout << "==> 2nd excited state binding energy : " << ener - vinfty << endl;
+        }
 		cout << "==> Ex. State r_RMS : " << sqrt(real(rRMS2)) << endl;
 		cout << "==> Ex. State L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;
 		

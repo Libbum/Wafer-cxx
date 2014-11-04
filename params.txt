@@ -2,24 +2,24 @@
 SIG		1.0
 
 // number of spatial grid points; should be divisible by the number of computational nodes
-NUMZ    536
+NUMZ    300
 
 // can be used if grid is needed below pair separation bounds (pseudo-unbound
 // sets for example)
-NUMY    536
-NUMX    241
+NUMY    300
+NUMX    101
 
 // spatial grid spacing
-A      0.003
+A      0.01
 
 // temporal grid spacing - should be <= A*A/3
-EPS		3e-6
+EPS		1.5e-5
 
 // If using S-M Potential, how far should aEPS take you?
 MINTSTEP     1.e-9
 
 // convergence tolerance for ground state energy
-TOLERANCE	1.e-6
+TOLERANCE	1.e-4
 
 // maximum # of steps to take
 STEPS   	1E20
@@ -28,10 +28,13 @@ STEPS   	1E20
 UPDATE		1000
 
 // how many steps before dumping all variables to file; "taking a snapshot"
-SNAPUPDATE	300
+SNAPUPDATE	1000
 
 // set to one to dump the full 3d wavefncs to disk at the end of the run
 SAVEWAVEFNCS	1
+
+// Excited states 1 and 2 using projection method if set to 1
+EXCITEDSTATES   0
 
 // Set to one to also dump potential (before calculation for debugging)
 OUTPOT  0
@@ -95,13 +98,13 @@ INITSYMMETRY	0
 MASS  15.9994
 
 // 0 = Bound on AL values, 1 = cluster file, 2 = NUMn override
-RUNTYPE  0
+RUNTYPE  2
 
 //If reading in a cluster, shall we only calculate a certain region? This
 //value in Angstroms is from the origin to the box perimeter
-//BOXSIZE  2
+//BOXSIZE  2.5
 
 //Aluminium cluster data
-ALX   1.6
-ALY   500
-ALZ   500 
+ALX   1.85
+ALY   500.0
+ALZ   500.0 
