@@ -43,8 +43,8 @@ void setInitialConditions(int seedMult)
 	fstream input; //, debug_out;
 	char fname[32];
 	string line;
-    string delim = "\t";
-    string token = "";
+        string delim = "\t";
+        string token = "";
 	vector<string> lines;
 	int fileSize,stridein=1,strideout=1,linenumber;
 	
@@ -57,19 +57,19 @@ void setInitialConditions(int seedMult)
 	switch (INITCONDTYPE) { 
 	  case 0: 
 		// read from file
-	    sprintf(fname,"data/wavefunction_0_%d.dat",nodeID);
+	    sprintf(fname,"data/wavefunction_%d_%d.dat",waveNum,nodeID);
 	    input.open(fname, ios::in);
-		if (nodeID==1) cout << "==> Initial wavefunction : From file" << endl;
+	    if (nodeID==1) cout << "==> Initial wavefunction (state " << waveNum << ") : From file" << endl;
         //NOTE: numNodes must be the same for this run and the last! 
         //TODO: Check for this if at all possible.
-		if (!input) {
-			cout << "==> Error : Unable to open wavefunction file " << fname << ". Using random Gaussian instead." << endl;
-			for (sx=0;sx<=NUMX+5;sx++)
-				for (sy=0;sy<=NUMY+5;sy++)
-					for (sz=0; sz<=DISTNUMZ+5;sz++)
-                        w[sx][sy][sz] = dcomp(randGauss(sig),0.);
-		}
-		while( getline( input, line ) ) lines.push_back( line ) ;
+	    if (!input) {
+	        cout << "==> Error : Unable to open wavefunction file " << fname << ". Using random Gaussian instead." << endl;
+		for (sx=0;sx<=NUMX+5;sx++)
+	            for (sy=0;sy<=NUMY+5;sy++)
+		        for (sz=0; sz<=DISTNUMZ+5;sz++)
+                            w[sx][sy][sz] = dcomp(randGauss(sig),0.);
+	    }
+	    while( getline( input, line ) ) lines.push_back( line ) ;
        
         //sprintf(fname,"debug/input_%d.txt",nodeID);
         //debug_out.open(fname, ios::out);

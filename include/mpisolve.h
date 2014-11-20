@@ -71,6 +71,7 @@ extern double *clust;
 // the main solve routines
 void solveInitialize();
 void solve();
+void reInitSolver();
 void solveRestart();
 void solveFinalize();
 void evolve(int);

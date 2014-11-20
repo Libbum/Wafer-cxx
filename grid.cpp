@@ -65,15 +65,15 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) W[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W[sx][sy] = new dcomp[DISTNUMZ+6];
 
-    w0 = new dcomp**[NUMX+6];
-    for (int sx=0;sx<NUMX+6;sx++) w0[sx] = new dcomp*[NUMY+6];
-    for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) w0[sx][sy] = new dcomp[DISTNUMZ+6];
-
-    v = new dcomp**[NUMX+6]; 
+        w0 = new dcomp**[NUMX+6];
+        for (int sx=0;sx<NUMX+6;sx++) w0[sx] = new dcomp*[NUMY+6];
+        for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) w0[sx][sy] = new dcomp[DISTNUMZ+6];
+        
+        v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
     
-    v2 = new dcomp**[NUMX+6]; 
+        v2 = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v2[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v2[sx][sy] = new dcomp[DISTNUMZ+6];
 
@@ -85,11 +85,11 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) b[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) b[sx][sy] = new dcomp[DISTNUMZ+6];
 
-	int snaps = 2;
-	wstore = new dcomp***[snaps]; 
-	for (int n=0;n<snaps;n++) wstore[n] = new dcomp**[NUMX+6];
-	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUMX+6;sx++) wstore[n][sx] = new dcomp*[NUMY+6];
-	for (int n=0;n<snaps;n++) for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+6];
+	int states = 2; //TODO ground plus es1 for now
+	wstore = new dcomp***[states]; 
+	for (int n=0;n<states;n++) wstore[n] = new dcomp**[NUMX+6];
+	for (int n=0;n<states;n++) for (int sx=0;sx<NUMX+6;sx++) wstore[n][sx] = new dcomp*[NUMY+6];
+	for (int n=0;n<states;n++) for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+6];
 		
 	return;
 }

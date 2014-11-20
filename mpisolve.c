@@ -268,21 +268,30 @@ int main( int argc, char *argv[] )
 		if (debug == DEBUG_FULL) debug_out << "==> Rec Hello : "<< message << endl;
 
 		// the master said hello so now let's get to work
-		solve();
+        // Loops for each wavefunction to be calculated
+		for (int ii=0;ii<=1;ii++) { //TODO: Remove harcoded one with n wavefunctions
+            solve();
 	        
-        //If there's a nanError, extend EPS and resolve
-        while (nanErrorCollect == 1) {
-            solveRestart();
+            //If there's a nanError, extend EPS and resolve
+            while (nanErrorCollect == 1) {
+                solveRestart();
 
-            nanErrorCollect = 0;
-            MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
-            if (EPS >= MINTSTEP) { //Don't loop forever
-                solve();
+                nanErrorCollect = 0;
+                MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
+                if (EPS >= MINTSTEP) { //Don't loop forever
+                    solve();
+                }
             }
-        }
         
-        //solve() has found the ground state and is stored in w.
-        //Set waveNum flag and go again.
+            //solve() has found the ground state and is stored in w.
+            storeConverged(w,waveNum);
+
+            //Set waveNum flag and go again.
+            waveNum++;
+
+            //Reset values and load new wavefunctions from matlab guess
+            reInitSolver();
+        }
 
 		// done with main computation, now do any analysis required
 		solveFinalize();
@@ -351,6 +360,17 @@ void solveInitialize() {
       	cout << endl;
       	print_line();
 	}
+}
+
+void reInitSolver() {
+    //Reset Everything and load new wavefunction guess from disk
+    if (nodeID==1) { 
+        print_line();
+        cout << "Energy converged to tolerance, wavefunction found. Loading higer state." << endl;
+		flush(cout);
+    }
+	setInitialConditions(nodeID+1);
+    updatePotential();
 }
 
 void solveRestart() {
