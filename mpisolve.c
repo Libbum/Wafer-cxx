@@ -533,8 +533,10 @@ void solveFinalize() {
        //Comment if higher order states are wanted
 	    if (SAVEWAVEFNCS==1) {
 		// save 3d wavefunction for states
-	    	sprintf(label,"%d_%d",waveNum, nodeID); 
-	    	outputWavefunctionBinary(w,label);
+	    	for (int ii=0; ii<=waveNum; ii++) {
+                sprintf(label,"%d_%d",ii, nodeID); 
+	    	    outputWavefunctionBinary(&wstore[ii][0],label);
+            }
 	    }
        if (EXCITEDSTATES == 1) {
            //if higher order states are wanted
