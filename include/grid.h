@@ -27,6 +27,7 @@ extern dcomp ***tmp;
 
 // this holds the potential array
 extern dcomp ***v;
+extern dcomp ***v2;
 
 // these hold the alpha and beta arrays which are used during updates
 extern dcomp ***a,***b;
@@ -58,6 +59,7 @@ void updateBoundaries(double eps);
 void updateInterior(double eps);
 void copyDown();
 void loadPotentialArrays();
+void updatePotential();
 void normalizeWavefunction(dcomp*** wfnc);
 void recordSnapshot(dcomp*** wfnc);
 

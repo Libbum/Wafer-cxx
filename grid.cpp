@@ -38,6 +38,9 @@ dcomp ****wstore;
 // this holds the potential array
 dcomp ***v;
 
+// updated potential variable
+dcomp ***v2;
+
 // these hold the alpha and beta arrays which are used during updates
 dcomp ***a,***b;
 
@@ -69,6 +72,10 @@ void allocateMemory() {
     v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
+    
+    v2 = new dcomp**[NUMX+6]; 
+	for (int sx=0;sx<NUMX+6;sx++) v2[sx] = new dcomp*[NUMY+6];
+	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v2[sx][sy] = new dcomp[DISTNUMZ+6];
 
 	a = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) a[sx] = new dcomp*[NUMY+6];
@@ -107,17 +114,34 @@ void copyDown() {
 // initializes the potentials from potential.cpp 
 void loadPotentialArrays()
 {
-        int sx,sy,sz;
+    int sx,sy,sz;
 
-        for (sx=0;sx<=NUMX+5;sx++)
-        for (sy=0;sy<=NUMY+5;sy++)
-        for (sz=0; sz<=DISTNUMZ+5;sz++) {
-          v[sx][sy][sz] = potential(sx,sy,sz);
-          b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
-          a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
-        }  
+    for (sx=0;sx<=NUMX+5;sx++)
+    for (sy=0;sy<=NUMY+5;sy++)
+    for (sz=0; sz<=DISTNUMZ+5;sz++) {
+        v[sx][sy][sz] = potential(sx,sy,sz);
+        b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
+        a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
+   }  
 }
 
+//Updates potintial with the current energy penalty
+void updatePotential()
+{
+    int sx,sy,sz;
+        
+    for (sx=0;sx<=NUMX+5;sx++)
+    for (sy=0;sy<=NUMY+5;sy++)
+    for (sz=0; sz<=DISTNUMZ+5;sz++) {
+        v2[sx][sy][sz] = v[sx][sy][sz]; //TODO: Plus offset
+        b[sx][sy][sz] = 1./(1.+EPS*v2[sx][sy][sz]/((dcomp) 2.));
+        a[sx][sy][sz] = (1.-EPS*v2[sx][sy][sz]/((dcomp) 2.))*v2[sx][sy][sz];
+    }  
+    // Swap v2 to v
+    tmp = v;
+    v = v2;
+    v2 = tmp; //We don't need this at this stage, but also don't want to loose the pointer
+}
 // compute energy of a wave function
 dcomp wfncEnergy(dcomp*** wfnc) {
 	dcomp res=0;

@@ -44,7 +44,7 @@ extern "C"
 extern int DISTNUMZ,NUMX,NUMY,NUMZ,UPDATE,SNAPUPDATE,POTENTIAL,INITCONDTYPE,INITSYMMETRY,NF,SAVEWAVEFNCS,RUNTYPE,CLUSTSIZE,OUTPOT,EXCITEDSTATES;
 extern double A,STEPS,EPS,MINTSTEP,SIG,MASS,T,TC,SIGMA,XI,TOLERANCE,ALX,ALY,ALZ,BOXSIZE;
 
-extern int nodeID, numNodes, debug;
+extern int nodeID, numNodes, debug, waveNum;
 
 extern dcomp energyCollect;
 extern dcomp normalizationCollect;

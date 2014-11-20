@@ -75,9 +75,10 @@ dcomp rRMS2=0;                 // the local node <r^2>  #ad.
 dcomp rRMS2Collect=0;		// the total <r^2>  #ad.
 int nanErrorCollect=0;
 
-// #ad.: grnd-state energy and final time saved in global var after convergence
+//grnd-state energy and final time saved in global var after convergence
 dcomp	EGrnd, EOne, timef;
 int step = 0;
+int waveNum = 0; //wavefunction number. Defaults to zero to compute ground.
 
 int main( int argc, char *argv[] ) 
 { 
