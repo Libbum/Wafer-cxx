@@ -58,8 +58,24 @@ void outputSummaryData() {
       //cout << "==> Normalization2 : " << normalizationCollect << endl;
       cout.precision(dbl::digits10);
       if (POTENTIAL==22) {
-         cout << "==> Ground State Energy : " << fixed << ener*1e6/239.2311 << " (ueV)" << endl;
-         cout << "==> Ground State Binding Energy : " << binding*1e6/239.2311 << " (ueV)" << endl;
+          string state;
+          switch (waveNum) {
+              case 1:
+                  state = "First Excited ";
+              case 2:
+                  state = "Second Excited ";
+              case 3:
+                  state = "Third Excited ";
+              case 4:
+                  state = "Fourth Excited ";
+              case 5:
+                  state = "Fifth Excited ";
+              default:
+                  state = "Ground ";
+         }
+          
+         cout << "==> " << state << "State Energy : " << fixed << ener*1e6/239.2311 << " (ueV)" << endl;
+         cout << "==> " << state << "State Binding Energy : " << binding*1e6/239.2311 << " (ueV)" << endl;
       } else {
          cout << "==> Ground State Energy : " << fixed << ener << endl;
          cout << "==> Ground State Binding Energy : " << binding << endl;

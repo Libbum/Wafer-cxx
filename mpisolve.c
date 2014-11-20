@@ -285,12 +285,14 @@ int main( int argc, char *argv[] )
         
             //solve() has found the ground state and is stored in w.
             storeConverged(w,waveNum);
+            
+            if (ii<waveNum) {
+                //Set waveNum flag and go again.
+                waveNum++;
 
-            //Set waveNum flag and go again.
-            waveNum++;
-
-            //Reset values and load new wavefunctions from matlab guess
-            reInitSolver();
+                //Reset values and load new wavefunctions from matlab guess
+                reInitSolver();
+            }
         }
 
 		// done with main computation, now do any analysis required
@@ -369,6 +371,10 @@ void reInitSolver() {
         cout << "Energy converged to tolerance, wavefunction found. Loading higer state." << endl;
 		flush(cout);
     }
+
+    //reset step
+    step = 0;
+
 	setInitialConditions(nodeID+1);
     updatePotential();
 }
@@ -473,12 +479,10 @@ void solve() {
 			// broadcast observables
 			MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			MPI_Bcast(&energyCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
-		    if (debug == DEBUG_FULL) debug_out << "b4 Ecol "<< energyCollect << " Normcol " << normalizationCollect << endl;
 			// force symmetry
 			symmetrizeWavefunction();
             // normalize wavefunction
             normalizeWavefunction(w);
-		    if (debug == DEBUG_FULL) debug_out << "Ecol "<< energyCollect << " Normcol " << normalizationCollect << endl;
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
             if (!isfinite(real(energytot))) {
