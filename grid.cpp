@@ -29,8 +29,8 @@ dcomp ***w;
 // this holds the updated values of the wavefunction
 dcomp ***W;
 
-// another variable for phi2
-dcomp ***W2;
+// Converged Ground state wavefunction 
+dcomp ***w0;
 
 // this holds the snapshots of the wavefunction
 dcomp ****wstore;
@@ -65,9 +65,9 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) W[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W[sx][sy] = new dcomp[DISTNUMZ+6];
 
-    W2 = new dcomp**[NUMX+6];
-    for (int sx=0;sx<NUMX+6;sx++) W2[sx] = new dcomp*[NUMY+6];
-    for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W2[sx][sy] = new dcomp[DISTNUMZ+6];
+    w0 = new dcomp**[NUMX+6];
+    for (int sx=0;sx<NUMX+6;sx++) w0[sx] = new dcomp*[NUMY+6];
+    for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) w0[sx][sy] = new dcomp[DISTNUMZ+6];
 
     v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
@@ -242,15 +242,12 @@ void updateInterior(double step) {
 	    }
 }
 
-void recordSnapshot(dcomp*** wfnc) { //, int step
-	//int snap = (int) step/SNAPUPDATE;
-  //int nsnaps = (int) step/SNAPUPDATE;
+void storeConverged(dcomp*** wfnc,int num) { 
   for (int sx=0;sx<=NUMX+5;sx++) 
-      	  for (int sy=0;sy<=NUMY+5;sy++)
-       	    for (int sz=0; sz<=DISTNUMZ+5;sz++) {
-		wstore[1][sx][sy][sz] = wstore[0][sx][sy][sz];
-		wstore[0][sx][sy][sz] = wfnc[sx][sy][sz];
-            }
+    for (int sy=0;sy<=NUMY+5;sy++)
+        for (int sz=0; sz<=DISTNUMZ+5;sz++) {
+		    wstore[num][sx][sy][sz] = wfnc[sx][sy][sz];
+        }
 }
 
 void normalizeWavefunction(dcomp*** wfnc) {

@@ -17,8 +17,8 @@ extern dcomp ***w;
 
 // this holds the updated values of the wavefunction
 extern dcomp ***W;
-
-extern dcomp ***W2;
+//Converged ground state
+extern dcomp ***w0;
 // this holds the snapshots of the wavefunction
 extern dcomp ****wstore;
 
@@ -61,6 +61,6 @@ void copyDown();
 void loadPotentialArrays();
 void updatePotential();
 void normalizeWavefunction(dcomp*** wfnc);
-void recordSnapshot(dcomp*** wfnc);
+void storeConverged(dcomp*** wfnc, int num);
 
 #endif /* __grid_h__ */

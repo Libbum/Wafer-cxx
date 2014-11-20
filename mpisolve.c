@@ -280,7 +280,10 @@ int main( int argc, char *argv[] )
                 solve();
             }
         }
-                
+        
+        //solve() has found the ground state and is stored in w.
+        //Set waveNum flag and go again.
+
 		// done with main computation, now do any analysis required
 		solveFinalize();
 		
@@ -469,7 +472,6 @@ void solve() {
                 break;
 	        } else {
 		        lastenergy = energytot;
-		        if (step!=STEPS) recordSnapshot(w);
 	        }
         }
         if (nodeID==1) outputMeasurements(step*EPS);
@@ -511,7 +513,7 @@ void solveFinalize() {
        //Comment if higher order states are wanted
 	    if (SAVEWAVEFNCS==1) {
 		// save 3d wavefunction for states
-	    	sprintf(label,"0_%d",nodeID); 
+	    	sprintf(label,"%d_%d",waveNum, nodeID); 
 	    	outputWavefunctionBinary(w,label);
 	    }
        if (EXCITEDSTATES == 1) {
@@ -607,13 +609,13 @@ void findExcitedStates() {
 	dcomp overlap2=0,overlapCollect2=0;
 
 	// compute first excited state
-	int snap = 0;  //most recently saved snapshot;
+	int state = 0;  //Ground state;
 	
 	// compute overlap
 	for (int sx=3;sx<=2+NUMX;sx++) 
 		for (int sy=3;sy<=2+NUMY;sy++)
        	    for (int sz=3; sz<=2+DISTNUMZ;sz++) 
-				overlap += w[sx][sy][sz]*wstore[snap][sx][sy][sz];
+				overlap += w[sx][sy][sz]*wstore[state][sx][sy][sz];
 	
 	MPI_Reduce(&overlap,&overlapCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
@@ -622,7 +624,7 @@ void findExcitedStates() {
 	for (int sx=0;sx<=NUMX+5;sx++) 
 		for (int sy=0;sy<=NUMY+5;sy++)
        	    for (int sz=0; sz<=DISTNUMZ+5;sz++) 
-				W[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect*w[sx][sy][sz];
+				W[sx][sy][sz] = wstore[state][sx][sy][sz] - overlapCollect*w[sx][sy][sz];
 	
 	// compute observables
 	computeObservables(W);
@@ -662,88 +664,10 @@ void findExcitedStates() {
 	}
 	
 	if (SAVEWAVEFNCS) {
-		// save 3d wavefunction for states
-		//sprintf(label,"0_%d",nodeID); 
-		//outputWavefunctionBinary(w,label);
 		sprintf(label,"1_%d",nodeID); 
 		outputWavefunctionBinary(W,label);
 	}
 	
-  //compute second excited state
-  //copyDown();
-
-  overlap = 0;
-  overlapCollect = 0;
-	
-	// compute first excited state
-	snap = 1; //second most recently saved snapshot
-	
-	// compute overlap
-	for (int sx=3;sx<=2+NUMX;sx++) 
-		for (int sy=3;sy<=2+NUMY;sy++)
-       	    for (int sz=3; sz<=2+DISTNUMZ;sz++) {
-				overlap += w[sx][sy][sz]*wstore[snap][sx][sy][sz];
-                overlap2 += W[sx][sy][sz]*wstore[snap][sx][sy][sz];
-            }
-	
-	MPI_Reduce(&overlap,&overlapCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
-    MPI_Reduce(&overlap2,&overlapCollect2,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-    MPI_Bcast(&overlapCollect2, 1, MPI_DOUBLE, 0, workers_comm);
-
-	// subtract overlap
-	for (int sx=0;sx<=NUMX+5;sx++) 
-		for (int sy=0;sy<=NUMY+5;sy++)
-            for (int sz=0; sz<=DISTNUMZ+5;sz++) {
-                W2[sx][sy][sz] = wstore[snap][sx][sy][sz] - overlapCollect2*W[sx][sy][sz] - overlapCollect*w[sx][sy][sz];
-      }
-	
-   // compute observables
-   computeObservables(W2);
-   
-   // normalize
-   MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE, 0, workers_comm);
-   normalizeWavefunction(W2);
-  
-
-
-	// output snapshot of excited states
-	sprintf(label,"excited_2_%d",nodeID); 
-	outputSnapshot(W2,label);
-	
-	if (nodeID==1) {
-		dcomp ener = energyCollect/normalizationCollect;
-		dcomp snapdiff = ((dcomp) 1)/(ener-EOne);
-        dcomp vinfty = vInfinityCollect/normalizationCollect;
-		dcomp rRMS2 = rRMS2Collect/normalizationCollect;
-		print_line();
-        cout.precision(dbl::digits10);
-        if (POTENTIAL == 22) {
-		    cout << "==> 2nd excited state energy : " << fixed << ener*1e6/239.2311 << endl; //setprecision (12) before << ener
-		    cout << "==> 2nd excited state binding energy : " << ener*1e6/239.2311 - vinfty << endl;
-        } else {
-		    cout << "==> 2nd excited state energy : " << fixed << ener << endl; //setprecision (12) before << ener
-		    cout << "==> 2nd excited state binding energy : " << ener - vinfty << endl;
-        }
-		cout << "==> Ex. State r_RMS : " << sqrt(real(rRMS2)) << endl;
-		cout << "==> Ex. State L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;
-		
-        cout << "==> 1/(E2-E1) : " << snapdiff << endl; 	
-		if (real(snapdiff)*2>SNAPUPDATE) {
-        cout << "==> WARNING: SNAPUPDATE is too small!" << endl;
-    }
-    if (real(snapdiff)<1) {
-      cout << "==> WARNING: SNAPUPDATE is too large!" << endl;
-    }
-
-    print_line();
-	}
-	
-	if (SAVEWAVEFNCS) {
-		// save 3d wavefunction for states
-		sprintf(label,"2_%d",nodeID); 
-		outputWavefunctionBinary(W2,label);
-  }
 	return;
 }
 
