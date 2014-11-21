@@ -421,7 +421,9 @@ void solveRestart() {
 void computeObservables(dcomp*** wfnc) {
 
     // Find overlap with lower level wavefunctions
-    getOverlap(wfnc);
+    if (waveNum>0) {
+        getOverlap(wfnc);
+    }
 
 	// sum energy across nodes
 	double energy_re=0.,energy_im=0.;
