@@ -378,6 +378,17 @@ void reInitSolver() {
     
     //reset step
     step = 0;
+	
+    // output some summary information
+	if (nodeID==1) { 
+	print_line();
+      	print_line();
+      	cout.width(dwidth); cout << "Time";
+      	cout.width(dwidth); cout << "Energy";
+      	cout.width(dwidth); cout << "r_RMS";   
+      	cout << endl;
+      	print_line();
+	}
 }
 
 void solveRestart() {
