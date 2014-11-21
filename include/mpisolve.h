@@ -76,6 +76,7 @@ void solveRestart();
 void solveFinalize();
 void evolve(int);
 void findExcitedStates();
+void getOverlap(dcomp*** wfnc);
 
 // boundary sync stuff
 void syncBoundaries(dcomp*** wfnc);

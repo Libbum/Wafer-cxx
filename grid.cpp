@@ -29,8 +29,8 @@ dcomp ***w;
 // this holds the updated values of the wavefunction
 dcomp ***W;
 
-// Converged Ground state wavefunction 
-dcomp ***w0;
+// Overlap of converged states
+//dcomp ***beta;
 
 // this holds the snapshots of the wavefunction
 dcomp ****wstore;
@@ -50,6 +50,9 @@ dcomp ***tmp;
 //nsnaps = STEPS/SNAPUPDATE;
 int nsnaps = 0;
 
+//Enegry penalty offset for beta
+double epsilon = 0;
+
 // allocate memory arrays
 void allocateMemory() {
 
@@ -64,16 +67,16 @@ void allocateMemory() {
 	W = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) W[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W[sx][sy] = new dcomp[DISTNUMZ+6];
-
-        w0 = new dcomp**[NUMX+6];
-        for (int sx=0;sx<NUMX+6;sx++) w0[sx] = new dcomp*[NUMY+6];
-        for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) w0[sx][sy] = new dcomp[DISTNUMZ+6];
-        
-        v = new dcomp**[NUMX+6]; 
+    
+       // beta = new dcomp**[NUMX+6];
+       // for (int sx=0;sx<NUMX+6;sx++) beta[sx] = new dcomp*[NUMY+6];
+       // for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) beta[sx][sy] = new dcomp[DISTNUMZ+6];
+    
+    v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
-    
-        v2 = new dcomp**[NUMX+6]; 
+
+    v2 = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v2[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v2[sx][sy] = new dcomp[DISTNUMZ+6];
 
@@ -122,18 +125,20 @@ void loadPotentialArrays()
         v[sx][sy][sz] = potential(sx,sy,sz);
         b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
         a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
-   }  
+    } 
+    
+    calcEnergyOffset();
 }
 
 //Updates potintial with the current energy penalty
-void updatePotential()
+void updatePotential(dcomp beta)
 {
     int sx,sy,sz;
         
     for (sx=0;sx<=NUMX+5;sx++)
     for (sy=0;sy<=NUMY+5;sy++)
     for (sz=0; sz<=DISTNUMZ+5;sz++) {
-        v2[sx][sy][sz] = v[sx][sy][sz]; //TODO: Plus offset
+        v2[sx][sy][sz] = v[sx][sy][sz] + epsilon*abs(beta*beta); //Add epsilon|beta|^2 offset
         b[sx][sy][sz] = 1./(1.+EPS*v2[sx][sy][sz]/((dcomp) 2.));
         a[sx][sy][sz] = (1.-EPS*v2[sx][sy][sz]/((dcomp) 2.))*v2[sx][sy][sz];
     }  
@@ -141,6 +146,24 @@ void updatePotential()
     tmp = v;
     v = v2;
     v2 = tmp; //We don't need this at this stage, but also don't want to loose the pointer
+}
+
+//Get 2*abs(min(potential)) for offset of beta
+void calcEnergyOffset()
+{
+    int sx,sy,sz;
+    dcomp minima = v[0][0][0];
+
+    for (sx=0;sx<=NUMX+5;sx++)
+    for (sy=0;sy<=NUMY+5;sy++)
+    for (sz=0; sz<=DISTNUMZ+5;sz++) {
+        if (real(v[sx][sy][sz])<real(minima)) {
+            minima = v[sx][sy][sz];
+        }
+    }
+
+    epsilon = 2*abs(real(minima));
+
 }
 // compute energy of a wave function
 dcomp wfncEnergy(dcomp*** wfnc) {

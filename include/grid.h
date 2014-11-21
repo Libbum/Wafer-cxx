@@ -17,8 +17,8 @@ extern dcomp ***w;
 
 // this holds the updated values of the wavefunction
 extern dcomp ***W;
-//Converged ground state
-extern dcomp ***w0;
+//Overlap of converged states
+//extern dcomp ***beta;
 // this holds the snapshots of the wavefunction
 extern dcomp ****wstore;
 
@@ -34,6 +34,9 @@ extern dcomp ***a,***b;
 
 // number of snapshots to capture in memory
 extern int nsnaps;
+
+//Energy penalty offset
+extern double epsilon;
 
 // return energy of the passed wavefnc
 dcomp wfncEnergy(dcomp*** wfnc);
@@ -59,7 +62,8 @@ void updateBoundaries(double eps);
 void updateInterior(double eps);
 void copyDown();
 void loadPotentialArrays();
-void updatePotential();
+void updatePotential(dcomp beta);
+void calcEnergyOffset();
 void normalizeWavefunction(dcomp*** wfnc);
 void storeConverged(dcomp*** wfnc, int num);
 

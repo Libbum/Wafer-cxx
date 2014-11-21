@@ -286,7 +286,7 @@ int main( int argc, char *argv[] )
             //solve() has found the ground state and is stored in w.
             storeConverged(w,waveNum);
             
-            if (ii<waveNum) {
+            if (ii<1) { //TODO: Remove hardcoded one
                 //Set waveNum flag and go again.
                 waveNum++;
 
@@ -348,6 +348,7 @@ void solveInitialize() {
 	// output some summary information
 	if (nodeID==1) { 
 	print_line();
+      	cout << "==> Energy offset epsilon : " << epsilon << endl; 
       	cout << "==> Number of computational nodes : " << numNodes-1 << endl; 
       	cout << "==> DISTNUMZ : " << DISTNUMZ << endl; 
       	print_line();
@@ -372,11 +373,11 @@ void reInitSolver() {
 		flush(cout);
     }
 
+    setInitialConditions(nodeID+1);
+    //getOverlap(wfnc);
+    
     //reset step
     step = 0;
-
-	setInitialConditions(nodeID+1);
-    updatePotential();
 }
 
 void solveRestart() {
@@ -407,7 +408,10 @@ void solveRestart() {
 
 // reduce observables across nodes to first worker node
 void computeObservables(dcomp*** wfnc) {
-	
+
+    // Find overlap with lower level wavefunctions
+    //getOverlap(wfnc);
+
 	// sum energy across nodes
 	double energy_re=0.,energy_im=0.;
 	double energy_re_collect=0.,energy_im_collect=0.;
@@ -447,6 +451,24 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&rRMS2_re,&rRMS2_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&rRMS2_im,&rRMS2_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	rRMS2Collect = dcomp(rRMS2_re_collect,rRMS2_im_collect);
+}
+
+void getOverlap(dcomp*** wfnc) {
+        
+    dcomp beta=0,betaCollect=0; //Ground state
+
+	// compute overlap
+	for (int sx=3;sx<=2+NUMX;sx++) 
+	  for (int sy=3;sy<=2+NUMY;sy++)
+       	    for (int sz=3; sz<=2+DISTNUMZ;sz++) { //TODO: Add a switch for higher states
+                beta += wstore[0][sx][sy][sz]*wfnc[sx][sy][sz];
+            }
+	
+	MPI_Reduce(&beta,&betaCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	MPI_Bcast(&betaCollect, 1, MPI_DOUBLE, 0, workers_comm);
+	
+    //betaCollect is now beta, a number.
+    updatePotential(betaCollect);
 }
 
 // main computational solve routine
