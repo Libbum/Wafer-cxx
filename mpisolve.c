@@ -374,7 +374,7 @@ void reInitSolver() {
     }
 
     setInitialConditions(nodeID+1);
-    //getOverlap(wfnc);
+    getOverlap(w);
     
     //reset step
     step = 0;
@@ -421,7 +421,7 @@ void solveRestart() {
 void computeObservables(dcomp*** wfnc) {
 
     // Find overlap with lower level wavefunctions
-    //getOverlap(wfnc);
+    getOverlap(wfnc);
 
 	// sum energy across nodes
 	double energy_re=0.,energy_im=0.;
@@ -506,8 +506,7 @@ void solve() {
 		// reduce observables across nodes
 		computeObservables(w);
                 
-		// output 2d snapshots of the wavefunction for inspection
-		// and check convergence of ground state energy
+		// Check convergence of ground state energy
 		if (step%SNAPUPDATE==0) {
 			// broadcast observables
 			MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
