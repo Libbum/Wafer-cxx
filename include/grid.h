@@ -27,7 +27,7 @@ extern dcomp ***tmp;
 
 // this holds the potential array
 extern dcomp ***v;
-extern dcomp ***v2;
+//extern dcomp ***v2;
 
 // these hold the alpha and beta arrays which are used during updates
 extern dcomp ***a,***b;

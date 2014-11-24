@@ -39,7 +39,7 @@ dcomp ****wstore;
 dcomp ***v;
 
 // updated potential variable
-dcomp ***v2;
+//dcomp ***v2;
 
 // these hold the alpha and beta arrays which are used during updates
 dcomp ***a,***b;
@@ -76,9 +76,9 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
 
-    v2 = new dcomp**[NUMX+6]; 
-	for (int sx=0;sx<NUMX+6;sx++) v2[sx] = new dcomp*[NUMY+6];
-	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v2[sx][sy] = new dcomp[DISTNUMZ+6];
+//    v2 = new dcomp**[NUMX+6]; 
+//	for (int sx=0;sx<NUMX+6;sx++) v2[sx] = new dcomp*[NUMY+6];
+//	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v2[sx][sy] = new dcomp[DISTNUMZ+6];
 
 	a = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) a[sx] = new dcomp*[NUMY+6];
@@ -88,11 +88,10 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) b[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) b[sx][sy] = new dcomp[DISTNUMZ+6];
 
-	int states = 2; //TODO ground plus es1 for now
-	wstore = new dcomp***[states]; 
-	for (int n=0;n<states;n++) wstore[n] = new dcomp**[NUMX+6];
-	for (int n=0;n<states;n++) for (int sx=0;sx<NUMX+6;sx++) wstore[n][sx] = new dcomp*[NUMY+6];
-	for (int n=0;n<states;n++) for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+6];
+	wstore = new dcomp***[WAVEMAX]; 
+	for (int n=0;n<WAVEMAX;n++) wstore[n] = new dcomp**[NUMX+6];
+	for (int n=0;n<WAVEMAX;n++) for (int sx=0;sx<NUMX+6;sx++) wstore[n][sx] = new dcomp*[NUMY+6];
+	for (int n=0;n<WAVEMAX;n++) for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+6];
 		
 	return;
 }

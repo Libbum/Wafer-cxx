@@ -484,21 +484,22 @@ void computeObservables(dcomp*** wfnc) {
 
 void getOverlap(dcomp*** wfnc) {
         
-    dcomp beta=0,betaCollect=0; //Ground state
+    dcomp beta=0,betaCollect=0; 
 
 	// compute overlap
-	for (int sx=3;sx<=2+NUMX;sx++) 
-	  for (int sy=3;sy<=2+NUMY;sy++)
-       	    for (int sz=3; sz<=2+DISTNUMZ;sz++) { //TODO: Add a switch for higher states
-                beta += wstore[0][sx][sy][sz]*wfnc[sx][sy][sz];
-            }
+    for (int wnum=0; wnum<WAVENUM; wnum++)
+	    for (int sx=3;sx<=2+NUMX;sx++) 
+	        for (int sy=3;sy<=2+NUMY;sy++)
+                for (int sz=3; sz<=2+DISTNUMZ;sz++) { 
+                    beta += wstore[wnum][sx][sy][sz]*wfnc[sx][sy][sz];
+    }
 	
 	MPI_Reduce(&beta,&betaCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Bcast(&betaCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
 	if (debug == DEBUG_FULL) debug_out << "beta = "<< betaCollect << endl;
     //betaCollect is now beta, a number.
-    //updatePotential(betaCollect);
+    updatePotential(betaCollect);
 }
 
 // main computational solve routine
