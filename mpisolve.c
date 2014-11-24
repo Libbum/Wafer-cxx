@@ -351,17 +351,19 @@ void solveInitialize() {
         //Starting from previously output states. Load lower ones to the store
         for (int ii=0; ii<WAVENUM; ii++) {
 	        if (nodeID==1) { 
-                cout << "Loading converged wavefunction (state " << ii << ") into memory" << endl;
+                cout << "==> Loading converged wavefunction (state " << ii << ") into memory" << endl;
             }
             readWavefunctionBinary(ii);
         }
     }
 	// set initial conditions
 	setInitialConditions(nodeID+1);
-	
+    if (WAVENUM>0) {
+        getOverlap(w);
+    }
 	// output some summary information
 	if (nodeID==1) { 
-	print_line();
+	    print_line();
       	cout << "==> Energy offset epsilon : " << epsilon << endl; 
       	cout << "==> Number of computational nodes : " << numNodes-1 << endl; 
       	cout << "==> DISTNUMZ : " << DISTNUMZ << endl; 
@@ -387,8 +389,8 @@ void reInitSolver() {
 		flush(cout);
     }
 
-    getOverlap(w);
     setInitialConditions(nodeID+1);
+    getOverlap(w);
     
     //reset step
     step = 0;
@@ -494,8 +496,9 @@ void getOverlap(dcomp*** wfnc) {
 	MPI_Reduce(&beta,&betaCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Bcast(&betaCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
+	if (debug == DEBUG_FULL) debug_out << "beta = "<< betaCollect << endl;
     //betaCollect is now beta, a number.
-    updatePotential(betaCollect);
+    //updatePotential(betaCollect);
 }
 
 // main computational solve routine

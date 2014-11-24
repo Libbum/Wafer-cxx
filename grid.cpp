@@ -144,14 +144,10 @@ void updatePotential(dcomp beta)
     for (sx=0;sx<=NUMX+5;sx++)
     for (sy=0;sy<=NUMY+5;sy++)
     for (sz=0; sz<=DISTNUMZ+5;sz++) {
-        v2[sx][sy][sz] = v[sx][sy][sz] + epsilon*abs(beta*beta); //Add epsilon|beta|^2 offset
-        b[sx][sy][sz] = 1./(1.+EPS*v2[sx][sy][sz]/((dcomp) 2.));
-        a[sx][sy][sz] = (1.-EPS*v2[sx][sy][sz]/((dcomp) 2.))*v2[sx][sy][sz];
+        v[sx][sy][sz] = v[sx][sy][sz] + epsilon*abs(beta*beta); //Add epsilon|beta|^2 offset
+        b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
+        a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*v[sx][sy][sz];
     }  
-    // Swap v2 to v
-    tmp = v;
-    v = v2;
-    v2 = tmp; //We don't need this at this stage, but also don't want to loose the pointer
 }
 
 // compute energy of a wave function
