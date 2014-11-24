@@ -25,7 +25,7 @@ typedef std::numeric_limits< double > dbl;
 
 // these global vars are initialized from parameters file
 // defaults set here are overridden by that file
-int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000;
+int    DISTNUMZ=20,NUMX=20,NUMY=20,NUMZ=20,UPDATE=100,SNAPUPDATE=1000,WAVENUM=0,WAVEMAX=5;
 int    POTENTIAL=0,INITCONDTYPE=0,INITSYMMETRY=0,NF=2,SAVEWAVEFNCS=0,RUNTYPE=0,CLUSTSIZE=7,OUTPOT=0,EXCITEDSTATES=0;
 double  A=0.05,EPS=0.001,MINTSTEP=1.e-8,SIG=0.06,MASS=1.0,T=1.0,TC=0.2,SIGMA=1.0,XI=0.0,BOXSIZE=0.0,TOLERANCE=1.e-10,STEPS=40000;
 double  ALX=4.7,ALY=4,ALZ=2.5788; //Aluminium Clusters & Grid Range
@@ -43,7 +43,7 @@ int nodeID,numNodes;
 fstream debug_out;
 
 // debug flag; options are DEBUG_{OFF,ON,FULL}
-int debug = DEBUG_OFF;
+int debug = DEBUG_FULL;
 
 // used for MPI non-blocking sends
 double *leftSendBuffer,*rightSendBuffer;
@@ -78,12 +78,12 @@ int nanErrorCollect=0;
 //grnd-state energy and final time saved in global var after convergence
 dcomp	EGrnd, EOne, timef;
 int step = 0;
-int waveNum = 0; //wavefunction number. Defaults to zero to compute ground.
 
 int main( int argc, char *argv[] ) 
 { 
     int done=0,checksum=0;
     char message[64]; 
+    char label[64];
     char fname[32];
     int exclude[1];
     struct tms starttime,endtime;
@@ -269,7 +269,7 @@ int main( int argc, char *argv[] )
 
 		// the master said hello so now let's get to work
         // Loops for each wavefunction to be calculated
-		for (int ii=0;ii<=1;ii++) { //TODO: Remove harcoded one with n wavefunctions
+		for (int ii=WAVENUM;ii<=WAVEMAX;ii++) { 
             solve();
 	        
             //If there's a nanError, extend EPS and resolve
@@ -284,11 +284,16 @@ int main( int argc, char *argv[] )
             }
         
             //solve() has found the ground state and is stored in w.
-            storeConverged(w,waveNum);
+            storeConverged(w,WAVENUM);
+	        if (SAVEWAVEFNCS==1) {
+		    // save 3d wavefunction for states
+                sprintf(label,"%d_%d",WAVENUM, nodeID); 
+	    	    outputWavefunctionBinary(&wstore[WAVENUM][0],label);
+	        }
             
-            if (ii<1) { //TODO: Remove hardcoded one
-                //Set waveNum flag and go again.
-                waveNum++;
+            if (ii<WAVEMAX) { //TODO: Remove hardcoded one
+                //Set WAVENUM flag and go again.
+                WAVENUM++;
 
                 //Reset values and load new wavefunctions from matlab guess
                 reInitSolver();
@@ -341,7 +346,16 @@ void solveInitialize() {
     }
 	
 	if (nodeID==1) print_line();
-	
+
+    if (WAVENUM>0) {
+        //Starting from previously output states. Load lower ones to the store
+        for (int ii=0; ii<WAVENUM; ii++) {
+	        if (nodeID==1) { 
+                cout << "Loading converged wavefunction (state " << ii << ") into memory" << endl;
+            }
+            readWavefunctionBinary(ii);
+        }
+    }
 	// set initial conditions
 	setInitialConditions(nodeID+1);
 	
@@ -373,8 +387,8 @@ void reInitSolver() {
 		flush(cout);
     }
 
-    setInitialConditions(nodeID+1);
     getOverlap(w);
+    setInitialConditions(nodeID+1);
     
     //reset step
     step = 0;
@@ -421,7 +435,7 @@ void solveRestart() {
 void computeObservables(dcomp*** wfnc) {
 
     // Find overlap with lower level wavefunctions
-    if (waveNum>0) {
+    if (WAVENUM>0) {
         getOverlap(wfnc);
     }
 
@@ -565,17 +579,9 @@ void solve() {
 // solve finalize
 void solveFinalize() {
 
-    char label[64];
 	// this routine currently computes the first excited state energy and wavefunction
 	if (EPS >= MINTSTEP) {
        //Comment if higher order states are wanted
-	    if (SAVEWAVEFNCS==1) {
-		// save 3d wavefunction for states
-	    	for (int ii=0; ii<=waveNum; ii++) {
-                sprintf(label,"%d_%d",ii, nodeID); 
-	    	    outputWavefunctionBinary(&wstore[ii][0],label);
-            }
-	    }
        if (EXCITEDSTATES == 1) {
            //if higher order states are wanted
           findExcitedStates();

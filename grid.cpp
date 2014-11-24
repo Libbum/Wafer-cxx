@@ -119,15 +119,21 @@ void loadPotentialArrays()
 {
     int sx,sy,sz;
 
+    dcomp minima = potential(0,0,0);
+
     for (sx=0;sx<=NUMX+5;sx++)
     for (sy=0;sy<=NUMY+5;sy++)
     for (sz=0; sz<=DISTNUMZ+5;sz++) {
         v[sx][sy][sz] = potential(sx,sy,sz);
         b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
         a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
+        if (real(v[sx][sy][sz])<real(minima)) {
+            minima = v[sx][sy][sz];
+        }
     } 
     
-    calcEnergyOffset();
+    //Get 2*abs(min(potential)) for offset of beta
+    epsilon = 2*abs(real(minima));
 }
 
 //Updates potintial with the current energy penalty
@@ -148,23 +154,6 @@ void updatePotential(dcomp beta)
     v2 = tmp; //We don't need this at this stage, but also don't want to loose the pointer
 }
 
-//Get 2*abs(min(potential)) for offset of beta
-void calcEnergyOffset()
-{
-    int sx,sy,sz;
-    dcomp minima = v[0][0][0];
-
-    for (sx=0;sx<=NUMX+5;sx++)
-    for (sy=0;sy<=NUMY+5;sy++)
-    for (sz=0; sz<=DISTNUMZ+5;sz++) {
-        if (real(v[sx][sy][sz])<real(minima)) {
-            minima = v[sx][sy][sz];
-        }
-    }
-
-    epsilon = 2*abs(real(minima));
-
-}
 // compute energy of a wave function
 dcomp wfncEnergy(dcomp*** wfnc) {
 	dcomp res=0;

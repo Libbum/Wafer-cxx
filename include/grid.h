@@ -63,7 +63,6 @@ void updateInterior(double eps);
 void copyDown();
 void loadPotentialArrays();
 void updatePotential(dcomp beta);
-void calcEnergyOffset();
 void normalizeWavefunction(dcomp*** wfnc);
 void storeConverged(dcomp*** wfnc, int num);
 

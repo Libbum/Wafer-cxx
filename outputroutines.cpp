@@ -59,7 +59,7 @@ void outputSummaryData() {
       cout.precision(dbl::digits10);
       if (POTENTIAL==22) {
           string state;
-          switch (waveNum) {
+          switch (WAVENUM) {
               case 1:
                   state = "First Excited ";
               case 2:

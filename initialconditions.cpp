@@ -57,9 +57,9 @@ void setInitialConditions(int seedMult)
 	switch (INITCONDTYPE) { 
 	  case 0: 
 		// read from file
-	    sprintf(fname,"data/wavefunction_%d_%d.dat",waveNum,nodeID);
+	    sprintf(fname,"data/wavefunction_%d_%d.dat",WAVENUM,nodeID);
 	    input.open(fname, ios::in);
-	    if (nodeID==1) cout << "==> Initial wavefunction (state " << waveNum << ") : From file" << endl;
+	    if (nodeID==1) cout << "==> Initial wavefunction (state " << WAVENUM << ") : From file" << endl;
         //NOTE: numNodes must be the same for this run and the last! 
         //TODO: Check for this if at all possible.
 	    if (!input) {
@@ -297,3 +297,40 @@ void symmetrizeWavefunction()
 		break;
 	}
 }
+
+
+void readWavefunctionBinary(int waveNum) {
+  //waveNum is the state that needs to be read
+  //size of wavefunc is assumed to be in line with current params
+  int tx, ty, z;
+  fstream input; //, debug_out;
+  char fname[255];
+  double tmpre, tmpim;
+
+  //sprintf(fname,"debug/input_%d.txt",nodeID);
+  //debug_out.open(fname, ios::out);
+  // input full 3d wfnc
+  sprintf(fname,"data/wavefunction_%d_%d.dat",waveNum,nodeID);
+  input.open(fname, ios::in|ios::binary);
+
+  for (int sx=3;sx<=2+NUMX;sx++) {
+    for (int sy=3;sy<=2+NUMY;sy++) {
+      for (int sz=3; sz<=2+DISTNUMZ;sz++) {
+                tx = sx-2;
+                ty = sy-2;
+                z=(nodeID-1)*DISTNUMZ + sz-2;
+
+                input.read((char*)&tx, sizeof(int));
+                input.read((char*)&ty, sizeof(int));
+                input.read((char*)&z, sizeof(int));
+                input.read((char*)&tmpre, sizeof(double));
+                input.read((char*)&tmpim, sizeof(double));
+                //debug_out << endl << tx << "," << ty << "," << z << ";" << tmpre << "," << tmpim << endl;
+                wstore[waveNum][tx][ty][z] = dcomp(tmpre,tmpim);
+  }}}
+  input.close();
+  //debug_out.close();
+  return;
+
+}
+

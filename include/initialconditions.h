@@ -14,5 +14,6 @@
 
 void symmetrizeWavefunction();
 void setInitialConditions(int seedMult);
+void readWavefunctionBinary(int waveNum);
 
 #endif /* __initialconditions_h__ */
