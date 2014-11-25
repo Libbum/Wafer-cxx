@@ -29,17 +29,12 @@ dcomp ***w;
 // this holds the updated values of the wavefunction
 dcomp ***W;
 
-// Overlap of converged states
-//dcomp ***beta;
-
 // this holds the snapshots of the wavefunction
 dcomp ****wstore;
 
 // this holds the potential array
 dcomp ***v;
-
-// updated potential variable
-//dcomp ***v2;
+dcomp ***vBase;
 
 // these hold the alpha and beta arrays which are used during updates
 dcomp ***a,***b;
@@ -68,17 +63,13 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) W[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) W[sx][sy] = new dcomp[DISTNUMZ+6];
     
-       // beta = new dcomp**[NUMX+6];
-       // for (int sx=0;sx<NUMX+6;sx++) beta[sx] = new dcomp*[NUMY+6];
-       // for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) beta[sx][sy] = new dcomp[DISTNUMZ+6];
-    
     v = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) v[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v[sx][sy] = new dcomp[DISTNUMZ+6];
 
-//    v2 = new dcomp**[NUMX+6]; 
-//	for (int sx=0;sx<NUMX+6;sx++) v2[sx] = new dcomp*[NUMY+6];
-//	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) v2[sx][sy] = new dcomp[DISTNUMZ+6];
+    vBase = new dcomp**[NUMX+6]; 
+	for (int sx=0;sx<NUMX+6;sx++) vBase[sx] = new dcomp*[NUMY+6];
+	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) vBase[sx][sy] = new dcomp[DISTNUMZ+6];
 
 	a = new dcomp**[NUMX+6]; 
 	for (int sx=0;sx<NUMX+6;sx++) a[sx] = new dcomp*[NUMY+6];
@@ -124,6 +115,7 @@ void loadPotentialArrays()
     for (sy=0;sy<=NUMY+5;sy++)
     for (sz=0; sz<=DISTNUMZ+5;sz++) {
         v[sx][sy][sz] = potential(sx,sy,sz);
+        vBase[sx][sy][sz] = v[sx][sy][sz];
         b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
         a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
         if (real(v[sx][sy][sz])<real(minima)) {
@@ -143,7 +135,7 @@ void updatePotential(dcomp beta)
     for (sx=0;sx<=NUMX+5;sx++)
     for (sy=0;sy<=NUMY+5;sy++)
     for (sz=0; sz<=DISTNUMZ+5;sz++) {
-        v[sx][sy][sz] = v[sx][sy][sz] + epsilon*abs(beta*beta); //Add epsilon|beta|^2 offset
+        v[sx][sy][sz] = vBase[sx][sy][sz] + epsilon*abs(beta*beta); //Add epsilon|beta|^2 offset
         b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
         a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*v[sx][sy][sz];
     }  

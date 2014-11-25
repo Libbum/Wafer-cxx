@@ -17,8 +17,6 @@ extern dcomp ***w;
 
 // this holds the updated values of the wavefunction
 extern dcomp ***W;
-//Overlap of converged states
-//extern dcomp ***beta;
 // this holds the snapshots of the wavefunction
 extern dcomp ****wstore;
 
@@ -27,7 +25,7 @@ extern dcomp ***tmp;
 
 // this holds the potential array
 extern dcomp ***v;
-//extern dcomp ***v2;
+extern dcomp ***vBase;
 
 // these hold the alpha and beta arrays which are used during updates
 extern dcomp ***a,***b;
