@@ -47,6 +47,7 @@ extern double A,STEPS,EPS,MINTSTEP,SIG,MASS,T,TC,SIGMA,XI,TOLERANCE,ALX,ALY,ALZ,
 extern int nodeID, numNodes, debug;
 
 extern dcomp energyCollect;
+extern dcomp betaCollect;
 extern dcomp normalizationCollect;
 extern dcomp vInfinityCollect;
 extern dcomp rRMS2Collect;    // #ad.

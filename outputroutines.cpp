@@ -35,13 +35,14 @@ void outputMeasurements(const double time) {
 	// output to screen
 
 	cout.precision(12);
-	cout.width(dwidth); cout << time;
+	cout.width(20); cout << time;
     if (POTENTIAL==22) {
        cout.width(35); cout << setprecision (dbl::digits10) << ener*1e6/239.2311;
     } else {
        cout.width(35); cout << setprecision (dbl::digits10) << ener;
     }
 	cout.width(15); cout << setprecision (7) << sqrt(real(rRMS2)); 
+	cout.width(25); cout << setprecision (7) << betaCollect; 
 	cout << endl;
 
 }

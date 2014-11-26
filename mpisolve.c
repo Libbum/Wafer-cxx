@@ -69,6 +69,8 @@ dcomp energy=0;		// the local node energy
 dcomp energyCollect=0;		// the total energy
 dcomp normalization=0;		// the local node normalization squared
 dcomp normalizationCollect=(1,1);  // the total normalization squared
+dcomp beta=0;
+dcomp betaCollect=0; 
 dcomp vInfinity=0;		// the local node expectation value of v_infty
 dcomp vInfinityCollect=0;      // the total expectation value of v_infty
 dcomp rRMS2=0;                 // the local node <r^2>  #ad.
@@ -374,9 +376,10 @@ void solveInitialize() {
       	cout << "Standard Deviation of initial wavefunction noise (SIG): " << SIG << endl;
       	cout << "Box Dimensions: X = " << A*NUMX << ", Y = " << A*NUMY << ", Z = " << A*NUMZ << endl;
       	print_line();
-      	cout.width(dwidth); cout << "Time";
-      	cout.width(dwidth); cout << "Energy";
-      	cout.width(dwidth); cout << "r_RMS";   
+      	cout.width(20); cout << "Time";
+      	cout.width(30); cout << "Energy";
+      	cout.width(20); cout << "r_RMS";   
+      	cout.width(20); cout << "Overlap";   
       	cout << endl;
       	print_line();
 	}
@@ -470,10 +473,6 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&rRMS2_im,&rRMS2_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	rRMS2Collect = dcomp(rRMS2_re_collect,rRMS2_im_collect);
     
-    // Find overlap with lower level wavefunctions
-    if (WAVENUM>0) {
-        getOverlap(wfnc);
-    }
 }
 
 void getNormalization(dcomp*** wfnc) {
@@ -490,7 +489,6 @@ void getNormalization(dcomp*** wfnc) {
 
 void getOverlap(dcomp*** wfnc) {
         
-    dcomp beta=0,betaCollect=0; 
 
 	MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
     dcomp norm = sqrt(normalizationCollect);
@@ -612,7 +610,14 @@ void evolve(int nsteps) {
 	
 	for (int i=1;i<=nsteps;i++) {
 		
-		// receive boundary sync
+        // Find overlap with lower level wavefunctions
+        if (WAVENUM>0) {
+            getNormalization(w);
+            getOverlap(w);
+        }
+		
+        
+        // receive boundary sync
 		leftTest=1; 
 		rightTest=1;
 		if (i>1) {
@@ -673,8 +678,6 @@ void evolve(int nsteps) {
 		// copy fields from capital vars (updated) down to lowercase vars (current)
 		copyDown();
 		
-        getNormalization(w);
-        getOverlap(w);
 	}
 	
 }
