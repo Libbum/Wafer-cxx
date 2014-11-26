@@ -77,11 +77,11 @@ void outputSummaryData() {
          cout << "==> " << state << "State Energy : " << fixed << ener*1e6/239.2311 << " (ueV)" << endl;
          cout << "==> " << state << "State Binding Energy : " << binding*1e6/239.2311 << " (ueV)" << endl;
       } else {
-         cout << "==> Ground State Energy : " << fixed << ener << endl;
+         cout << "==> Ground State Energy.. : " << fixed << ener << endl;
          cout << "==> Ground State Binding Energy : " << binding << endl;
       }
-      cout << "==> Ground State r_RMS : " << sqrt(real(rRMS2)) << endl;  // #ad.
-      cout << "==> Ground State L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;  // #ad.
+      cout << "==> r_RMS : " << sqrt(real(rRMS2)) << endl;  // #ad.
+      cout << "==> L/r_RMS : " << float(NUMX)/sqrt(real(rRMS2)) << endl;  // #ad.
 
 }
 

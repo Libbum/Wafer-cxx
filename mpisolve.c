@@ -68,7 +68,7 @@ MPI_Group workers_group;
 dcomp energy=0;		// the local node energy
 dcomp energyCollect=0;		// the total energy
 dcomp normalization=0;		// the local node normalization squared
-dcomp normalizationCollect=0;  // the total normalization squared
+dcomp normalizationCollect=(1,1);  // the total normalization squared
 dcomp vInfinity=0;		// the local node expectation value of v_infty
 dcomp vInfinityCollect=0;      // the total expectation value of v_infty
 dcomp rRMS2=0;                 // the local node <r^2>  #ad.
@@ -288,7 +288,7 @@ int main( int argc, char *argv[] )
 	        if (SAVEWAVEFNCS==1) {
 		    // save 3d wavefunction for states
                 sprintf(label,"%d_%d",WAVENUM, nodeID); 
-	    	    outputWavefunctionBinary(&wstore[WAVENUM][0],label);
+	    	    outputWavefunctionBinary(w,label);
 	        }
             
             if (ii<WAVEMAX) { //TODO: Remove hardcoded one
@@ -358,6 +358,7 @@ void solveInitialize() {
     }
 	// set initial conditions
 	setInitialConditions(nodeID+1);
+    getNormalization(w);
     if (WAVENUM>0) {
         getOverlap(w);
     }
@@ -390,6 +391,7 @@ void reInitSolver() {
     }
 
     setInitialConditions(nodeID+1);
+    getNormalization(w);
     getOverlap(w);
     
     //reset step
@@ -436,11 +438,6 @@ void solveRestart() {
 // reduce observables across nodes to first worker node
 void computeObservables(dcomp*** wfnc) {
 
-    // Find overlap with lower level wavefunctions
-    if (WAVENUM>0) {
-        getOverlap(wfnc);
-    }
-
 	// sum energy across nodes
 	double energy_re=0.,energy_im=0.;
 	double energy_re_collect=0.,energy_im_collect=0.;
@@ -450,17 +447,9 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&energy_re,&energy_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&energy_im,&energy_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	energyCollect = dcomp(energy_re_collect,energy_im_collect);
-	
-	// sum normalization squared across nodes
-	double normalization_re=0.,normalization_im=0.;
-	double normalization_re_collect=0.,normalization_im_collect=0.;
-	normalization = wfncNorm2(wfnc);
-	normalization_re = real(normalization);
-	normalization_im = imag(normalization);
-	MPI_Reduce(&normalization_re,&normalization_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-	MPI_Reduce(&normalization_im,&normalization_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-	normalizationCollect = dcomp(normalization_re_collect,normalization_im_collect);
-	
+    
+    getNormalization(wfnc);	
+
 	// sum expectation across nodes
 	double vInfinity_re=0.,vInfinity_im=0.;
 	double vInfinity_re_collect=0.,vInfinity_im_collect=0.;
@@ -480,24 +469,44 @@ void computeObservables(dcomp*** wfnc) {
 	MPI_Reduce(&rRMS2_re,&rRMS2_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Reduce(&rRMS2_im,&rRMS2_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	rRMS2Collect = dcomp(rRMS2_re_collect,rRMS2_im_collect);
+    
+    // Find overlap with lower level wavefunctions
+    if (WAVENUM>0) {
+        getOverlap(wfnc);
+    }
+}
+
+void getNormalization(dcomp*** wfnc) {
+	// sum normalization squared across nodes
+	double normalization_re=0.,normalization_im=0.;
+	double normalization_re_collect=0.,normalization_im_collect=0.;
+	normalization = wfncNorm2(wfnc);
+	normalization_re = real(normalization);
+	normalization_im = imag(normalization);
+	MPI_Reduce(&normalization_re,&normalization_re_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	MPI_Reduce(&normalization_im,&normalization_im_collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	normalizationCollect = dcomp(normalization_re_collect,normalization_im_collect);
 }
 
 void getOverlap(dcomp*** wfnc) {
         
     dcomp beta=0,betaCollect=0; 
 
+	MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
+    dcomp norm = sqrt(normalizationCollect);
+
 	// compute overlap
     for (int wnum=0; wnum<WAVENUM; wnum++)
 	    for (int sx=3;sx<=2+NUMX;sx++) 
 	        for (int sy=3;sy<=2+NUMY;sy++)
                 for (int sz=3; sz<=2+DISTNUMZ;sz++) { 
-                    beta += wstore[wnum][sx][sy][sz]*wfnc[sx][sy][sz];
+                    beta += (wstore[wnum][sx][sy][sz]*(wfnc[sx][sy][sz] /= norm));
     }
 	
 	MPI_Reduce(&beta,&betaCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Bcast(&betaCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
-	if (debug == DEBUG_FULL) debug_out << "beta = "<< betaCollect << endl;
+    if (debug == DEBUG_FULL) debug_out << "betacol: " << real(betaCollect) << ", norm: " << real(normalizationCollect) << endl;
     //betaCollect is now beta, a number.
     updatePotential(betaCollect);
 }
@@ -664,6 +673,8 @@ void evolve(int nsteps) {
 		// copy fields from capital vars (updated) down to lowercase vars (current)
 		copyDown();
 		
+        getNormalization(w);
+        getOverlap(w);
 	}
 	
 }
