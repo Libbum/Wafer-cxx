@@ -21,7 +21,7 @@ void outputMeasurements(double time);
 void outputSnapshot(dcomp ***wfnc, char* label);
 void outputWavefunction(dcomp ***wfnc, char* label);
 void outputWavefunctionBinary(dcomp ***wfnc, char* label);
-void outputSummaryData();
+void outputSummaryData(int WAVENUM);
 void outputPotential(char* label);
 void outputPotentialBinary(char* label);
 void dumpPotential();

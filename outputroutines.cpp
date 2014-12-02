@@ -47,7 +47,7 @@ void outputMeasurements(const double time) {
 
 }
 
-void outputSummaryData() {
+void outputSummaryData(int WAVENUM) {
 
       dcomp ener = energyCollect/normalizationCollect;
       dcomp binding = ener - vInfinityCollect/normalizationCollect;
@@ -63,18 +63,23 @@ void outputSummaryData() {
           switch (WAVENUM) {
               case 1:
                   state = "First Excited ";
+                  break;
               case 2:
                   state = "Second Excited ";
+                  break;
               case 3:
                   state = "Third Excited ";
+                  break;
               case 4:
                   state = "Fourth Excited ";
+                  break;
               case 5:
                   state = "Fifth Excited ";
+                  break;
               default:
                   state = "Ground ";
+                  break;
          }
-          
          cout << "==> " << state << "State Energy : " << fixed << ener*1e6/239.2311 << " (ueV)" << endl;
          cout << "==> " << state << "State Binding Energy : " << binding*1e6/239.2311 << " (ueV)" << endl;
       } else {

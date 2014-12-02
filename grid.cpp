@@ -79,10 +79,10 @@ void allocateMemory() {
 	for (int sx=0;sx<NUMX+6;sx++) b[sx] = new dcomp*[NUMY+6];
 	for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) b[sx][sy] = new dcomp[DISTNUMZ+6];
 
-	wstore = new dcomp***[WAVEMAX]; 
-	for (int n=0;n<WAVEMAX;n++) wstore[n] = new dcomp**[NUMX+6];
-	for (int n=0;n<WAVEMAX;n++) for (int sx=0;sx<NUMX+6;sx++) wstore[n][sx] = new dcomp*[NUMY+6];
-	for (int n=0;n<WAVEMAX;n++) for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+6];
+	wstore = new dcomp***[WAVEMAX+1]; 
+	for (int n=0;n<=WAVEMAX;n++) wstore[n] = new dcomp**[NUMX+6];
+	for (int n=0;n<=WAVEMAX;n++) for (int sx=0;sx<NUMX+6;sx++) wstore[n][sx] = new dcomp*[NUMY+6];
+	for (int n=0;n<=WAVEMAX;n++) for (int sx=0;sx<NUMX+6;sx++) for (int sy=0;sy<NUMY+6;sy++) wstore[n][sx][sy] = new dcomp[DISTNUMZ+6];
 		
 	return;
 }

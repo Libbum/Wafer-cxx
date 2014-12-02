@@ -285,12 +285,16 @@ int main( int argc, char *argv[] )
                 }
             }
         
+            if (debug == DEBUG_FULL) debug_out << "Solved" << endl;
             //solve() has found the ground state and is stored in w.
             storeConverged(w,WAVENUM);
+            if (debug == DEBUG_FULL) debug_out << "Stored" << endl;
 	        if (SAVEWAVEFNCS==1) {
 		    // save 3d wavefunction for states
                 sprintf(label,"%d_%d",WAVENUM, nodeID); 
+                if (debug == DEBUG_FULL) debug_out << "Label" << endl;
 	    	    outputWavefunctionBinary(w,label);
+                if (debug == DEBUG_FULL) debug_out << "Output" << endl;
 	        }
             
             if (ii<WAVEMAX) { //TODO: Remove hardcoded one
@@ -504,7 +508,6 @@ void getOverlap(dcomp*** wfnc) {
 	MPI_Reduce(&beta,&betaCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
 	MPI_Bcast(&betaCollect, 1, MPI_DOUBLE, 0, workers_comm);
 	
-    if (debug == DEBUG_FULL) debug_out << "betacol: " << real(betaCollect) << ", norm: " << real(normalizationCollect) << endl;
     //betaCollect is now beta, a number.
     updatePotential(betaCollect);
 }
@@ -574,7 +577,7 @@ void solve() {
         }
 
         if (nodeID==1) {
-            outputSummaryData();
+            outputSummaryData(WAVENUM);
         }	
 
     }
@@ -609,12 +612,6 @@ void evolve(int nsteps) {
 	int leftTest,rightTest;
 	
 	for (int i=1;i<=nsteps;i++) {
-		
-        // Find overlap with lower level wavefunctions
-        if (WAVENUM>0) {
-            getNormalization(w);
-            getOverlap(w);
-        }
 		
         
         // receive boundary sync
@@ -678,6 +675,11 @@ void evolve(int nsteps) {
 		// copy fields from capital vars (updated) down to lowercase vars (current)
 		copyDown();
 		
+        // Find overlap with lower level wavefunctions
+        if (WAVENUM>0) {
+            getNormalization(w);
+            getOverlap(w);
+        }
 	}
 	
 }
