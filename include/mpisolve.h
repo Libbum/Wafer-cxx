@@ -79,6 +79,7 @@ void evolve(int);
 void findExcitedStates();
 void getNormalization(dcomp*** wfnc);
 void getOverlap(dcomp*** wfnc);
+void gramSchmidt();
 
 // boundary sync stuff
 void syncBoundaries(dcomp*** wfnc);

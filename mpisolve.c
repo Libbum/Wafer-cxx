@@ -364,10 +364,10 @@ void solveInitialize() {
     }
 	// set initial conditions
 	setInitialConditions(nodeID+1);
-    getNormalization(w);
-    if (WAVENUM>0) {
-        getOverlap(w);
-    }
+    //getNormalization(w);
+    //if (WAVENUM>0) {
+        //getOverlap(w);
+    //}
 	// output some summary information
 	if (nodeID==1) { 
 	    print_line();
@@ -383,7 +383,7 @@ void solveInitialize() {
       	cout.width(20); cout << "Time";
       	cout.width(30); cout << "Energy";
       	cout.width(20); cout << "r_RMS";   
-      	cout.width(20); cout << "Overlap";   
+      	cout.width(20); cout << "Gram-Schmidt";   
       	cout << endl;
       	print_line();
 	}
@@ -398,8 +398,8 @@ void reInitSolver() {
     }
 
     setInitialConditions(nodeID+1);
-    getNormalization(w);
-    getOverlap(w);
+    //getNormalization(w);
+    //getOverlap(w);
     
     //reset step
     step = 0;
@@ -408,9 +408,10 @@ void reInitSolver() {
 	if (nodeID==1) { 
 	print_line();
       	print_line();
-      	cout.width(dwidth); cout << "Time";
-      	cout.width(dwidth); cout << "Energy";
-      	cout.width(dwidth); cout << "r_RMS";   
+      	cout.width(20); cout << "Time";
+      	cout.width(30); cout << "Energy";
+      	cout.width(20); cout << "r_RMS";   
+      	cout.width(20); cout << "Gram-Schmidt";   
       	cout << endl;
       	print_line();
 	}
@@ -431,9 +432,10 @@ void solveRestart() {
 
         if (nodeID==1) { 
             print_line();
-      	    cout.width(dwidth); cout << "Time";
-      	    cout.width(dwidth); cout << "Energy";
-      	    cout.width(dwidth); cout << "r_RMS";   
+      	    cout.width(20); cout << "Time";
+      	    cout.width(30); cout << "Energy";
+      	    cout.width(20); cout << "r_RMS";   
+      	    cout.width(20); cout << "Gram-Schmidt";   
       	    cout << endl;
       	    print_line();
         }
@@ -510,13 +512,45 @@ void getOverlap(dcomp*** wfnc) {
 	
     //betaCollect is now beta, a number.
     updatePotential(betaCollect);
+	
+}
+
+void gramSchmidt() {
+
+    //wfnc is normalised through snapupdate loop, no need to do it again
+    
+	dcomp overlap=0,overlapCollect=0;
+    // compute first excited state
+	//int state = 0;  //Ground state;
+	
+	// compute overlap
+	for (int sx=3;sx<=2+NUMX;sx++) 
+		for (int sy=3;sy<=2+NUMY;sy++)
+       	    for (int sz=3; sz<=2+DISTNUMZ;sz++) 
+				overlap += wstore[0][sx][sy][sz]*w[sx][sy][sz]; //just GS for now
+	
+	MPI_Reduce(&overlap,&overlapCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
+	
+	// subtract overlap
+	for (int sx=0;sx<=NUMX+5;sx++) 
+		for (int sy=0;sy<=NUMY+5;sy++)
+       	    for (int sz=0; sz<=DISTNUMZ+5;sz++) 
+				W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapCollect;
+   
+    //Normalise new wavefunction
+    //getNormalization(W);
+	//MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
+    //normalizeWavefunction(W);
+    copyDown(); 
+	
 }
 
 // main computational solve routine
 void solve() {
 	
 	dcomp energytot,lastenergy = 1.0e50;
-	int done=1; //step=0,
+	int done=1, gs=0;
 	char label[64]; 
 	
 	leftSendBuffer = (double *)malloc( 6 * (NUMX+6) * (NUMY+6) * sizeof(double) );
@@ -529,7 +563,7 @@ void solve() {
 	
 	// evolve lattice in steps of UPDATE and output data along the way
 	do {
-		
+	    gs = 0;	
 		// sync boundaries
 		syncBoundaries(w);
 		
@@ -540,11 +574,23 @@ void solve() {
 		if (step%SNAPUPDATE==0) {
 			// broadcast observables
 			MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
-			MPI_Bcast(&energyCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			// force symmetry
 			symmetrizeWavefunction();
             // normalize wavefunction
             normalizeWavefunction(w);
+			
+            // Orthoganalise wavefunction
+            if (WAVENUM>0) {
+                gramSchmidt();
+                gs = 1;
+		        syncBoundaries(w);
+		        computeObservables(w);
+			    MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
+			    symmetrizeWavefunction();
+                normalizeWavefunction(w);
+            }
+            
+            MPI_Bcast(&energyCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			energytot =  energyCollect/normalizationCollect;
             //break run if we have a nanError - use RMS for check as energy can have both nan and inf issues...
             if (!isfinite(real(energytot))) {
@@ -554,13 +600,15 @@ void solve() {
                 break;
             }
             if (abs(energytot-lastenergy)<TOLERANCE) {
-	            if (nodeID==1) outputMeasurements(step*EPS);
+	            if (nodeID==1) outputMeasurements(step*EPS, gs);
                 break;
 	        } else {
 		        lastenergy = energytot;
 	        }
         }
-        if (nodeID==1) outputMeasurements(step*EPS);
+        if (nodeID==1) {
+            outputMeasurements(step*EPS, gs);
+        }
         if (step<STEPS) evolve(UPDATE);
         step += UPDATE;
                 
@@ -676,10 +724,10 @@ void evolve(int nsteps) {
 		copyDown();
 		
         // Find overlap with lower level wavefunctions
-        if (WAVENUM>0) {
-            getNormalization(w);
-            getOverlap(w);
-        }
+        //if (WAVENUM>0) {
+            //getNormalization(w);
+            //getOverlap(w);
+        //}
 	}
 	
 }

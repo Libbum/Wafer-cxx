@@ -17,7 +17,7 @@
 
 const int dwidth = 25;
 
-void outputMeasurements(double time);
+void outputMeasurements(double time, int ortho);
 void outputSnapshot(dcomp ***wfnc, char* label);
 void outputWavefunction(dcomp ***wfnc, char* label);
 void outputWavefunctionBinary(dcomp ***wfnc, char* label);
