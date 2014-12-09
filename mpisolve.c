@@ -494,7 +494,7 @@ void getNormalization(dcomp*** wfnc) {
 }
 
 void getOverlap(dcomp*** wfnc) {
-        
+    //Here for great justice, but may be removed if new GS works    
 
 	MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
     dcomp norm = sqrt(normalizationCollect);
@@ -517,31 +517,80 @@ void getOverlap(dcomp*** wfnc) {
 
 void gramSchmidt() {
 
-    //wfnc is normalised through snapupdate loop, no need to do it again
+    //w is normalised through snapupdate loop, no need to do it again
     
-	dcomp overlap=0,overlapCollect=0;
-    // compute first excited state
-	//int state = 0;  //Ground state;
+	dcomp overlapGS=0,overlapGSCollect=0;
+	dcomp overlapES1=0,overlapES1Collect=0;
+	dcomp overlapES2=0,overlapES2Collect=0;
+	dcomp overlapES3=0,overlapES3Collect=0;
+	dcomp overlapES4=0,overlapES4Collect=0;
 	
-	// compute overlap
+	// compute overlaps
 	for (int sx=3;sx<=2+NUMX;sx++) 
 		for (int sy=3;sy<=2+NUMY;sy++)
-       	    for (int sz=3; sz<=2+DISTNUMZ;sz++) 
-				overlap += wstore[0][sx][sy][sz]*w[sx][sy][sz]; //just GS for now
-	
-	MPI_Reduce(&overlap,&overlapCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
-	MPI_Bcast(&overlapCollect, 1, MPI_DOUBLE, 0, workers_comm);
+       	    for (int sz=3; sz<=2+DISTNUMZ;sz++) {
+                if (WAVENUM >= 1) {
+                    overlapGS += wstore[0][sx][sy][sz]*w[sx][sy][sz];
+                }
+                if (WAVENUM >= 2) {
+                    overlapES1 += wstore[1][sx][sy][sz]*w[sx][sy][sz];
+                }
+                if (WAVENUM >= 3) {
+                    overlapES2 += wstore[2][sx][sy][sz]*w[sx][sy][sz];
+                }
+                if (WAVENUM >= 4) {
+                    overlapES3 += wstore[3][sx][sy][sz]*w[sx][sy][sz];
+                }
+                if (WAVENUM >= 5) {
+                    overlapES4 += wstore[4][sx][sy][sz]*w[sx][sy][sz];
+                }
+            }
+
+    //collect overlaps
+    if (WAVENUM >= 1) {
+	    MPI_Reduce(&overlapGS,&overlapGSCollect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	    MPI_Bcast(&overlapGSCollect, 1, MPI_DOUBLE, 0, workers_comm);
+    }
+    if (WAVENUM >= 2) {
+	    MPI_Reduce(&overlapES1,&overlapES1Collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	    MPI_Bcast(&overlapES1Collect, 1, MPI_DOUBLE, 0, workers_comm);
+    }
+    if (WAVENUM >= 3) {
+	    MPI_Reduce(&overlapES2,&overlapES2Collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	    MPI_Bcast(&overlapES2Collect, 1, MPI_DOUBLE, 0, workers_comm);
+    }
+    if (WAVENUM >= 4) {
+	    MPI_Reduce(&overlapES3,&overlapES3Collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	    MPI_Bcast(&overlapES3Collect, 1, MPI_DOUBLE, 0, workers_comm);
+    }
+    if (WAVENUM >= 5) {
+	    MPI_Reduce(&overlapES4,&overlapES4Collect,1,MPI_DOUBLE,MPI_SUM,0,workers_comm);
+	    MPI_Bcast(&overlapES4Collect, 1, MPI_DOUBLE, 0, workers_comm);
+    }
 	
 	// subtract overlap
 	for (int sx=0;sx<=NUMX+5;sx++) 
 		for (int sy=0;sy<=NUMY+5;sy++)
-       	    for (int sz=0; sz<=DISTNUMZ+5;sz++) 
-				W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapCollect;
+       	    for (int sz=0; sz<=DISTNUMZ+5;sz++) {
+                switch (WAVENUM) {
+                    case 1:
+                        W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapGSCollect;
+                        break;
+                    case 2:
+                        W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapGSCollect - wstore[1][sx][sy][sz]*overlapES1Collect;
+                        break;
+                    case 3:
+                        W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapGSCollect - wstore[1][sx][sy][sz]*overlapES1Collect - wstore[2][sx][sy][sz]*overlapES2Collect;
+                        break;
+                    case 4:
+                        W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapGSCollect - wstore[1][sx][sy][sz]*overlapES1Collect - wstore[2][sx][sy][sz]*overlapES2Collect - wstore[3][sx][sy][sz]*overlapES3Collect;
+                        break;
+                    case 5:
+                        W[sx][sy][sz] = w[sx][sy][sz] - wstore[0][sx][sy][sz]*overlapGSCollect - wstore[1][sx][sy][sz]*overlapES1Collect - wstore[2][sx][sy][sz]*overlapES2Collect - wstore[3][sx][sy][sz]*overlapES3Collect - wstore[4][sx][sy][sz]*overlapES4Collect;
+                        break;
+                }
+            }
    
-    //Normalise new wavefunction
-    //getNormalization(W);
-	//MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
-    //normalizeWavefunction(W);
     copyDown(); 
 	
 }
@@ -571,7 +620,7 @@ void solve() {
 		computeObservables(w);
                 
 		// Check convergence of ground state energy
-		if (step%SNAPUPDATE==0) {
+		if (step%SNAPUPDATE==0) { //TODO: I think we can do away with SNAPUPDATE now. Kill this if.
 			// broadcast observables
 			MPI_Bcast(&normalizationCollect, 1, MPI_DOUBLE_COMPLEX, 0, workers_comm);
 			// force symmetry
