@@ -57,7 +57,6 @@ void outputSummaryData(int WAVENUM) {
 
       //cout << "==> Total energy : " << energyCollect << endl;
       //cout << "==> Normalization2 : " << normalizationCollect << endl;
-      cout.precision(dbl::digits10);
       if (POTENTIAL==22) {
           string state;
           switch (WAVENUM) {
@@ -80,7 +79,7 @@ void outputSummaryData(int WAVENUM) {
                   state = "Ground ";
                   break;
          }
-         cout << "==> " << state << "State Energy : " << fixed << ener*1e6/239.2311 << " (ueV)" << endl;
+         cout << "==> " << state << "State Energy : " << setprecision (dbl::digits10) << ener*1e6/239.2311 << " (ueV)" << endl;
          cout << "==> " << state << "State Binding Energy : " << binding*1e6/239.2311 << " (ueV)" << endl;
       } else {
          cout << "==> Ground State Energy.. : " << fixed << ener << endl;
