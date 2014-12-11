@@ -361,10 +361,9 @@ void solveInitialize() {
             }
             readWavefunctionBinary(ii);
         }
-    } else {
-	    // set initial conditions
-	    setInitialConditions(nodeID+1);
-    }
+    } 
+	// set initial conditions
+	setInitialConditions(nodeID+1);
 	// output some summary information
 	if (nodeID==1) { 
 	    print_line();
@@ -394,11 +393,7 @@ void reInitSolver() {
 		flush(cout);
     }
    
-    if (WAVENUM>0) {
-        readWavefunctionBinary(WAVENUM);
-    } else {
-        setInitialConditions(nodeID+1);
-    }
+    setInitialConditions(nodeID+1);
     
     //reset step
     step = 0;
@@ -427,11 +422,7 @@ void solveRestart() {
 
     	loadPotentialArrays(); //to update a and b with new eps, wont need to reload cluster data if it's needed though.
         //Reinitialise w and W to ICs (usually rand gaussian)
-        if (WAVENUM>0) {
-            readWavefunctionBinary(WAVENUM);
-        } else {
-            setInitialConditions(nodeID+1);
-        }
+        setInitialConditions(nodeID+1);
 
         if (nodeID==1) { 
             print_line();
