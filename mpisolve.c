@@ -361,13 +361,10 @@ void solveInitialize() {
             }
             readWavefunctionBinary(ii);
         }
+    } else {
+	    // set initial conditions
+	    setInitialConditions(nodeID+1);
     }
-	// set initial conditions
-	setInitialConditions(nodeID+1);
-    //getNormalization(w);
-    //if (WAVENUM>0) {
-        //getOverlap(w);
-    //}
 	// output some summary information
 	if (nodeID==1) { 
 	    print_line();
@@ -396,10 +393,12 @@ void reInitSolver() {
         cout << "Energy converged to tolerance, wavefunction found. Loading higer state." << endl;
 		flush(cout);
     }
-
-    setInitialConditions(nodeID+1);
-    //getNormalization(w);
-    //getOverlap(w);
+   
+    if (WAVENUM>0) {
+        readWavefunctionBinary(WAVENUM);
+    } else {
+        setInitialConditions(nodeID+1);
+    }
     
     //reset step
     step = 0;
@@ -428,7 +427,11 @@ void solveRestart() {
 
     	loadPotentialArrays(); //to update a and b with new eps, wont need to reload cluster data if it's needed though.
         //Reinitialise w and W to ICs (usually rand gaussian)
-        setInitialConditions(nodeID+1);
+        if (WAVENUM>0) {
+            readWavefunctionBinary(WAVENUM);
+        } else {
+            setInitialConditions(nodeID+1);
+        }
 
         if (nodeID==1) { 
             print_line();

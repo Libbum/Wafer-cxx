@@ -303,6 +303,7 @@ void readWavefunctionBinary(int waveNum) {
   //waveNum is the state that needs to be read
   //size of wavefunc is assumed to be in line with current params
   int tx, ty, z;
+  int sx, sy, sz;
   fstream input; //, debug_out;
   char fname[255];
   double tmpre, tmpim;
@@ -330,6 +331,45 @@ void readWavefunctionBinary(int waveNum) {
   }}}
   input.close();
   //debug_out.close();
+	// enforce BCs
+        for (sx=0;sx<=NUMX+5;sx++)
+          for (sy=0;sy<=NUMY+5;sy++) {
+		w[sx][sy][0] = 0;
+		w[sx][sy][1] = 0;
+		w[sx][sy][2] = 0;
+		w[sx][sy][2+DISTNUMZ+1] = 0;
+		w[sx][sy][2+DISTNUMZ+2] = 0;
+		w[sx][sy][2+DISTNUMZ+3] = 0;
+	  }
+
+        for (sz=0;sz<=DISTNUMZ+5;sz++)
+          for (sy=0;sy<=NUMY+5;sy++) {
+		w[0][sy][sz] = 0;
+		w[1][sy][sz] = 0;
+		w[2][sy][sz] = 0;
+		w[2+NUMX+1][sy][sz] = 0;
+		w[2+NUMX+2][sy][sz] = 0;
+		w[2+NUMX+3][sy][sz] = 0;
+	  }
+
+        for (sx=0;sx<=NUMX+5;sx++)
+          for (sz=0;sz<=DISTNUMZ+5;sz++) {
+		w[sx][0][sz] = 0;
+		w[sx][1][sz] = 0;
+		w[sx][2][sz] = 0;
+		w[sx][2+NUMY+1][sz] = 0;
+		w[sx][2+NUMY+2][sz] = 0;
+		w[sx][2+NUMY+3][sz] = 0;
+	  }
+
+	// zero out updated wavefnc for safety's sake
+        for (sx=0;sx<=NUMX+5;sx++)
+          for (sy=0;sy<=NUMY+5;sy++)
+            for (sz=0;sz<=DISTNUMZ+5;sz++)
+		W[sx][sy][sz] = 0;
+
+	// symmetrize the intial condition
+	symmetrizeWavefunction();
   return;
 
 }
