@@ -27,7 +27,7 @@ using namespace std;
 
 typedef std::numeric_limits< double > dbl;
 
-void outputMeasurements(const double time, int ortho) {
+void outputMeasurements(const double time, dcomp laste) {
 
 	dcomp ener = energyCollect/normalizationCollect;
 	dcomp rRMS2 = rRMS2Collect/normalizationCollect;
@@ -42,7 +42,7 @@ void outputMeasurements(const double time, int ortho) {
             cout.width(35); cout << setprecision (dbl::digits10) << ener;
         }
 	cout.width(15); cout << setprecision (7) << sqrt(real(rRMS2)); 
-	cout.width(25); cout << setprecision (7) << ortho; 
+	cout.width(25); cout << setprecision (7) << abs(real(laste)-real(ener)); //Arb units 
 	cout << endl;
 
 }

@@ -379,7 +379,7 @@ void solveInitialize() {
       	cout.width(20); cout << "Time";
       	cout.width(30); cout << "Energy";
       	cout.width(20); cout << "r_RMS";   
-      	cout.width(20); cout << "Gram-Schmidt";   
+      	cout.width(20); cout << "Diff";   
       	cout << endl;
       	print_line();
 	}
@@ -405,7 +405,7 @@ void reInitSolver() {
       	cout.width(20); cout << "Time";
       	cout.width(30); cout << "Energy";
       	cout.width(20); cout << "r_RMS";   
-      	cout.width(20); cout << "Gram-Schmidt";   
+      	cout.width(20); cout << "Diff";   
       	cout << endl;
       	print_line();
 	}
@@ -429,7 +429,7 @@ void solveRestart() {
       	    cout.width(20); cout << "Time";
       	    cout.width(30); cout << "Energy";
       	    cout.width(20); cout << "r_RMS";   
-      	    cout.width(20); cout << "Gram-Schmidt";   
+      	    cout.width(20); cout << "Diff";   
       	    cout << endl;
       	    print_line();
         }
@@ -643,14 +643,14 @@ void solve() {
                 break;
             }
             if (abs(energytot-lastenergy)<TOLERANCE) {
-	            if (nodeID==1) outputMeasurements(step*EPS, gs);
+	            if (nodeID==1) outputMeasurements(step*EPS, lastenergy);
                 break;
 	        } else {
 		        lastenergy = energytot;
 	        }
         }
         if (nodeID==1) {
-            outputMeasurements(step*EPS, gs);
+            outputMeasurements(step*EPS, lastenergy);
         }
         if (step<STEPS) evolve(UPDATE);
         step += UPDATE;
