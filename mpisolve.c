@@ -592,7 +592,7 @@ void gramSchmidt() {
 // main computational solve routine
 void solve() {
 	
-	dcomp energytot,lastenergy = 1.0e50;
+	dcomp energytot,lastenergy,dispenergy = 1.0e50;
 	int done=1, gs=0;
 	char label[64]; 
 	
@@ -646,11 +646,12 @@ void solve() {
 	            if (nodeID==1) outputMeasurements(step*EPS, lastenergy);
                 break;
 	        } else {
+                dispenergy = lastenergy;
 		        lastenergy = energytot;
 	        }
         }
         if (nodeID==1) {
-            outputMeasurements(step*EPS, lastenergy);
+            outputMeasurements(step*EPS, dispenergy);
         }
         if (step<STEPS) evolve(UPDATE);
         step += UPDATE;
