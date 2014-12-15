@@ -18,8 +18,8 @@ EPS		1e-5
 // If using S-M Potential, how far should aEPS take you?
 MINTSTEP     1.e-9
 
-// convergence tolerance for ground state energy
-TOLERANCE	1e-7
+// convergence tolerance for ground state energy (in ueV)
+TOLERANCE	1e-3
 
 // maximum # of steps to take
 STEPS   	1E20
@@ -41,7 +41,7 @@ EXCITEDSTATES   0
 WAVENUM 0 
 
 //Maximum wavenumber, Full run will have five. Starts from 0.
-WAVEMAX 3
+WAVEMAX 5
 
 // Set to one to also dump potential (before calculation for debugging)
 OUTPOT  0
@@ -112,6 +112,6 @@ RUNTYPE  2
 //BOXSIZE  2.5
 
 //Aluminium cluster data
-ALX   1.8
+ALX   1.6
 ALY   500.0
 ALZ   500.0 
