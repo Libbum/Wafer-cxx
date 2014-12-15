@@ -42,7 +42,7 @@ void outputMeasurements(const double time, dcomp laste) {
             cout.width(35); cout << setprecision (dbl::digits10) << ener;
         }
 	cout.width(15); cout << setprecision (7) << sqrt(real(rRMS2)); 
-	cout.width(25); cout << setprecision (7) << abs(real(laste)-real(ener)); //Arb units 
+	cout.width(25); cout << setprecision (7) << abs(real(laste)-real(ener))*1e6/239.2311; //ueV 
 	cout << endl;
 
 }

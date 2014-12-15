@@ -19,16 +19,16 @@ EPS		1e-5
 MINTSTEP     1.e-9
 
 // convergence tolerance for ground state energy
-TOLERANCE	1e-4
+TOLERANCE	1e-7
 
 // maximum # of steps to take
 STEPS   	1E20
 
 // how many steps before recording measurables
-UPDATE		1000
+UPDATE	    1000
 
 // how many steps before dumping all variables to file; "taking a snapshot"
-SNAPUPDATE	300
+SNAPUPDATE   1000	
 
 // set to one to dump the full 3d wavefncs to disk at the end of the run
 SAVEWAVEFNCS	1
@@ -38,10 +38,10 @@ EXCITEDSTATES   0
 
 //Starting wavenumber. New run this should be zero. If ground state is
 //converged, set this to 1 (for example)
-WAVENUM 1 
+WAVENUM 0 
 
 //Maximum wavenumber, Full run will have five. Starts from 0.
-WAVEMAX 1
+WAVEMAX 3
 
 // Set to one to also dump potential (before calculation for debugging)
 OUTPOT  0
@@ -112,6 +112,6 @@ RUNTYPE  2
 //BOXSIZE  2.5
 
 //Aluminium cluster data
-ALX   1.85
+ALX   1.8
 ALY   500.0
 ALZ   500.0 

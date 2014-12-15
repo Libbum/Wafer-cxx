@@ -642,7 +642,7 @@ void solve() {
                 MPI_Bcast(&nanErrorCollect, 1, MPI_INT, 0, workers_comm);
                 break;
             }
-            if (abs(energytot-lastenergy)<TOLERANCE) {
+            if ((abs(energytot-lastenergy)*1e6/239.2311)<TOLERANCE) { //Put this in ueV
 	            if (nodeID==1) outputMeasurements(step*EPS, lastenergy);
                 break;
 	        } else {
