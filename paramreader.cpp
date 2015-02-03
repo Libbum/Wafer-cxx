@@ -38,6 +38,7 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"WAVENUM")==0) WAVENUM=atoi(value);
 	if (strcmp(key,"WAVEMAX")==0) WAVEMAX=atoi(value);
     if (strcmp(key,"RUNTYPE")==0) RUNTYPE=atoi(value);
+    if (strcmp(key,"CLUSTRUN")==0) CLUSTRUN=atoi(value);
     if (strcmp(key,"OUTPOT")==0) OUTPOT=atoi(value);
 	// double/float params
 	if (strcmp(key,"A")==0) A=atof(value);
@@ -172,13 +173,15 @@ void readClusterData(char *filename, int echo) {
     input.close();	
     
     //NUMZ (& DISTNUMZ) Should already be calculated and in params.txt
-    if (BOXSIZE>0) { //Boxsize is set, use it.
-        NUMX = ceil((2*BOXSIZE+A)/A);
-        NUMY = ceil((2*BOXSIZE+A)/A);
-    } else {
-        //use max values of cluster to set new values for NUM{X,Y} 
-        NUMX = ceil((2*xmax+A)/A);
-        NUMY = ceil((2*ymax+A)/A);
+    if (RUNTYPE==1) {
+        if (BOXSIZE>0) { //Boxsize is set, use it.
+            NUMX = ceil((2*BOXSIZE+A)/A);
+            NUMY = ceil((2*BOXSIZE+A)/A);
+        } else {
+            //use max values of cluster to set new values for NUM{X,Y} 
+            NUMX = ceil((2*xmax+A)/A);
+            NUMY = ceil((2*ymax+A)/A);
+        }
     }
 
     return;	

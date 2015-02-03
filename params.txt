@@ -13,13 +13,13 @@ NUMX    204
 A      0.01
 
 // temporal grid spacing - should be <= A*A/3
-EPS		1e-5
+EPS		3e-5
 
 // If using S-M Potential, how far should aEPS take you?
 MINTSTEP     1.e-9
 
 // convergence tolerance for ground state energy (in ueV)
-TOLERANCE	1e-3
+TOLERANCE	1e-4
 
 // maximum # of steps to take
 STEPS   	1E20
@@ -41,7 +41,7 @@ EXCITEDSTATES   0
 WAVENUM 0 
 
 //Maximum wavenumber, Full run will have five. Starts from 0.
-WAVEMAX 5
+WAVEMAX 2
 
 // Set to one to also dump potential (before calculation for debugging)
 OUTPOT  0
@@ -104,14 +104,17 @@ INITSYMMETRY	0
 // Currently Mass of Oxygen in amu 
 MASS  15.9994
 
-// 0 = Bound on AL values, 1 = cluster file, 2 = NUMn override
+// 0 = Bound on AL values, 1 = cluster bounds, 2 = NUMn override
 RUNTYPE  2
 
+//1 for read in of a cluster, 0 for no cluster info
+CLUSTRUN  1
+
 //If reading in a cluster, shall we only calculate a certain region? This
-//value in Angstroms is from the origin to the box perimeter
+//value in Angstroms is from the origin to the box perimeter. (RUNTYPE == 1)
 //BOXSIZE  2.5
 
 //Aluminium cluster data
-ALX   1.6
+ALX   1.4
 ALY   500.0
 ALZ   500.0 
