@@ -439,7 +439,7 @@ dcomp mexHatPotential(double dx, double dy, double dz)
     
    // cluster = (double *)calloc(sizeC*3,sizeof(double));
     //GR2
-    if (RUNTYPE == 1) {
+    if (CLUSTRUN == 1) {
         //generate from cluster data
         dcomp V;
         
