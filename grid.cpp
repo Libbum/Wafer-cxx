@@ -10,7 +10,10 @@
 */
 
 #include <cmath>
-
+#include <cstring>
+#include <stdlib.h>
+#include <fstream>
+	
 #include "mpisolve.h"
 #include "grid.h"
 #include "outputroutines.h"
@@ -108,13 +111,18 @@ void copyDown() {
 void loadPotentialArrays()
 {
     int sx,sy,sz;
-
+    
     dcomp minima = potential(0,0,0);
+    if (POTFILE) {
+        potentialFromFile();
+    }
 
     for (sx=0;sx<=NUMX+5;sx++)
     for (sy=0;sy<=NUMY+5;sy++)
     for (sz=0; sz<=DISTNUMZ+5;sz++) {
-        v[sx][sy][sz] = potential(sx,sy,sz);
+        if (!POTFILE) {
+            v[sx][sy][sz] = potential(sx,sy,sz);
+        }
         vBase[sx][sy][sz] = v[sx][sy][sz];
         b[sx][sy][sz] = 1./(1.+EPS*v[sx][sy][sz]/((dcomp) 2.));
         a[sx][sy][sz] = (1.-EPS*v[sx][sy][sz]/((dcomp) 2.))*b[sx][sy][sz];
@@ -125,6 +133,38 @@ void loadPotentialArrays()
     
     //Get 2*abs(min(potential)) for offset of beta
     epsilon = 2*abs(real(minima));
+}
+
+void potentialFromFile()
+{
+		// read from file
+        string line;
+	    char fname[32];
+	    fstream input, debug_out;
+	    int sx,sy,sz;
+        double pot;
+
+        sprintf(fname,"data/potential_%d.dat",nodeID);
+	    input.open(fname, ios::in);
+	    if (nodeID==1) cout << "==> Potential read from file" << endl;
+	    //TODO: Make a failsafe for this
+        //while( getline( input, line ) ) lines.push_back( line ) ;
+       
+        sprintf(fname,"debug/input_%d.txt",nodeID);
+        debug_out.open(fname, ios::out);
+       
+		for (sx=0;sx<=NUMX+5;sx++)
+			for (sy=0;sy<=NUMY+5;sy++)
+				for (sz=0; sz<=DISTNUMZ+5;sz++) {
+				    getline( input, line );	
+                    pot = atof(line.c_str());
+                    v[sx][sy][sz] = dcomp(pot,0.0);
+
+                    debug_out << sx << " " << sy << " " << sz << " " << v[sx][sy][sz] << endl;
+				}
+        debug_out.close();
+		input.close();
+
 }
 
 //Updates potintial with the current energy penalty

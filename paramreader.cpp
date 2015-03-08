@@ -30,6 +30,7 @@ void setParameter(char *key, const char *value) {
 	if (strcmp(key,"UPDATE")==0) UPDATE=atoi(value);
 	if (strcmp(key,"SNAPUPDATE")==0) SNAPUPDATE=atoi(value);
 	if (strcmp(key,"POTENTIAL")==0) POTENTIAL=atoi(value);
+	if (strcmp(key,"POTFILE")==0) POTFILE=atoi(value);
 	if (strcmp(key,"INITCONDTYPE")==0) INITCONDTYPE=atoi(value);
 	if (strcmp(key,"INITSYMMETRY")==0) INITSYMMETRY=atoi(value);
 	if (strcmp(key,"NF")==0) NF=atoi(value);
