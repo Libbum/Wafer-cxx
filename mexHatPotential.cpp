@@ -291,8 +291,7 @@ dcomp makepot(double *points, double *species, int sizeC)
      
     /* Variables for SM */
     double r;
-    double UBuckTot = 0, URydTot = 0, UEAMTot = 0, UElecNegTot = 0;
-    double rhoEAM[] = {0, 0};
+    double UBuckTot = 0, URydTot = 0, UEAMTot = 0, UElecNegTot = 0, rhoEAM = 0;
 
     /* SM Constants
      * everything in ev or AA
@@ -333,10 +332,22 @@ dcomp makepot(double *points, double *species, int sizeC)
     {
         for (j = 0; j < sizeC; j++) /* over mesh in y*/
         {
-            if (j > i)
-            {
+            if (i != j) {
                 /* find r */
                 r = dist(points+i, points+j, sizeC);
+                /* Density calculation for EAM */
+                if ((r >= RangeEAM[0]) && (r <= RangeEAM[1]))
+                {
+                    if (species[i] == 1) {
+                        rhoEAM += AEAM[0]*pow(r,nEAM)*exp(-BEAM[0]*(r-r0EAM[0])); 
+                    } else {
+                        rhoEAM += AEAM[1]*pow(r,nEAM)*exp(-BEAM[1]*(r-r0EAM[1])); 
+                    }
+                }
+            }
+
+            if (j > i)
+            {
                 
 //if ((j == 1) && (i == 0)) { 
     //double *pointsi, *pointsj;
@@ -386,31 +397,15 @@ dcomp makepot(double *points, double *species, int sizeC)
                         URydTot += -ARyd[1]*(1+BRyd[1]*((r/r0Ryd[1])-1))*exp(-BRyd[1]*((r/r0Ryd[1])-1));
                     }   
                 }
-                if ((r >= RangeEAM[0]) && (r <= RangeEAM[1]))
-                {
-                    rhoEAM[0] = AEAM[0]*pow(r,nEAM)*exp(-BEAM[0]*(r-r0EAM[0])); 
-                    rhoEAM[1] = AEAM[1]*pow(r,nEAM)*exp(-BEAM[1]*(r-r0EAM[1]));
-                    /* check species of i and j to find what EAM params to use. */
-                    
-                    /* UEAM values: 0=Al Al, 1=Al O, 2=O O;
-                     * rhoEAM/AfuncEAM values: 0=Al, 1=O; */
-                    if ((species[i] == 1) && (species[j] == 1))
-                    {
-                        /*Al Al*/
-                        UEAMTot += -(AfuncEAM[0]*2)*sqrt(rhoEAM[0]); 
-                    }
-                    else if ((species[i] == 2) && (species[j] == 2))
-                    {
-                        /*O O*/
-                        UEAMTot += -(AfuncEAM[1]*2)*sqrt(rhoEAM[1]);
-                    }
-                    else
-                    {
-                        /*Al O*/
-                        UEAMTot += -(AfuncEAM[0]*sqrt(rhoEAM[0])+AfuncEAM[1]*sqrt(rhoEAM[1]));
-                    }
-                }
             }
+        }
+        if ((r >= RangeEAM[0]) && (r <= RangeEAM[1])) {
+            if (species[i] == 1) {
+                UEAMTot += -AfuncEAM[0]*sqrt(rhoEAM);
+            } else {
+                UEAMTot += -AfuncEAM[1]*sqrt(rhoEAM);
+            }
+            rhoEAM = 0;{
         }
     }
    
