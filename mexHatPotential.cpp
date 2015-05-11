@@ -405,7 +405,7 @@ dcomp makepot(double *points, double *species, int sizeC)
             } else {
                 UEAMTot += -AfuncEAM[1]*sqrt(rhoEAM);
             }
-            rhoEAM = 0;{
+            rhoEAM = 0;
         }
     }
    
@@ -423,18 +423,19 @@ dcomp makepot(double *points, double *species, int sizeC)
 
 }
 
-dcomp mexHatPotential(double dx, double dy, double dz)
+dcomp mexHatPotential(double dx, double dy, double dz) {
   //dx,dy,dz are the coords of the system centered on the simulation volume
   //Essentially oxycube. Assume NUM is a global. 
-{
-    //Top Al, Bottom Al, 3rd nn Al (X left), 4th nn Al (X right), 5th nn Al (Y left), 6th nn Al (Y right), Oxygen Position
+  
+  //Top Al, Bottom Al, 3rd nn Al (X left), 4th nn Al (X right), 5th nn Al (Y left), 6th nn Al (Y right), Oxygen Position
     //double cluster[][3] = { { 0.0, 0.0, ALZ }, { 0.0, 0.0, -ALZ }, { ALX, 0.0, 0.0 }, { -ALX, 0.0, 0.0 }, { 0.0, ALY, 0.0 }, { 0.0, -ALY, 0.0 }, { ALX*1.5, ALY*1.5, ALZ*1.5 }, { -ALX*1.5, ALY*1.5, ALZ*1.5 }, { ALX*1.5, -ALY*1.5, ALZ*1.5 }, { -ALX*1.5, -ALY*1.5, ALZ*1.5 }, { ALX*1.5, ALY*1.5, -ALZ*1.5 }, { -ALX*1.5, ALY*1.5, -ALZ*1.5 }, { ALX*1.5, -ALY*1.5, -ALZ*1.5 }, { -ALX*1.5, -ALY*1.5, -ALZ*1.5 }, { dx, dy, dz } };
     //NO CAGE 7 49
     
     
    // cluster = (double *)calloc(sizeC*3,sizeof(double));
     //GR2
-    if (CLUSTRUN == 1) {
+    if (CLUSTRUN == 1) 
+    {
         //generate from cluster data
         dcomp V;
         
@@ -447,9 +448,7 @@ dcomp mexHatPotential(double dx, double dy, double dz)
                 *(cluster+(CLUSTSIZE*0)+j) = *(clust+(CLUSTSIZE*0)+j); 
                 *(cluster+(CLUSTSIZE*1)+j) = *(clust+(CLUSTSIZE*1)+j); 
                 *(cluster+(CLUSTSIZE*2)+j) = *(clust+(CLUSTSIZE*2)+j); 
-            }
-            else
-            {
+            } else  {
                 // Delocalised Oxygen 
                 *(cluster+(CLUSTSIZE*0)+j) = dx; 
                 *(cluster+(CLUSTSIZE*1)+j) = dy; 
