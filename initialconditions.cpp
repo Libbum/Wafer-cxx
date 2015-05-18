@@ -317,9 +317,9 @@ void readWavefunctionBinary(int waveNum) {
   for (int sx=3;sx<=2+NUMX;sx++) {
     for (int sy=3;sy<=2+NUMY;sy++) {
       for (int sz=3; sz<=2+DISTNUMZ;sz++) {
-                tx = sx-2;
-                ty = sy-2;
-                z=(nodeID-1)*DISTNUMZ + sz-2;
+                //tx = sx-2;
+                //ty = sy-2;
+                //z=(nodeID-1)*DISTNUMZ + sz-2;
 
                 input.read((char*)&tx, sizeof(int));
                 input.read((char*)&ty, sizeof(int));
@@ -327,49 +327,43 @@ void readWavefunctionBinary(int waveNum) {
                 input.read((char*)&tmpre, sizeof(double));
                 input.read((char*)&tmpim, sizeof(double));
                 //debug_out << endl << tx << "," << ty << "," << z << ";" << tmpre << "," << tmpim << endl;
-                wstore[waveNum][tx][ty][z] = dcomp(tmpre,tmpim);
+                wstore[waveNum][sx][sy][sz] = dcomp(tmpre,tmpim);
   }}}
   input.close();
   //debug_out.close();
+  //
+ //syncBoundaries(wstore[waveNum]);
 	// enforce BCs
-        for (sx=0;sx<=NUMX+5;sx++)
-          for (sy=0;sy<=NUMY+5;sy++) {
-		w[sx][sy][0] = 0;
-		w[sx][sy][1] = 0;
-		w[sx][sy][2] = 0;
-		w[sx][sy][2+DISTNUMZ+1] = 0;
-		w[sx][sy][2+DISTNUMZ+2] = 0;
-		w[sx][sy][2+DISTNUMZ+3] = 0;
-	  }
+        //for (sx=0;sx<=NUMX+5;sx++)
+          //for (sy=0;sy<=NUMY+5;sy++) {
+		//wstore[waveNum][sx][sy][0] = 0;
+		//wstore[waveNum][sx][sy][1] = 0;
+		//wstore[waveNum][sx][sy][2] = 0;
+		//wstore[waveNum][sx][sy][2+DISTNUMZ+1] = 0;
+		//wstore[waveNum][sx][sy][2+DISTNUMZ+2] = 0;
+		//wstore[waveNum][sx][sy][2+DISTNUMZ+3] = 0;
+	  //}
+//
+        //for (sz=0;sz<=DISTNUMZ+5;sz++)
+          //for (sy=0;sy<=NUMY+5;sy++) {
+		//wstore[waveNum][0][sy][sz] = 0;
+		//wstore[waveNum][1][sy][sz] = 0;
+		//wstore[waveNum][2][sy][sz] = 0;
+		//wstore[waveNum][2+NUMX+1][sy][sz] = 0;
+		//wstore[waveNum][2+NUMX+2][sy][sz] = 0;
+		//wstore[waveNum][2+NUMX+3][sy][sz] = 0;
+	  //}
+//
+        //for (sx=0;sx<=NUMX+5;sx++)
+          //for (sz=0;sz<=DISTNUMZ+5;sz++) {
+		//wstore[waveNum][sx][0][sz] = 0;
+		//wstore[waveNum][sx][1][sz] = 0;
+		//wstore[waveNum][sx][2][sz] = 0;
+		//wstore[waveNum][sx][2+NUMY+1][sz] = 0;
+		//wstore[waveNum][sx][2+NUMY+2][sz] = 0;
+		//wstore[waveNum][sx][2+NUMY+3][sz] = 0;
+	  //}
 
-        for (sz=0;sz<=DISTNUMZ+5;sz++)
-          for (sy=0;sy<=NUMY+5;sy++) {
-		w[0][sy][sz] = 0;
-		w[1][sy][sz] = 0;
-		w[2][sy][sz] = 0;
-		w[2+NUMX+1][sy][sz] = 0;
-		w[2+NUMX+2][sy][sz] = 0;
-		w[2+NUMX+3][sy][sz] = 0;
-	  }
-
-        for (sx=0;sx<=NUMX+5;sx++)
-          for (sz=0;sz<=DISTNUMZ+5;sz++) {
-		w[sx][0][sz] = 0;
-		w[sx][1][sz] = 0;
-		w[sx][2][sz] = 0;
-		w[sx][2+NUMY+1][sz] = 0;
-		w[sx][2+NUMY+2][sz] = 0;
-		w[sx][2+NUMY+3][sz] = 0;
-	  }
-
-	// zero out updated wavefnc for safety's sake
-        for (sx=0;sx<=NUMX+5;sx++)
-          for (sy=0;sy<=NUMY+5;sy++)
-            for (sz=0;sz<=DISTNUMZ+5;sz++)
-		W[sx][sy][sz] = 0;
-
-	// symmetrize the intial condition
-	symmetrizeWavefunction();
   return;
 
 }
