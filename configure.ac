@@ -7,13 +7,13 @@ AC_CONFIG_SRCDIR([src/mpisolve.cpp])
 AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
-
+AM_MAINTAINER_MODE([disable])
 
 # Checks for programs.
 #AC_PROG_CXX
 #AC_PROG_CC
 #AC_PROG_CXXCPP
-AX_PROG_CXX_MPI
+AX_PROG_CXX
 AC_LANG([C++])
 
 # Checks for libraries.
