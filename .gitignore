@@ -13,12 +13,13 @@
 *.a
 
 #Autoconf stuff
-/Makefile
+Makefile
 /aclocal.m4
 /autom4te.cache/
 /stamp-h?
 /config.log
 /config.h
+/config.status
 .deps/
 .dirstamp
 *.o
