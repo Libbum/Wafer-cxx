@@ -92,7 +92,8 @@ bin_PROGRAMS = wafer$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_blas.m4 \
-	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/ax_lapack.m4 $(top_srcdir)/m4/ax_mpi.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -179,7 +180,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
-CXXFLAGS = @CXXFLAGS@
+CXXFLAGS = $(DEBUG) $(OPTIMIZATION) $(INCLUDE)
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -204,6 +205,8 @@ LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
+MPICC = @MPICC@
+MPILIBS = @MPILIBS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -272,7 +275,6 @@ top_srcdir = @top_srcdir@
 DEBUG = -Wno-deprecated #-W -Wall -g
 OPTIMIZATION = -funroll-loops -finline-functions -O2
 INCLUDE = -I include 
-AM_CFLAGS = $(DEBUG) $(OPTIMIZATION) $(INCLUDE)
 wafer_SOURCES = intde2.c random.c paramreader.c grid.c outputroutines.c initialconditions.c potential.c mpisolve.c mexHatPotential.c
 all: all-am
 

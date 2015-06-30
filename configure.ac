@@ -33,5 +33,8 @@ AX_LAPACK([AC_MSG_RESULT()], [AC_MSG_WARN([LAPACK library not found])])
 
 LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
 
+# Checks for MPI
+AX_MPI([AC_MSG_RESULT()], [AC_MSG_ERROR([MPI not found])])
+
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
