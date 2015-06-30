@@ -26,6 +26,11 @@
 *.o
 *~
 
+/compile
+/depcomp
+/install-sh
+/missing
+
 
 .*.swp
 mpisolve

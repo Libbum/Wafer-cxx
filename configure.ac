@@ -2,10 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT(wafer, 1.0, https://github.com/Libbum/Wafer/issues)
-AM_INIT_AUTOMAKE(wafer, 1.0)
-AC_CONFIG_SRCDIR([src/])
+AC_INIT([wafer], [1.0], [https://github.com/Libbum/Wafer/issues])
+AC_CONFIG_SRCDIR([src/mpisolve.c])
+AM_INIT_AUTOMAKE
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
+
 
 # Checks for programs.
 AC_PROG_CXX
@@ -26,8 +28,8 @@ AC_CHECK_FUNCS([gethostname pow sqrt])
 
 # Checks for BLAS/LAPACK libraries:
 
-AX_BLAS([], [AC_MSG_ERROR([BLAS library not found])])
-AX_LAPACK([], [AC_MSG_ERROR([LAPACK library not found])])
+AX_BLAS([AC_MSG_RESULT()], [AC_MSG_WARN([BLAS library not found])])
+AX_LAPACK([AC_MSG_RESULT()], [AC_MSG_WARN([LAPACK library not found])])
 
 LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
 
