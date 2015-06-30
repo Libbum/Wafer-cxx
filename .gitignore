@@ -24,6 +24,7 @@ Makefile
 .dirstamp
 *.o
 *~
+src/.deps/
 
 .*.swp
 mpisolve
