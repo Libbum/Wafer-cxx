@@ -11,15 +11,12 @@
 #include <iostream>
 #include <complex>
 
-#if defined(RAIJIN)
-#include <mkl.h>
+/* Prefer MKL over other Lapack implementations */
+#if defined MKL_INT
 #define LP_INT MKL_INT
-#elif defined(TRIFID)
-#define LP_INT int
 #else
-#error "One of RAIJIN or TRIFID must be defined"
+#define LP_INT int
 #endif
-//#include <Accelerate/Accelerate.h> //For Lapack & Blas
 
 using namespace std;
 
