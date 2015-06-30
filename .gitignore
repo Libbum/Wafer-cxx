@@ -19,18 +19,11 @@
 /autom4te.cache/
 /config.*
 /configure
-/m4/
 /stamp-h?
 .deps/
 .dirstamp
 *.o
 *~
-
-/compile
-/depcomp
-/install-sh
-/missing
-
 
 .*.swp
 mpisolve
