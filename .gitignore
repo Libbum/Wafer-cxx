@@ -12,5 +12,20 @@
 *.la
 *.a
 
+#Autoconf stuff
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache/
+/config.*
+/configure
+/m4/
+/stamp-h?
+.deps/
+.dirstamp
+*.o
+*~
+
+
 .*.swp
 mpisolve
