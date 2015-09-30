@@ -3,5 +3,5 @@ OPTIMIZATION = -funroll-loops -finline-functions -O2
 AM_CXXFLAGS = $(DEBUG) $(OPTIMIZATION) $(LIB)
 
 bin_PROGRAMS = wafer 
-wafer_SOURCES = intde2.cpp random.cpp paramreader.cpp grid.cpp outputroutines.cpp initialconditions.cpp potential.cpp mexHatPotential.cpp mpisolve.cpp
+wafer_SOURCES = intde2.cpp random.cpp paramreader.cpp grid.cpp outputroutines.cpp initialconditions.cpp potential.cpp mexHatPotential.cpp mpisolve.cpp grid.h intde2.h mpisolve.h paramreader.h random.h initialconditions.h mexHatPotential.h outputroutines.h potential.h
 
