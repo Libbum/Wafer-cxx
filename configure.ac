@@ -10,11 +10,11 @@ AC_CONFIG_HEADERS([config.h])
 AM_MAINTAINER_MODE([disable])
 
 # Checks for programs.
-#AC_PROG_CXX
-#AC_PROG_CC
-#AC_PROG_CXXCPP
-AX_PROG_CXX
 AC_LANG([C++])
+
+# Checks for MPI (required)
+AC_MSG_NOTICE(Searching for MPI capability...)
+AX_PROG_CXX_MPI([], [AC_MSG_RESULT()], [AC_MSG_ERROR([MPI not found])])
 
 #Compile options
 #AC_ARG_ENABLE(debug, 
@@ -60,11 +60,8 @@ AS_IF([test "x$enable_lapack" = "xyes"], [
     AX_LAPACK([AC_MSG_RESULT()], [AC_MSG_ERROR([LAPACK library not found])])
 ])
 
-# Checks for MPI (required)
-AC_MSG_NOTICE(Searching for MPI capability...)
-AX_MPI([AC_MSG_RESULT()], [AC_MSG_ERROR([MPI not found])])
 
-CXX="$MPICXX"
+#CXX="$MPICXX"
 LIBS="$MPILIBS $LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
 
 AC_CONFIG_FILES([Makefile src/Makefile])
