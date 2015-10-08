@@ -16,7 +16,19 @@ AM_MAINTAINER_MODE([disable])
 AX_PROG_CXX
 AC_LANG([C++])
 
-# Checks for libraries.
+#Compile options
+#AC_ARG_ENABLE(debug, 
+#    [AC_HELP_STRING([--debug-level,Compile with debugging: OFF (default); ON or FULL])],
+#    [case "${enableval}" in
+         
+#THis is auctaully todo. We want to pass through this value to the main file
+#enable_debug=$enableval, enable_debug=no)
+#if test "$enable_debug" = "yes"; then
+#    CFLAGS="-g"
+#    CXXFLAGS="-g"
+#    FFLAGS="-g"
+#    AC_DEFINE(DEBUG,1,[define to enable debugging code])
+#fi
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h sys/time.h unistd.h])
@@ -32,11 +44,24 @@ AC_CHECK_FUNCS([pow sqrt])
 
 # Checks for BLAS/LAPACK libraries:
 
-AX_BLAS([AC_MSG_RESULT()], [AC_MSG_WARN([BLAS library not found])])
-AX_LAPACK([AC_MSG_RESULT()], [AC_MSG_WARN([LAPACK library not found])])
+AC_ARG_ENABLE([blas],
+    AS_HELP_STRING([--enable-blas], [Include BLAS library (using an automatic search)]))
 
+AS_IF([test "x$enable_blas" = "xyes"], [
+    AC_MSG_NOTICE(BLAS support requested. Configuring...)
+    AX_BLAS([AC_MSG_RESULT()], [AC_MSG_ERROR([BLAS library not found])])
+])
 
-# Checks for MPI
+AC_ARG_ENABLE([lapack],
+    AS_HELP_STRING([--enable-lapack], [Include LAPACK library (using an automatic search)]))
+
+AS_IF([test "x$enable_lapack" = "xyes"], [
+    AC_MSG_NOTICE(LAPACK support requested. Configuring...)
+    AX_LAPACK([AC_MSG_RESULT()], [AC_MSG_ERROR([LAPACK library not found])])
+])
+
+# Checks for MPI (required)
+AC_MSG_NOTICE(Searching for MPI capability...)
 AX_MPI([AC_MSG_RESULT()], [AC_MSG_ERROR([MPI not found])])
 
 CXX="$MPICXX"

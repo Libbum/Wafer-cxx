@@ -750,7 +750,9 @@ ac_user_opts='
 enable_option_checking
 enable_maintainer_mode
 enable_dependency_tracking
+enable_blas
 with_blas
+enable_lapack
 with_lapack
 '
       ac_precious_vars='build_alias
@@ -1402,6 +1404,8 @@ Optional Features:
 			  (and sometimes confusing) to the casual installer
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-blas           Include BLAS library (using an automatic search)
+  --enable-lapack         Include LAPACK library (using an automatic search)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2433,7 +2437,19 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-# Checks for libraries.
+#Compile options
+#AC_ARG_ENABLE(debug,
+#    [AC_HELP_STRING([--debug-level,Compile with debugging: OFF (default); ON or FULL])],
+#    [case "${enableval}" in
+
+#THis is auctaully todo. We want to pass through this value to the main file
+#enable_debug=$enableval, enable_debug=no)
+#if test "$enable_debug" = "yes"; then
+#    CFLAGS="-g"
+#    CXXFLAGS="-g"
+#    FFLAGS="-g"
+#    AC_DEFINE(DEBUG,1,[define to enable debugging code])
+#fi
 
 # Checks for header files.
 DEPDIR="${am__leading_dot}deps"
@@ -4696,6 +4712,12 @@ done
 
 # Checks for BLAS/LAPACK libraries:
 
+# Check whether --enable-blas was given.
+if test "${enable_blas+set}" = set; then
+  enableval=$enable_blas;
+fi
+
+
 ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
 ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -6660,6 +6682,10 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+if test "x$enable_blas" = "xyes"; then
+
+    { $as_echo "$as_me:$LINENO: BLAS support requested. Configuring..." >&5
+$as_echo "$as_me: BLAS support requested. Configuring..." >&6;}
 
 
 
@@ -8719,10 +8745,25 @@ $as_echo "" >&6; }
         :
 else
         ax_blas_ok=no
-        { $as_echo "$as_me:$LINENO: WARNING: BLAS library not found" >&5
-$as_echo "$as_me: WARNING: BLAS library not found" >&2;}
+        { { $as_echo "$as_me:$LINENO: error: BLAS library not found" >&5
+$as_echo "$as_me: error: BLAS library not found" >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
+
+fi
+
+
+# Check whether --enable-lapack was given.
+if test "${enable_lapack+set}" = set; then
+  enableval=$enable_lapack;
+fi
+
+
+if test "x$enable_lapack" = "xyes"; then
+
+    { $as_echo "$as_me:$LINENO: LAPACK support requested. Configuring..." >&5
+$as_echo "$as_me: LAPACK support requested. Configuring..." >&6;}
 
 
 ax_lapack_ok=no
@@ -9049,13 +9090,18 @@ $as_echo "" >&6; }
         :
 else
         ax_lapack_ok=no
-        { $as_echo "$as_me:$LINENO: WARNING: LAPACK library not found" >&5
-$as_echo "$as_me: WARNING: LAPACK library not found" >&2;}
+        { { $as_echo "$as_me:$LINENO: error: LAPACK library not found" >&5
+$as_echo "$as_me: error: LAPACK library not found" >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
 
+fi
 
-# Checks for MPI
+
+# Checks for MPI (required)
+{ $as_echo "$as_me:$LINENO: Searching for MPI capability..." >&5
+$as_echo "$as_me: Searching for MPI capability..." >&6;}
 
 
 
