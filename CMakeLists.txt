@@ -1,0 +1,32 @@
+cmake_minimum_required (VERSION 3.1 FATAL_ERROR)
+#set (CMAKE_CXX_STANDARD 14)
+project (Wafer)
+set (Wafer_VERSION_MAJOR 0)
+set (Wafer_VERSION_MINOR 9)
+set (Wafer_VERSION_REVISION 0)
+
+set (CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/Modules/" CACHE PATH "CMake module path" FORCE)
+
+#find_package (Config++ REQUIRED)
+find_package (MPI REQUIRED)
+find_package (LAPACK REQUIRED)
+set (CMAKE_BUILD_TYPE Release)
+
+#include (GetGitRevisionDescription)
+#get_git_head_revision (GIT_REFSPEC GIT_SHA1)
+#configure_file (gitsha1.hpp.in ${CMAKE_BINARY_DIR}/generated/gitsha1.hpp @ONLY)
+#include_directories (${CMAKE_BINARY_DIR}/generated)
+include_directories (${MPI_INCLUDE_PATH})
+
+add_executable (wafer mpisolve.cpp)
+target_link_libraries (veritas ${MPI_LIBRARIES} lapack blas)
+if(MPI_COMPILE_FLAGS)
+  set_target_properties(hello PROPERTIES APPEND COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+endif()
+
+if(MPI_LINK_FLAGS)
+  set_target_properties(hello PROPERTIES APPEND LINK_FLAGS "${MPI_LINK_FLAGS}")
+endif()
+#set_target_properties (veritas PROPERTIES COMPILE_FLAGS -I"${CONFIG++_INCLUDE_DIR}" LINK_FLAGS "${CONFIG++_LIBRARY}")
+set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
+install (TARGETS veritas DESTINATION bin)
