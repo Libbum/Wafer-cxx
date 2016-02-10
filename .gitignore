@@ -14,3 +14,7 @@
 
 .*.swp
 mpisolve
+wafer
+
+build/*
+!build/Modules

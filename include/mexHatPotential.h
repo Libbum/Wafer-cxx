@@ -12,7 +12,7 @@
 typedef complex<double> dcomp;
 extern double ALX,ALY,ALZ;
 
-#if defined(RAIJIN)
+/*#if defined(RAIJIN)
 
 extern "C"
 {
@@ -20,7 +20,7 @@ extern "C"
                          double*,int*,double*,double*,int*);
 }
 
-#elif defined(TRIFID)
+#elif defined(TRIFID) */
 
 extern "C" 
 {
@@ -36,12 +36,13 @@ extern "C"
  void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
                  double*,int*,double*,double*,int*);  
 }
+/*
 
 #else
 
 #error "One of RAIJIN or TRIFID must be defined"
 
-#endif
+#endif */
 
 
 
