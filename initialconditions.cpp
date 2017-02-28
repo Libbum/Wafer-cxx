@@ -3,6 +3,7 @@
    initialconditions.cpp
 
    Copyright (c) Michael Strickland
+   Forked at v2.0; Additions by Tim DuBois
 
    GNU General Public License (GPLv3)
    See detailed text in license directory
