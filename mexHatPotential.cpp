@@ -11,17 +11,12 @@
 #include <iostream>
 #include <complex>
 
+#include "mpisolve.h"
+#include "mexHatPotential.h"
 /* Prefer MKL over other Lapack implementations */
-#if defined MKL_INT
-#define LP_INT MKL_INT
-#else
-#define LP_INT int
-#endif
 
 using namespace std;
 
-#include "mexHatPotential.h"
-#include "mpisolve.h"
 
 
 /* Calculate matrix "\" division using LAPACK */
@@ -31,10 +26,14 @@ void matRightDivide(double *A, double *B, LP_INT M, LP_INT N)
     LP_INT *iPivot;
     LP_INT info;
     iPivot = (LP_INT *)malloc((M+1)*sizeof(LP_INT));
-    
+
+#if defined(USEMKL)
+    info = LAPACKE_dgesv(LAPACK_COL_MAJOR, M, N, A, M, iPivot, B, M); 
+#else
     /* Call LAPACK */
     dgesv_(&M,&N,A,&M,iPivot,B,&M,&info);
     /* B now holds A\B */
+#endif
     
     free(iPivot);
 }
@@ -46,8 +45,12 @@ void matMultiply(double *A, double *B, double *C, int M, int N)
     /* scalar values to use in dgemm */
     double one = 1.0, zero = 0.0;
     
+#if defined(USEMKL)
+    cblas_dgemm(CblasColMajor, (char *)"N", (char *)"N", M, N, M, one, A, M, B, M, zero, C, M);
+#else
     /* Pass arguments to Fortran by reference */
     dgemm_((char *)"N", (char *)"N", &M, &N, &M, &one, A, &M, B, &M, &zero, C, &M);
+#endif
 }
 
 /* Calculate matrix inverse using LAPACK */
@@ -63,6 +66,15 @@ void matInverse(double *A, LP_INT N)
     WORK = (double *)malloc(prod*sizeof(double));
     iPivot = (LP_INT *)malloc((N+1)*sizeof(LP_INT));
     
+#if defined(USINGMKL)
+    /* dgetrf(M,N,A,LDA,IPIV,INFO)
+     * LU decomoposition of a general matrix, which means invert LDA columns of an M by N matrix
+     * called A, sending the pivot indices to IPIV, and spitting error information to INFO. */
+    info = LAPACKE_dgetrf(LAPACK_COL_MAJOR, N, N, A, N, iPivot);
+    
+    /* generate inverse of a matrix given its LU decomposition */
+    info = LAPACKE_dgetri(LAPACK_COL_MAJOR, N, A, N, iPivot);
+#else
     /* dgetrf(M,N,A,LDA,IPIV,INFO)
      * LU decomoposition of a general matrix, which means invert LDA columns of an M by N matrix
      * called A, sending the pivot indices to IPIV, and spitting error information to INFO. */
@@ -70,7 +82,8 @@ void matInverse(double *A, LP_INT N)
     
     /* generate inverse of a matrix given its LU decomposition */
     dgetri_(&N,A,&N,iPivot,WORK,&prod,&info);
-    
+#endif
+
     /* A is now the inverse */
     free(iPivot);
     free(WORK);    

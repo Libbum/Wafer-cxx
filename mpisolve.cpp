@@ -19,7 +19,7 @@
 #include "potential.h"
 #include "outputroutines.h"
 #include "paramreader.h"
-
+#include "gitsha1.hpp"
 
 typedef std::numeric_limits< double > dbl;
 
@@ -114,6 +114,11 @@ int main( int argc, char *argv[] )
     // node 0 is the master
     if (nodeID == 0) {
         times(&starttime); // load start time into starttime structure
+cout << "                    ___" << endl;
+cout << "   __      ____ _  / __\\__ _ __" << endl;
+cout << "   \\ \\ /\\ / / _` |/ _\\/ _ \\ '__|" << endl;
+cout << "    \\ V  V / (_| / / |  __/ |" << endl;
+cout << "     \\_/\\_/ \\__,_\\/   \\___|_|    Current build SHA1: " << GIT_SHA1 << endl << endl;
         print_line();
 	    cout << "Parameters from file" << endl;
 	    print_line();
