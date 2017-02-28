@@ -6,8 +6,8 @@
 
 */
 
-#ifndef __mexHatPotential_h__
-#define __mexHatPotential_h__
+#ifndef __mexHatPotential_hpp__
+#define __mexHatPotential_hpp__
 
 typedef complex<double> dcomp;
 extern double ALX,ALY,ALZ;
@@ -47,4 +47,4 @@ double electroneg(double *system, double *species, int sizeC);
 dcomp makepot(double *points, double *species, int sizeC);
 dcomp mexHatPotential(double dx, double dy, double dz);
 
-#endif /* __mexHatPotential_h__ */
+#endif /* __mexHatPotential_hpp__ */

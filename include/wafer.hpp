@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __mpisolve_h__
-#define __mpisolve_h__
+#ifndef __mpisolve_hpp__
+#define __mpisolve_hpp__
 
 #include <iostream>
 #include <iomanip>
@@ -91,4 +91,4 @@ void receiveRightBoundary();
 void loadRightBoundaryFromBuffer(dcomp*** wfnc);
 void loadLeftBoundaryFromBuffer(dcomp*** wfnc);
 
-#endif /* __mpisolve_h__ */
+#endif /* __mpisolve_hpp__ */

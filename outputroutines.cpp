@@ -21,10 +21,10 @@
 
 using namespace std;
 
-#include "mpisolve.h"
-#include "grid.h"
-#include "outputroutines.h"
-#include "potential.h"
+#include "wafer.hpp"
+#include "grid.hpp"
+#include "outputroutines.hpp"
+#include "potential.hpp"
 
 typedef std::numeric_limits< double > dbl;
 

@@ -11,11 +11,11 @@
 */
 
 
-#ifndef __paramreader_h__
-#define __paramreader_h__
+#ifndef __paramreader_hpp__
+#define __paramreader_hpp__
 
 void readParametersFromFile(char *filename, int echo);
 void readParametersFromCommandLine(int argc, char** argv, int echo);
 void readClusterData(char *filename, int echo);
 
-#endif /* __paramreader_h__ */
+#endif /* __paramreader_hpp__ */

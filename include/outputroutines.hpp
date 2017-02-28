@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __outputroutines_h__
-#define __outputroutines_h__
+#ifndef __outputroutines_hpp__
+#define __outputroutines_hpp__
 
 #include <iostream>
 #include <fstream>
@@ -31,4 +31,4 @@ void print_line();
 // output files
 extern std::fstream energy_out;
 
-#endif /* __outputroutines_h__ */
+#endif /* __outputroutines_hpp__ */

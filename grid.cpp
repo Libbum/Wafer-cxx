@@ -15,11 +15,11 @@
 #include <stdlib.h>
 #include <fstream>
 	
-#include "mpisolve.h"
-#include "grid.h"
-#include "outputroutines.h"
-#include "initialconditions.h"
-#include "potential.h"
+#include "wafer.hpp"
+#include "grid.hpp"
+#include "outputroutines.hpp"
+#include "initialconditions.hpp"
+#include "potential.hpp"
 
 #include <complex>
 

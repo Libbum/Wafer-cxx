@@ -30,10 +30,10 @@
 
 using namespace std;
 
-#include "mpisolve.h"
-#include "grid.h"
-#include "initialconditions.h"
-#include "random.h"
+#include "wafer.hpp"
+#include "grid.hpp"
+#include "initialconditions.hpp"
+#include "random.hpp"
 
 // initializes the variables 
 void setInitialConditions(int seedMult)

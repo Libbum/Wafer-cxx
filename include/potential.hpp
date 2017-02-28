@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __potential_h__
-#define __potential_h__
+#ifndef __potential_hpp__
+#define __potential_hpp__
 
 dcomp potential(int sx, int sy, int sz);
 dcomp potentialSub(int sx, int sy, int sz);
@@ -24,4 +24,4 @@ double phir(double z);
 double psi1(double z);
 double psi2(double z);
 
-#endif /* __potential_h__ */
+#endif /* __potential_hpp__ */

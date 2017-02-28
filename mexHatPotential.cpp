@@ -11,13 +11,10 @@
 #include <iostream>
 #include <complex>
 
-#include "mpisolve.h"
-#include "mexHatPotential.h"
-/* Prefer MKL over other Lapack implementations */
+#include "wafer.hpp"
+#include "mexHatPotential.hpp"
 
 using namespace std;
-
-
 
 /* Calculate matrix "\" division using LAPACK */
 void matRightDivide(double *A, double *B, LP_INT M, LP_INT N)

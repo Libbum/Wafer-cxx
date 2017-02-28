@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __grid_h__
-#define __grid_h__
+#ifndef __grid_hpp__
+#define __grid_hpp__
 
 // this holds the current values of the wavefunction
 extern dcomp ***w;
@@ -66,4 +66,4 @@ void updatePotential(dcomp beta);
 void normalizeWavefunction(dcomp*** wfnc);
 void storeConverged(dcomp*** wfnc, int num);
 
-#endif /* __grid_h__ */
+#endif /* __grid_hpp__ */

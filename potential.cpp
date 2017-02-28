@@ -21,11 +21,11 @@
 
 using namespace std;
 
-#include "mpisolve.h"
-#include "grid.h"
-#include "potential.h"
-#include "intde2.h"
-#include "mexHatPotential.h"
+#include "wafer.hpp"
+#include "grid.hpp"
+#include "potential.hpp"
+#include "intde2.hpp"
+#include "mexHatPotential.hpp"
 
 // used for numerical integration when necessary
 int     lenaw=LENAW;

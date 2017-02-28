@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <complex>
 
-#include "mpisolve.h"
+#include "wafer.hpp"
 
 using namespace std;
 

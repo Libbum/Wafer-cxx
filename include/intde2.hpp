@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __intde2_h__
-#define __intde2_h__
+#ifndef __intde2_hpp__
+#define __intde2_hpp__
 
 #define SMALL   1.0e-12         // used for upperlimit offset in w (0->k) integration
 #define INTACC  1.0e-8          // target integration accuracy
@@ -33,4 +33,4 @@ void intdei(double (*f)(double), double a, double *aw, double *i, double *err);
 void intdeoini(int lenaw, double tiny, double eps, double *aw);
 void intdeo(double (*f)(double), double a, double omega, double *aw, double *i, double *err);
 
-#endif /* __intde2_h__ */
+#endif /* __intde2_hpp__ */

@@ -45,7 +45,7 @@ include_directories (${CMAKE_BINARY_DIR}/generated)
 
 include_directories (include "${MPI_INCLUDE_PATH}" ${CMAKE_BINARY_DIR}/generated)
 
-add_executable (wafer intde2.cpp random.cpp paramreader.cpp grid.cpp outputroutines.cpp initialconditions.cpp potential.cpp mexHatPotential.cpp mpisolve.cpp)
+add_executable (wafer intde2.cpp random.cpp paramreader.cpp grid.cpp outputroutines.cpp initialconditions.cpp potential.cpp mexHatPotential.cpp wafer.cpp)
 if (MKL_FOUND)
    if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
       target_link_libraries (wafer "${MPI_LIBRARIES}" -L${MKLROOT}/lib/intel64 -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm -ldl)
@@ -62,10 +62,5 @@ endif()
 
 set_target_properties (wafer PROPERTIES COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
 
-#if (LAPACK_FOUND)
-#   set_target_properties(wafer PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS} ${LAPACK_LINKER_FLAGS}")
-#else ()
-#   set_target_properties(wafer PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS}")
-#endif ()
 set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 install (TARGETS wafer DESTINATION bin)

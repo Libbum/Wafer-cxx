@@ -2,7 +2,7 @@
  
  Parallelized Finite Difference Time Domain Schrodinger Eq Solver
  
- mpisolve.c
+ wafer.cpp
  
  Copyright (c) Michael Strickland
  Forked at v2.0; Additions by Tim DuBois
@@ -12,13 +12,13 @@
  
  */
 
-#include "mpi.h" 
-#include "mpisolve.h"
-#include "grid.h"
-#include "initialconditions.h"
-#include "potential.h"
-#include "outputroutines.h"
-#include "paramreader.h"
+#include <mpi.h> 
+#include "wafer.hpp"
+#include "grid.hpp"
+#include "initialconditions.hpp"
+#include "potential.hpp"
+#include "outputroutines.hpp"
+#include "paramreader.hpp"
 #include "gitsha1.hpp"
 
 typedef std::numeric_limits< double > dbl;
