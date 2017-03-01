@@ -37,9 +37,9 @@ typedef complex<double> dcomp;
 
 extern "C"
 {
-    
-  void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
-                         double*,int*,double*,double*,int*);
+
+    void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
+            double*,int*,double*,double*,int*);
 }
 
 extern int DISTNUMZ,NUMX,NUMY,NUMZ,UPDATE,SNAPUPDATE,POTENTIAL,INITCONDTYPE,INITSYMMETRY,NF,SAVEWAVEFNCS,RUNTYPE,CLUSTRUN,CLUSTSIZE,OUTPOT,EXCITEDSTATES,WAVENUM,WAVEMAX,POTFILE;

@@ -1,10 +1,10 @@
 /* mexHatPotential.cpp
  * No frills potential builder designed for 3D calculations. dx independant, N independent.
- * Pulled from Matlab Mex routines 
+ * Pulled from Matlab Mex routines
  * Compile:
  * requrired flags for lapack:
  * -llapack -lblas
- * Written by Tim DuBois 24/09/12 
+ * Written by Tim DuBois 24/09/12
  * Updated to N independent version 21/10/13*/
 #include <cmath>
 #include <string>
@@ -25,23 +25,23 @@ void matRightDivide(double *A, double *B, LP_INT M, LP_INT N)
     iPivot = (LP_INT *)malloc((M+1)*sizeof(LP_INT));
 
 #if defined(USEMKL)
-    info = LAPACKE_dgesv(LAPACK_COL_MAJOR, M, N, A, M, iPivot, B, M); 
+    info = LAPACKE_dgesv(LAPACK_COL_MAJOR, M, N, A, M, iPivot, B, M);
 #else
     /* Call LAPACK */
     dgesv_(&M,&N,A,&M,iPivot,B,&M,&info);
     /* B now holds A\B */
 #endif
-    
+
     free(iPivot);
 }
 
 /* Calculate matrix multiplication using BLAS */
 void matMultiply(double *A, double *B, double *C, int M, int N)
 {
-//    char *chn = "N";
+    //    char *chn = "N";
     /* scalar values to use in dgemm */
     double one = 1.0, zero = 0.0;
-    
+
 #if defined(USEMKL)
     cblas_dgemm(CblasColMajor, (char *)"N", (char *)"N", M, N, M, one, A, M, B, M, zero, C, M);
 #else
@@ -57,18 +57,18 @@ void matInverse(double *A, LP_INT N)
     LP_INT *iPivot;   /* inputs to dgetrf */
     LP_INT info;
     LP_INT prod;
-    
+
     /* Create inputs for dgetrf */
     prod = N*N;
     WORK = (double *)malloc(prod*sizeof(double));
     iPivot = (LP_INT *)malloc((N+1)*sizeof(LP_INT));
-    
+
 #if defined(USINGMKL)
     /* dgetrf(M,N,A,LDA,IPIV,INFO)
      * LU decomoposition of a general matrix, which means invert LDA columns of an M by N matrix
      * called A, sending the pivot indices to IPIV, and spitting error information to INFO. */
     info = LAPACKE_dgetrf(LAPACK_COL_MAJOR, N, N, A, N, iPivot);
-    
+
     /* generate inverse of a matrix given its LU decomposition */
     info = LAPACKE_dgetri(LAPACK_COL_MAJOR, N, A, N, iPivot);
 #else
@@ -76,14 +76,14 @@ void matInverse(double *A, LP_INT N)
      * LU decomoposition of a general matrix, which means invert LDA columns of an M by N matrix
      * called A, sending the pivot indices to IPIV, and spitting error information to INFO. */
     dgetrf_(&N,&N,A,&N,iPivot,&info);
-    
+
     /* generate inverse of a matrix given its LU decomposition */
     dgetri_(&N,A,&N,iPivot,WORK,&prod,&info);
 #endif
 
     /* A is now the inverse */
     free(iPivot);
-    free(WORK);    
+    free(WORK);
 }
 
 /* Finds distance between two points */
@@ -101,14 +101,14 @@ void gammasm(double *za, double *zb, double *r, double *gambfa, double *gamfafb)
         double rr;
         double expzetaA,expzetaB;
         rr=1/r[0];
-        
+
         /*fir*/
         expzetaA=exp(-2*za[0]*r[0]);
         expzetaB=exp(-2*zb[0]*r[0]);
-        
+
         /*calculate*/
         gambfa[0] = (expzetaA*(za[0]+rr))+rr;
-        
+
         if (fabs(za[0]-zb[0]) < 1e-8) {
             double zr;
             zr = za[0]*r[0];
@@ -122,7 +122,7 @@ void gammasm(double *za, double *zb, double *r, double *gambfa, double *gamfafb)
             zc2 = pow(rzetasum,2)*pow(rzetadiff,2)*pow(za[0],4)*zb[0];
             zc3 = pow(rzetasum,3)*pow(rzetadiff,3)*pow(zb[0],4)*(3*pow(za[0],2)-pow(zb[0],2));
             zc4 = pow(rzetasum,3)*pow(rzetadiff,3)*pow(za[0],4)*(3*pow(zb[0],2)-pow(za[0],2));
-            
+
             gamfafb[0] = (-(zc1+zc3*rr)*expzetaA-(zc2+zc4*rr)*expzetaB);
         }
     }
@@ -146,16 +146,16 @@ double electroneg(double *system, double *species, int sizeC)
 
     /*Virtually allocated Constant*/
     double *chij;
-    
+
     /* Variables */
     double tmplhs = 0, tmprhs = 0, nmu = 0;
     double rij, gamjfi, gamfifj, jloop;
     int i, j, iatom, jatom, delta;
-    
+
     /*Virtually allocated Variables*/
     double *X, *q, *Vchij, *Vq, *V, *invV, *V1;
-    
-    /*Allocate memory*/    
+
+    /*Allocate memory*/
     chij = (double *)calloc(sizeC,sizeof(double));
     X = (double *)calloc(sizeC,sizeof(double));
     q = (double *)calloc(sizeC,sizeof(double));
@@ -165,14 +165,14 @@ double electroneg(double *system, double *species, int sizeC)
     V = (double *)calloc(sizeC*sizeC,sizeof(double));
     invV = (double *)calloc(sizeC*sizeC,sizeof(double));
     V1 = (double *)calloc(sizeC*sizeC,sizeof(double));
-    
+
     /* Set chij */
     for (i = 0; i<sizeC; i++)
     {
-        if (species[i] == 1) 
+        if (species[i] == 1)
         {
             /* Aluminium */
-            chij[i] = chi[0]; 
+            chij[i] = chi[0];
         }
         else
         {
@@ -180,7 +180,7 @@ double electroneg(double *system, double *species, int sizeC)
             chij[i] = chi[1];
         }
     }
-    
+
     /* Solve B12, B13 and system neutral mu */
     for (i = 0; i<sizeC; i++)
     {
@@ -197,7 +197,7 @@ double electroneg(double *system, double *species, int sizeC)
         jloop = 0;
         for (j = 0; j<sizeC; j++)
         {
-            if (species[j] == 1) 
+            if (species[j] == 1)
             {
                 /* Aluminium */
                 jatom = 0;
@@ -207,7 +207,7 @@ double electroneg(double *system, double *species, int sizeC)
                 /* Oxygen */
                 jatom = 1;
             }
-            
+
             /* For V */
             if (i == j)
             {
@@ -220,7 +220,7 @@ double electroneg(double *system, double *species, int sizeC)
             rij = dist(system+i, system+j, sizeC); /* Calculate distance */
             gammasm(&Xi[iatom],&Xi[jatom],&rij,&gamjfi,&gamfifj); /* call slater orbital solver */
             *(V+(sizeC*j)+i) = J[iatom]*delta+kc*gamfifj; /*V[j][i] V was being built the wrong way, so indexes have been flipped (C vs MATLAB indexing)*/
-            
+
             /* For X */
             if (j != i)
             {
@@ -229,19 +229,19 @@ double electroneg(double *system, double *species, int sizeC)
         }
         X[i] = chi[iatom]+jloop;
     }
-    
+
     /* build copies (Some LAPACK functions use input variables as temp vars and will thus change them) */
     memcpy(Vchij, chij, sizeC*sizeof(double));
     memcpy(invV, V, (sizeC*sizeC)*sizeof(double));
     memcpy(V1, V, (sizeC*sizeC)*sizeof(double));
     /* V\chij */
-    matRightDivide(V1,Vchij,clust,one); 
+    matRightDivide(V1,Vchij,clust,one);
     /* inverse(V) */
     matInverse(invV, clust);
-    
+
     /* Calulate nuetmu */
     /*neutmu = sum(V\chij)/sum(sum(inv(V)));*/
-   
+
     for (i = 0; i<sizeC; i++)
     {
         tmplhs += Vchij[i]; /*sum(V\chij)*/
@@ -254,21 +254,21 @@ double electroneg(double *system, double *species, int sizeC)
 
     /* Calculate q */
     /* q = V\(neutmu-chij); */
-    
+
     for (i = 0; i<sizeC; i++)
     {
         q[i] = nmu-chij[i]; /*nmu-chij*/
     }
-    
+
     memcpy(V1, V, (sizeC*sizeC)*sizeof(double));
     matRightDivide(V1,q,clust,one);
-     
+
     /* Calculate Ess */
     /* Ees = sum(q.*X)+0.5.*sum(V*q.*q); */
-    
+
     /* Find V*q*/
     matMultiply(V, q, Vq, clust, one);
-    
+
     tmplhs = 0;
     tmprhs = 0;
     for (i = 0; i<sizeC; i++)
@@ -276,17 +276,17 @@ double electroneg(double *system, double *species, int sizeC)
         tmplhs += q[i]*X[i]; /* sum(q.*X) */
         tmprhs += Vq[i]*q[i]; /* sum(V*q.*q) */
     }
-    
+
     /*Free allocated variables*/
-    free(chij); 
-    free(X); 
-    free(q); 
-    free(Vchij); 
-    free(Vq); 
+    free(chij);
+    free(X);
+    free(q);
+    free(Vchij);
+    free(Vq);
     free(V);
     free(invV);
     free(V1);
-        
+
     return(tmplhs+0.5*tmprhs); /* Ees */
 }
 
@@ -295,7 +295,7 @@ dcomp makepot(double *points, double *species, int sizeC)
 {
     /* Variables for cluster */
     int i, j, l;
-     
+
     /* Variables for SM */
     double r;
     double UBuckTot = 0, URydTot = 0, UEAMTot = 0, UElecNegTot = 0, rhoEAM = 0;
@@ -311,7 +311,7 @@ dcomp makepot(double *points, double *species, int sizeC)
     double rhoBuck[] = {0.991317,0.443658,0.291065};
     double CBuck[] = {0,0,0};
     double RangeBuck[] = {0,12}; /*20*/
-    
+
     /* Rydberg. Values correspond to:
      * Al	core	Al	core
      * Al	core	O	core
@@ -320,7 +320,7 @@ dcomp makepot(double *points, double *species, int sizeC)
     double BRyd[] = {5.949143672000,9.985407051900,16.822405075464};
     double r0Ryd[] = {3.365875,2.358570,2.005092};
     double RangeRyd[] = {0,12}; /*20*/
-    
+
     /* Many Body EAM. Values correspond to:
      * Al	core	Al	core
      * Al	core	O	core
@@ -331,10 +331,10 @@ dcomp makepot(double *points, double *species, int sizeC)
     double BEAM[] = {2.017519,6.871329};
     double r0EAM[] = {3.365875,2.005092};
     int nEAM = 0;
-    
+
     /* Values correspond to Al core; O core */
     double AfuncEAM[] = {1.987699,2.116850};
-    
+
     for (i = 0; i < sizeC; i++) /* over mesh in x */
     {
         for (j = 0; j < sizeC; j++) /* over mesh in y*/
@@ -346,26 +346,26 @@ dcomp makepot(double *points, double *species, int sizeC)
                 if ((r >= RangeEAM[0]) && (r <= RangeEAM[1]))
                 {
                     if (species[i] == 1) {
-                        rhoEAM += AEAM[0]*pow(r,nEAM)*exp(-BEAM[0]*(r-r0EAM[0])); 
+                        rhoEAM += AEAM[0]*pow(r,nEAM)*exp(-BEAM[0]*(r-r0EAM[0]));
                     } else {
-                        rhoEAM += AEAM[1]*pow(r,nEAM)*exp(-BEAM[1]*(r-r0EAM[1])); 
+                        rhoEAM += AEAM[1]*pow(r,nEAM)*exp(-BEAM[1]*(r-r0EAM[1]));
                     }
                 }
             }
 
             if (j > i)
             {
-                
-//if ((j == 1) && (i == 0)) { 
-    //double *pointsi, *pointsj;
 
-    //pointsi = points+i;
-    //pointsj = points+j;
-    //cout << *pointsj << "," << *(pointsj+8) << "," << *(pointsj+9)  << "," << *(pointsj+10) << "," << *(pointsj+11) << "," << *(pointsj+12) << "," << *(pointsj+13) << "," << *(pointsj+14) << endl;
-    //
-    //return(sqrt(pow(*pointsj-*pointsi,2)+pow(*(pointsj+(sizeC*1))-*(pointsi+(sizeC*1)),2)+pow(*(pointsj+(sizeC*2))-*(pointsi+(sizeC*2)),2)));
-    //cout << sizeC << ", " << species[j] << ", " << *(points) << ", " << *(points+1) << ", " << *(points+2) << endl;
-//}
+                //if ((j == 1) && (i == 0)) {
+                //double *pointsi, *pointsj;
+
+                //pointsi = points+i;
+                //pointsj = points+j;
+                //cout << *pointsj << "," << *(pointsj+8) << "," << *(pointsj+9)  << "," << *(pointsj+10) << "," << *(pointsj+11) << "," << *(pointsj+12) << "," << *(pointsj+13) << "," << *(pointsj+14) << endl;
+                //
+                //return(sqrt(pow(*pointsj-*pointsi,2)+pow(*(pointsj+(sizeC*1))-*(pointsi+(sizeC*1)),2)+pow(*(pointsj+(sizeC*2))-*(pointsi+(sizeC*2)),2)));
+                //cout << sizeC << ", " << species[j] << ", " << *(points) << ", " << *(points+1) << ", " << *(points+2) << endl;
+                //}
                 /* if statements check range. If r is not in the range the
                  * potential is not calculated */
                 if ((r >= RangeBuck[0]) && (r <= RangeBuck[1]))
@@ -402,7 +402,7 @@ dcomp makepot(double *points, double *species, int sizeC)
                     {
                         /*Al O*/
                         URydTot += -ARyd[1]*(1+BRyd[1]*((r/r0Ryd[1])-1))*exp(-BRyd[1]*((r/r0Ryd[1])-1));
-                    }   
+                    }
                 }
             }
         }
@@ -415,52 +415,52 @@ dcomp makepot(double *points, double *species, int sizeC)
             rhoEAM = 0;
         }
     }
-   
+
     UElecNegTot = electroneg(points,species,sizeC);
 
     //Curently potential is all in eV. Check to see if total is > 0, truncate if so.
-    if ((UBuckTot + URydTot + UEAMTot + UElecNegTot) > 0.0) 
+    if ((UBuckTot + URydTot + UEAMTot + UElecNegTot) > 0.0)
     {
-      return (dcomp)0.0;
+        return (dcomp)0.0;
     }
     else
     {
-      return (dcomp)(UBuckTot + URydTot + UEAMTot + UElecNegTot)*239.2311; //return result in eV*Scale Offset
+        return (dcomp)(UBuckTot + URydTot + UEAMTot + UElecNegTot)*239.2311; //return result in eV*Scale Offset
     }
 
 }
 
 dcomp mexHatPotential(double dx, double dy, double dz) {
-  //dx,dy,dz are the coords of the system centered on the simulation volume
-  //Essentially oxycube. Assume NUM is a global. 
-  
-  //Top Al, Bottom Al, 3rd nn Al (X left), 4th nn Al (X right), 5th nn Al (Y left), 6th nn Al (Y right), Oxygen Position
+    //dx,dy,dz are the coords of the system centered on the simulation volume
+    //Essentially oxycube. Assume NUM is a global.
+
+    //Top Al, Bottom Al, 3rd nn Al (X left), 4th nn Al (X right), 5th nn Al (Y left), 6th nn Al (Y right), Oxygen Position
     //double cluster[][3] = { { 0.0, 0.0, ALZ }, { 0.0, 0.0, -ALZ }, { ALX, 0.0, 0.0 }, { -ALX, 0.0, 0.0 }, { 0.0, ALY, 0.0 }, { 0.0, -ALY, 0.0 }, { ALX*1.5, ALY*1.5, ALZ*1.5 }, { -ALX*1.5, ALY*1.5, ALZ*1.5 }, { ALX*1.5, -ALY*1.5, ALZ*1.5 }, { -ALX*1.5, -ALY*1.5, ALZ*1.5 }, { ALX*1.5, ALY*1.5, -ALZ*1.5 }, { -ALX*1.5, ALY*1.5, -ALZ*1.5 }, { ALX*1.5, -ALY*1.5, -ALZ*1.5 }, { -ALX*1.5, -ALY*1.5, -ALZ*1.5 }, { dx, dy, dz } };
     //NO CAGE 7 49
-    
-    
-   // cluster = (double *)calloc(sizeC*3,sizeof(double));
+
+
+    // cluster = (double *)calloc(sizeC*3,sizeof(double));
     //GR2
-    if (CLUSTRUN == 1) 
+    if (CLUSTRUN == 1)
     {
         //generate from cluster data
         dcomp V;
-        
-        double *cluster = (double *)calloc(CLUSTSIZE*3,sizeof(double)); 
+
+        double *cluster = (double *)calloc(CLUSTSIZE*3,sizeof(double));
         for (int j = 0; j<CLUSTSIZE; j++)
         {
             if (j < CLUSTSIZE-1)
             {
-                // Add atoms 
-                *(cluster+(CLUSTSIZE*0)+j) = *(clust+(CLUSTSIZE*0)+j); 
-                *(cluster+(CLUSTSIZE*1)+j) = *(clust+(CLUSTSIZE*1)+j); 
-                *(cluster+(CLUSTSIZE*2)+j) = *(clust+(CLUSTSIZE*2)+j); 
+                // Add atoms
+                *(cluster+(CLUSTSIZE*0)+j) = *(clust+(CLUSTSIZE*0)+j);
+                *(cluster+(CLUSTSIZE*1)+j) = *(clust+(CLUSTSIZE*1)+j);
+                *(cluster+(CLUSTSIZE*2)+j) = *(clust+(CLUSTSIZE*2)+j);
             } else  {
-                // Delocalised Oxygen 
-                *(cluster+(CLUSTSIZE*0)+j) = dx; 
-                *(cluster+(CLUSTSIZE*1)+j) = dy; 
-                *(cluster+(CLUSTSIZE*2)+j) = dz; 
-            }                
+                // Delocalised Oxygen
+                *(cluster+(CLUSTSIZE*0)+j) = dx;
+                *(cluster+(CLUSTSIZE*1)+j) = dy;
+                *(cluster+(CLUSTSIZE*2)+j) = dz;
+            }
         }
 
         V = makepot(cluster,clustSpecies,CLUSTSIZE);

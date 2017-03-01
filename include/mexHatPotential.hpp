@@ -21,19 +21,19 @@ extern double ALX,ALY,ALZ;
 #endif
 
 #if defined(USINGLAPACK)
-extern "C" 
+extern "C"
 {
- void dgesv_(int *n, int *nrhs, double *a, int *lda, int *ipiv, 
-    double *b, int *ldb, int *info );
-  
- int dgetrf_(int *m, int *n, double *a, int *
-      lda, int *ipiv, int *info);
+    void dgesv_(int *n, int *nrhs, double *a, int *lda, int *ipiv,
+            double *b, int *ldb, int *info );
 
- int dgetri_(int *n, double *a, int *lda, int 
-      *ipiv, double *work, int *lwork, int *info);
- 
- void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
-                 double*,int*,double*,double*,int*);  
+    int dgetrf_(int *m, int *n, double *a, int *
+            lda, int *ipiv, int *info);
+
+    int dgetri_(int *n, double *a, int *lda, int
+            *ipiv, double *work, int *lwork, int *info);
+
+    void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
+            double*,int*,double*,double*,int*);
 }
 #endif
 

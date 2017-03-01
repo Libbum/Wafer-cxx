@@ -6,9 +6,9 @@ Numerical Automatic Integrator for Improper Integral
     table     : use
 functions
     intde  : integrator of f(x) over (a,b).
-    intdei : integrator of f(x) over (a,infinity), 
+    intdei : integrator of f(x) over (a,infinity),
                  f(x) is non oscillatory function.
-    intdeo : integrator of f(x) over (a,infinity), 
+    intdeo : integrator of f(x) over (a,infinity),
                  f(x) is oscillatory function.
 */
 
@@ -18,7 +18,7 @@ intde
         I = integral of f(x) over (a,b)
     [declaration]
         void intdeini(int lenaw, double tiny, double eps, double *aw);
-        void intde(double (*f)(double), double a, double b, 
+        void intde(double (*f)(double), double a, double b,
             double *aw, double *i, double *err);
     [usage]
         intdeini(lenaw, tiny, eps, aw);  // initialization of aw
@@ -26,10 +26,10 @@ intde
         intde(f, a, b, aw, &i, &err);
     [parameters]
         lenaw     : length of aw (int)
-        tiny      : minimum value that 1/tiny does not 
+        tiny      : minimum value that 1/tiny does not
                     overflow (double)
         eps       : relative error requested (double)
-        aw        : points and weights of the quadrature 
+        aw        : points and weights of the quadrature
                     formula, aw[0...lenaw-1] (double *)
         f         : integrand f(x) (double (*f)(double))
         a         : lower limit of integration (double)
@@ -38,42 +38,42 @@ intde
         err       : estimate of the absolute error (double *)
     [remarks]
         initial parameters
-            lenaw > 1000, 
+            lenaw > 1000,
             IEEE double :
                 lenaw = 8000;
                 tiny = 1.0e-307;
         function
             f(x) needs to be analytic over (a,b).
         relative error
-            eps is relative error requested excluding 
+            eps is relative error requested excluding
             cancellation of significant digits.
-            i.e. eps means : (absolute error) / 
+            i.e. eps means : (absolute error) /
                              (integral_a^b |f(x)| dx).
             eps does not mean : (absolute error) / I.
         error message
             err >= 0 : normal termination.
             err < 0  : abnormal termination.
                        i.e. convergent error is detected :
-                           1. f(x) or (d/dx)^n f(x) has 
-                              discontinuous points or sharp 
+                           1. f(x) or (d/dx)^n f(x) has
+                              discontinuous points or sharp
                               peaks over (a,b).
-                              you must divide the interval 
+                              you must divide the interval
                               (a,b) at this points.
-                           2. relative error of f(x) is 
+                           2. relative error of f(x) is
                               greater than eps.
-                           3. f(x) has oscillatory factor 
-                              and frequency of the oscillation 
+                           3. f(x) has oscillatory factor
+                              and frequency of the oscillation
                               is very high.
 */
 
 /*
 intdei
     [description]
-        I = integral of f(x) over (a,infinity), 
+        I = integral of f(x) over (a,infinity),
             f(x) has not oscillatory factor.
     [declaration]
         void intdeiini(int lenaw, double tiny, double eps, double *aw);
-        void intdei(double (*f)(double), double a, double *aw, 
+        void intdei(double (*f)(double), double a, double *aw,
             double *i, double *err);
     [usage]
         intdeiini(lenaw, tiny, eps, aw);  // initialization of aw
@@ -81,10 +81,10 @@ intdei
         intdei(f, a, aw, &i, &err);
     [parameters]
         lenaw     : length of aw (int)
-        tiny      : minimum value that 1/tiny does not 
+        tiny      : minimum value that 1/tiny does not
                     overflow (double)
         eps       : relative error requested (double)
-        aw        : points and weights of the quadrature 
+        aw        : points and weights of the quadrature
                     formula, aw[0...lenaw-1] (double *)
         f         : integrand f(x) (double (*f)(double))
         a         : lower limit of integration (double)
@@ -92,44 +92,44 @@ intdei
         err       : estimate of the absolute error (double *)
     [remarks]
         initial parameters
-            lenaw > 1000, 
+            lenaw > 1000,
             IEEE double :
                 lenaw = 8000;
                 tiny = 1.0e-307;
         function
             f(x) needs to be analytic over (a,infinity).
         relative error
-            eps is relative error requested excluding 
+            eps is relative error requested excluding
             cancellation of significant digits.
-            i.e. eps means : (absolute error) / 
+            i.e. eps means : (absolute error) /
                              (integral_a^infinity |f(x)| dx).
             eps does not mean : (absolute error) / I.
         error message
             err >= 0 : normal termination.
             err < 0  : abnormal termination.
                        i.e. convergent error is detected :
-                           1. f(x) or (d/dx)^n f(x) has 
-                              discontinuous points or sharp 
+                           1. f(x) or (d/dx)^n f(x) has
+                              discontinuous points or sharp
                               peaks over (a,infinity).
-                              you must divide the interval 
+                              you must divide the interval
                               (a,infinity) at this points.
-                           2. relative error of f(x) is 
+                           2. relative error of f(x) is
                               greater than eps.
-                           3. f(x) has oscillatory factor 
-                              and decay of f(x) is very slow 
+                           3. f(x) has oscillatory factor
+                              and decay of f(x) is very slow
                               as x -> infinity.
 */
 
 /*
 intdeo
     [description]
-        I = integral of f(x) over (a,infinity), 
+        I = integral of f(x) over (a,infinity),
             f(x) has oscillatory factor :
             f(x) = g(x) * sin(omega * x + theta) as x -> infinity.
     [declaration]
-        void intdeoini(int lenaw, double tiny, double eps, 
+        void intdeoini(int lenaw, double tiny, double eps,
             double *aw);
-        void intdeo(double (*f)(double), double a, double omega, 
+        void intdeo(double (*f)(double), double a, double omega,
             double *aw, double *i, double *err);
     [usage]
         intdeoini(lenaw, tiny, eps, aw);  // initialization of aw
@@ -137,10 +137,10 @@ intdeo
         intdeo(f, a, omega, aw, &i, &err);
     [parameters]
         lenaw     : length of aw (int)
-        tiny      : minimum value that 1/tiny does not 
+        tiny      : minimum value that 1/tiny does not
                     overflow (double)
         eps       : relative error requested (double)
-        aw        : points and weights of the quadrature 
+        aw        : points and weights of the quadrature
                     formula, aw[0...lenaw-1] (double *)
         f         : integrand f(x) (double (*f)(double))
         a         : lower limit of integration (double)
@@ -149,28 +149,28 @@ intdeo
         err       : estimate of the absolute error (double *)
     [remarks]
         initial parameters
-            lenaw > 1000, 
+            lenaw > 1000,
             IEEE double :
                 lenaw = 8000;
                 tiny = 1.0e-307;
         function
             f(x) needs to be analytic over (a,infinity).
         relative error
-            eps is relative error requested excluding 
+            eps is relative error requested excluding
             cancellation of significant digits.
-            i.e. eps means : (absolute error) / 
+            i.e. eps means : (absolute error) /
                              (integral_a^R |f(x)| dx).
             eps does not mean : (absolute error) / I.
         error message
             err >= 0 : normal termination.
             err < 0  : abnormal termination.
                        i.e. convergent error is detected :
-                           1. f(x) or (d/dx)^n f(x) has 
-                              discontinuous points or sharp 
+                           1. f(x) or (d/dx)^n f(x) has
+                              discontinuous points or sharp
                               peaks over (a,infinity).
-                              you must divide the interval 
+                              you must divide the interval
                               (a,infinity) at this points.
-                           2. relative error of f(x) is 
+                           2. relative error of f(x) is
                               greater than eps.
 */
 
@@ -184,7 +184,7 @@ void intdeini(int lenaw, double tiny, double eps, double *aw)
     /* ------------------------------ */
     int noff, nk, k, j;
     double pi2, tinyln, epsln, h0, ehp, ehm, h, t, ep, em, xw, wg;
-    
+
     pi2 = 2 * atan(1.0);
     tinyln = -log(tiny);
     epsln = 1 - log(efs * eps);
@@ -233,12 +233,12 @@ void intdeini(int lenaw, double tiny, double eps, double *aw)
 }
 
 
-void intde(double (*f)(double), double a, double b, double *aw, 
-    double *i, double *err)
+void intde(double (*f)(double), double a, double b, double *aw,
+        double *i, double *err)
 {
     int noff, lenawm, nk, k, j, jtmp, jm, m, klim;
     double epsh, ba, ir, xa, fa, fb, errt, errh, errd, h, iback, irback;
-    
+
     noff = 5;
     lenawm = (int) (aw[0] + 0.5);
     nk = (int) (aw[1] + 0.5);
@@ -337,9 +337,9 @@ void intdeiini(int lenaw, double tiny, double eps, double *aw)
     double efs = 0.1, hoff = 11.0;
     /* ------------------------------ */
     int noff, nk, k, j;
-    double pi4, tinyln, epsln, h0, ehp, ehm, h, t, ep, em, xp, xm, 
-        wp, wm;
-    
+    double pi4, tinyln, epsln, h0, ehp, ehm, h, t, ep, em, xp, xm,
+           wp, wm;
+
     pi4 = atan(1.0);
     tinyln = -log(tiny);
     epsln = 1 - log(efs * eps);
@@ -393,12 +393,12 @@ void intdeiini(int lenaw, double tiny, double eps, double *aw)
 }
 
 
-void intdei(double (*f)(double), double a, double *aw, double *i, 
-    double *err)
+void intdei(double (*f)(double), double a, double *aw, double *i,
+        double *err)
 {
     int noff, lenawm, nk, k, j, jtmp, jm, m, klim;
     double epsh, ir, fp, fm, errt, errh, errd, h, iback, irback;
-    
+
     noff = 5;
     lenawm = (int) (aw[0] + 0.5);
     nk = (int) (aw[1] + 0.5);
@@ -495,9 +495,9 @@ void intdeoini(int lenaw, double tiny, double eps, double *aw)
     double efs = 0.1, enoff = 0.40, pqoff = 2.9, ppoff = -0.72;
     /* ------------------------------ */
     int noff0, nk0, noff, k, nk, j;
-    double pi4, tinyln, epsln, frq4, per2, pp, pq, ehp, ehm, h, t, 
-        ep, em, tk, xw, wg, xa;
-    
+    double pi4, tinyln, epsln, frq4, per2, pp, pq, ehp, ehm, h, t,
+           ep, em, tk, xw, wg, xa;
+
     pi4 = atan(1.0);
     tinyln = -log(tiny);
     epsln = 1 - log(efs * eps);
@@ -570,13 +570,13 @@ void intdeoini(int lenaw, double tiny, double eps, double *aw)
 }
 
 
-void intdeo(double (*f)(double), double a, double omega, double *aw, 
-    double *i, double *err)
+void intdeo(double (*f)(double), double a, double omega, double *aw,
+        double *i, double *err)
 {
     int lenawm, nk0, noff0, nk, noff, lmax, m, k, j, jm, l;
-    double eps, per, perw, w02, ir, h, iback, irback, t, tk, 
-        xa, fm, fp, errh, s0, s1, s2, errd;
-    
+    double eps, per, perw, w02, ir, h, iback, irback, t, tk,
+           xa, fm, fp, errh, s0, s1, s2, errd;
+
     lenawm = (int) (aw[0] + 0.5);
     nk0 = (int) (aw[1] + 0.5);
     noff0 = 6;
