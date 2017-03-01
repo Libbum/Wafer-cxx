@@ -1,6 +1,6 @@
 /*
 
-   mpisolve.h
+   waver.hpp (mpisolve.h)
 
    Copyright (c) Michael Strickland
    Forked at v2.0; Additions by Tim DuBois
@@ -10,8 +10,8 @@
 
 */
 
-#ifndef __mpisolve_hpp__
-#define __mpisolve_hpp__
+#ifndef __wafer_hpp__
+#define __wafer_hpp__
 
 #include <iostream>
 #include <iomanip>
@@ -31,16 +31,33 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-using namespace std;
+#if defined(USINGMKL)
+#include <mkl.h>
+#define LP_INT lapack_int
+#else
+#define LP_INT int
+#endif
 
-typedef complex<double> dcomp;
-
+#if defined(USINGLAPACK)
 extern "C"
 {
+    void dgesv_(int *n, int *nrhs, double *a, int *lda, int *ipiv,
+            double *b, int *ldb, int *info );
+
+    int dgetrf_(int *m, int *n, double *a, int *
+            lda, int *ipiv, int *info);
+
+    int dgetri_(int *n, double *a, int *lda, int
+            *ipiv, double *work, int *lwork, int *info);
 
     void dgemm_(char*,char*,int*,int*,int*,double*,double*,int*,
             double*,int*,double*,double*,int*);
 }
+#endif
+
+using namespace std;
+
+typedef complex<double> dcomp;
 
 extern int DISTNUMZ,NUMX,NUMY,NUMZ,UPDATE,SNAPUPDATE,POTENTIAL,INITCONDTYPE,INITSYMMETRY,NF,SAVEWAVEFNCS,RUNTYPE,CLUSTRUN,CLUSTSIZE,OUTPOT,EXCITEDSTATES,WAVENUM,WAVEMAX,POTFILE;
 extern double A,STEPS,EPS,MINTSTEP,SIG,MASS,T,TC,SIGMA,XI,TOLERANCE,ALX,ALY,ALZ,BOXSIZE;
@@ -91,4 +108,4 @@ void receiveRightBoundary();
 void loadRightBoundaryFromBuffer(dcomp*** wfnc);
 void loadLeftBoundaryFromBuffer(dcomp*** wfnc);
 
-#endif /* __mpisolve_hpp__ */
+#endif /* __wafer_hpp__ */

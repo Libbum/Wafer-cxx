@@ -24,7 +24,7 @@ void matRightDivide(double *A, double *B, LP_INT M, LP_INT N)
     LP_INT info;
     iPivot = (LP_INT *)malloc((M+1)*sizeof(LP_INT));
 
-#if defined(USEMKL)
+#if defined(USINGMKL)
     info = LAPACKE_dgesv(LAPACK_COL_MAJOR, M, N, A, M, iPivot, B, M);
 #else
     /* Call LAPACK */
@@ -42,8 +42,8 @@ void matMultiply(double *A, double *B, double *C, int M, int N)
     /* scalar values to use in dgemm */
     double one = 1.0, zero = 0.0;
 
-#if defined(USEMKL)
-    cblas_dgemm(CblasColMajor, (char *)"N", (char *)"N", M, N, M, one, A, M, B, M, zero, C, M);
+#if defined(USINGMKL)
+    cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, M, N, M, one, A, M, B, M, zero, C, M);
 #else
     /* Pass arguments to Fortran by reference */
     dgemm_((char *)"N", (char *)"N", &M, &N, &M, &one, A, &M, B, &M, &zero, C, &M);

@@ -1,6 +1,6 @@
 /*
 
-   potential.h
+   potential.hpp
 
    Copyright (c) Michael Strickland
    Forked at v2.0; Additions by Tim DuBois
